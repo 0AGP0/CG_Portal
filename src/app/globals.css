@@ -1,8 +1,25 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --primary: #002757;
+  --secondary: #ffc105;
+  --accent: #ff9900;
+  --danger: #e00000;
+  --warning: #ff8a00;
+  --gold: #ffc108;
+  --text-primary: #002757;
+  --text-secondary: #333333;
+  --text-muted: #444444;
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+  --primary-color: #002757;
+  --secondary-color: #ffc105;
+  --accent-color: #ff9900;
 }
 
 @theme inline {
@@ -16,6 +33,9 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
   }
 }
 
@@ -23,4 +43,80 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-gray-50;
+  }
+  
+  p {
+    @apply text-[#333] font-medium;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-[#002757] font-bold;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-[#002757] text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity duration-300 font-medium;
+  }
+  
+  .btn-secondary {
+    @apply bg-[#ffc105] text-[#002757] px-4 py-2 rounded-md hover:opacity-90 transition-opacity duration-300 font-medium;
+  }
+  
+  .btn-accent {
+    @apply bg-[#ff9900] text-white px-4 py-2 rounded-md hover:opacity-90 transition-opacity duration-300 font-medium;
+  }
+
+  .panel {
+    @apply bg-white rounded-lg shadow-lg p-6 border-l-4 border-[#ffc105];
+  }
+
+  .nav-link {
+    @apply flex items-center gap-2 py-3 px-4 rounded-lg hover:bg-[#ffc10520] transition-all duration-300;
+  }
+
+  .nav-link.active {
+    @apply bg-[#002757] text-white;
+  }
+
+  .panel-transition {
+    @apply transition-all duration-500 ease-in-out;
+  }
+  
+  .text-default {
+    @apply text-gray-600;
+  }
+  
+  .text-muted {
+    @apply text-gray-500;
+  }
+
+  .panel {
+    @apply bg-white p-5 rounded-lg shadow mb-4;
+  }
+  
+  .nav-link {
+    @apply flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 font-medium hover:bg-gray-100 transition-colors;
+  }
+  
+  .nav-link.active {
+    @apply bg-blue-50 text-[#002757] font-semibold;
+  }
+  
+  .btn-primary {
+    @apply px-4 py-2 bg-[#002757] text-white rounded-lg hover:bg-[#002757]/90 transition-colors font-medium;
+  }
+  
+  .btn-secondary {
+    @apply px-4 py-2 bg-gray-100 text-[#002757] border border-gray-300 rounded-lg hover:bg-gray-200 transition-colors font-medium;
+  }
+  
+  .btn-sm {
+    @apply px-3 py-1 text-sm;
+  }
 }
