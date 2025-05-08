@@ -1,0 +1,28 @@
+[2025-05-08T13:20:56.724Z] [ERROR] Geçersiz webhook imzası
+{
+  "signature": ""
+}
+[2025-05-08T13:23:18.411Z] [ERROR] Geçersiz webhook imzası
+{
+  "signature": ""
+}
+[2025-05-08T13:33:26.719Z] [ERROR] Email bilgisi eksik
+{
+  "_action": "Send Webhook Notification(#1962)",
+  "_id": 1041,
+  "_model": "res.partner",
+  "id": 1041,
+  "name": "Akif",
+  "x_studio_email": false,
+  "x_studio_mail_adresi": "akifgiraypusat@gmail.com"
+}
+[2025-05-08T13:33:35.841Z] [ERROR] Email bilgisi eksik
+{
+  "_action": "Send Webhook Notification(#1962)",
+  "_id": 1041,
+  "_model": "res.partner",
+  "id": 1041,
+  "name": "Akif",
+  "x_studio_email": false,
+  "x_studio_mail_adresi": "akifgiraypusat@gmail.com"
+}

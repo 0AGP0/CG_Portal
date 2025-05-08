@@ -1,32 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyWebhookSignature } from '@/utils/security';
 import { updateDocumentRecord } from '@/utils/database';
 import { logWebhook, logError } from '@/utils/logger';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const signature = request.headers.get('X-Hub-Signature') || '';
+    const url = new URL(request.url);
+    const secretParam = url.searchParams.get('secret') || '';
+    
+    // Odoo'dan gelen veri formatına uygun olarak email bilgisini çıkartalım
+    const email = body.email || body.x_studio_mail_adresi || null;
+    const documentType = body.document_type || body.x_studio_document_type;
+    const documentUrl = body.document_url || body.x_studio_document_url;
+    const documentName = body.document_name || body.x_studio_document_name || 'Belge';
     
     logWebhook('odoo-webhook-docs', 'success', { 
-      email: body.email, 
-      document_type: body.document_type 
+      email: email, 
+      document_type: documentType 
     });
     
-    // Webhook imzasını doğrula
-    const isValidSignature = verifyWebhookSignature(
-      JSON.stringify(body),
-      signature,
-      process.env.ODOO_WEBHOOK_SECRET || ''
-    );
-    
-    if (!isValidSignature) {
-      logError('Geçersiz doküman webhook imzası', { signature });
-      return NextResponse.json({ error: 'Geçersiz imza' }, { status: 401 });
+    // URL'deki secret parametresini kontrol et
+    if (secretParam !== process.env.ODOO_WEBHOOK_SECRET) {
+      logError('Geçersiz doküman webhook secret parametresi', { secretParam });
+      return NextResponse.json({ error: 'Geçersiz güvenlik anahtarı' }, { status: 401 });
     }
     
     // Gerekli alanların varlığını kontrol et
-    if (!body.email || !body.document_type || !body.document_url) {
+    if (!email || !documentType || !documentUrl) {
       logError('Eksik doküman bilgisi', body);
       return NextResponse.json({ 
         error: 'Email, doküman tipi veya URL bilgisi eksik' 
@@ -35,10 +35,10 @@ export async function POST(request: NextRequest) {
     
     // Doküman bilgisini güncelle
     const result = await updateDocumentRecord({
-      email: body.email,
-      documentType: body.document_type,
-      documentUrl: body.document_url,
-      documentName: body.document_name || 'Belge',
+      email: email,
+      documentType: documentType,
+      documentUrl: documentUrl,
+      documentName: documentName,
       updatedAt: new Date().toISOString()
     });
     

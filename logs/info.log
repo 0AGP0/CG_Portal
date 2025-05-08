@@ -1,0 +1,14 @@
+[2025-05-08T13:20:56.718Z] [INFO] Webhook alındı: odoo-webhook - Durum: success
+{}
+[2025-05-08T13:23:18.408Z] [INFO] Webhook alındı: odoo-webhook - Durum: success
+{}
+[2025-05-08T13:33:26.713Z] [INFO] Webhook alındı: odoo-webhook - Durum: success
+{}
+[2025-05-08T13:33:35.838Z] [INFO] Webhook alındı: odoo-webhook - Durum: success
+{}
+[2025-05-08T13:37:28.294Z] [INFO] Webhook alındı: odoo-webhook - Durum: success
+{
+  "email": "akifgiraypusat@gmail.com",
+  "name": "Akif",
+  "action": "Send Webhook Notification(#1962)"
+}
