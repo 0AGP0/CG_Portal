@@ -2,8 +2,9 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 import Layout from '@/components/Layout';
-import ProtectedPanel from '@/components/ProtectedPanel';
+import { useAuth } from '@/context/AuthContext';
 
 // Animasyon varyantları
 const containerVariants = {
@@ -96,151 +97,157 @@ const processData = {
   ]
 };
 
+// Panel erişimini kontrol eden bileşen
+const ProtectedPanel = ({ children, panelName }: { children: React.ReactNode, panelName: string }) => {
+  const { user, startProcess } = useAuth();
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center p-8 bg-red-50 rounded-lg border border-red-200">
+          <h1 className="text-2xl font-bold text-red-600 mb-4">Erişim Reddedildi</h1>
+          <p className="mb-4">Bu sayfaya erişmek için giriş yapmalısınız.</p>
+          <Link href="/login" className="btn-primary">
+            Giriş Sayfasına Dön
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Süreç başlatılmadıysa blur'lu içerik göster
+  if (!user.processStarted) {
+    return (
+      <div className="relative">
+        {/* Blur'lu içerik */}
+        <div className="filter blur-sm pointer-events-none">
+          {children}
+        </div>
+        
+        {/* Overlay ve "Sürece Başla" butonu */}
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-900 bg-opacity-40 rounded-lg">
+          <div className="text-center p-8 bg-white rounded-lg shadow-xl max-w-md">
+            <h2 className="text-2xl font-bold text-[#002757] mb-4">
+              {panelName} Paneline Erişin
+            </h2>
+            <p className="mb-6 text-gray-600">
+              Bu paneli görüntülemek için önce başvuru sürecinizi başlatmanız gerekiyor. Süreci başlattığınızda danışmanınız size en kısa sürede yardımcı olacaktır.
+            </p>
+            <button 
+              onClick={startProcess}
+              className="px-6 py-3 bg-[#ff9900] text-white rounded-lg hover:bg-[#e68a00] transition-colors font-medium flex items-center gap-2 mx-auto"
+            >
+              <span>Süreci Başlat</span>
+              <span className="text-lg">🚀</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return <>{children}</>;
+};
+
 export default function ProcessPanel() {
   const [expandedStage, setExpandedStage] = useState<number | null>(processData.currentStage);
 
   return (
     <Layout>
-      <ProtectedPanel panelName="Süreç Durumu">
+      <ProtectedPanel panelName="Süreç Takip">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="max-w-4xl mx-auto"
         >
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-[#002757]">Süreç Durumu</h1>
+            <h1 className="text-3xl font-bold text-[#002757]">Süreç Takibi</h1>
             <p className="text-default mt-2">
-              Başvuru sürecinizin güncel durumunu ve aşamalarını buradan takip edebilirsiniz.
+              Başvuru sürecinizin tüm aşamalarını buradan takip edebilirsiniz.
             </p>
           </div>
 
-          {/* Genel İlerleme Durumu */}
+          {/* Süreç İlerleme Aşamaları */}
           <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-            <div className="flex flex-col md:flex-row justify-between mb-6">
-              <div>
-                <h2 className="text-xl font-semibold text-[#002757]">Genel İlerleme</h2>
-                <p className="text-default">Süreç başlangıç: {processData.startDate}</p>
-                <p className="text-default">Tahmini bitiş: {processData.estimatedCompletionDate}</p>
-              </div>
-              <div className="mt-4 md:mt-0">
-                <span className="text-4xl font-bold text-[#ff9900]">{processData.progress}%</span>
-                <p className="text-default">Tamamlandı</p>
-              </div>
-            </div>
-
-            {/* İlerleme Çubuğu */}
-            <div className="w-full bg-gray-200 rounded-full h-4 mb-2">
-              <motion.div 
-                className="bg-[#ffc105] h-4 rounded-full"
-                initial={{ width: 0 }}
-                animate={{ width: `${processData.progress}%` }}
-                transition={{ duration: 1, delay: 0.5 }}
-              />
-            </div>
-            <p className="text-muted text-sm font-medium">
-              {processData.currentStage} / {processData.totalStages} aşama tamamlandı
-            </p>
-          </div>
-
-          {/* Aşama Detayları */}
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="space-y-4"
-          >
-            {processData.stages.map((stage) => (
-              <motion.div 
-                key={stage.id}
-                variants={itemVariants}
-                className={`panel border-l-4 ${
-                  stage.status === 'completed' ? 'border-green-500' : 
-                  stage.status === 'in-progress' ? 'border-[#ffc105]' : 'border-gray-300'
-                } cursor-pointer`}
-                onClick={() => setExpandedStage(expandedStage === stage.id ? null : stage.id)}
-              >
-                <div className="flex items-center">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-4 ${
-                    stage.status === 'completed' ? 'bg-green-100 text-green-600' : 
-                    stage.status === 'in-progress' ? 'bg-yellow-100 text-yellow-600' : 'bg-gray-100 text-gray-500'
-                  }`}>
-                    <span className="text-xl">{stage.icon}</span>
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex justify-between items-center">
-                      <h3 className="font-semibold text-lg">{stage.name}</h3>
-                      <div className="flex items-center">
-                        <span className={`text-sm font-medium ${
-                          stage.status === 'completed' ? 'text-green-600' : 
-                          stage.status === 'in-progress' ? 'text-[#ff9900]' : 'text-[#444]'
+            <h2 className="text-xl font-semibold text-[#002757] mb-4">Genel Süreç Durumu</h2>
+            
+            <div className="relative">
+              {/* İlerleme çubuğu */}
+              <div className="absolute left-7 top-0 bottom-0 w-1 bg-gray-200 z-0"></div>
+              
+              {/* Aşamalar */}
+              <div className="space-y-8 relative z-10">
+                {processData.stages.map((step) => (
+                  <div key={step.id} className="flex">
+                    <div className={`w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0 z-10 ${
+                      step.status === 'completed' ? 'bg-green-500 text-white' :
+                      step.status === 'in-progress' ? 'bg-blue-500 text-white' :
+                      'bg-gray-200 text-gray-500'
+                    }`}>
+                      {step.status === 'completed' ? (
+                        <span className="text-xl">✓</span>
+                      ) : (
+                        <span className="text-sm font-medium">{step.id}</span>
+                      )}
+                    </div>
+                    
+                    <div className="ml-4 flex-1">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className={`font-semibold ${
+                            step.status === 'completed' ? 'text-green-700' :
+                            step.status === 'in-progress' ? 'text-blue-700' :
+                            'text-gray-500'
+                          }`}>
+                            {step.name}
+                          </h3>
+                          <p className="text-default mt-1">{step.description}</p>
+                        </div>
+                        <span className={`px-3 py-1 rounded-full text-sm ${
+                          step.status === 'completed' ? 'bg-green-100 text-green-800' :
+                          step.status === 'in-progress' ? 'bg-blue-100 text-blue-800' :
+                          'bg-gray-100 text-gray-600'
                         }`}>
-                          {stage.status === 'completed' ? 'Tamamlandı' : 
-                           stage.status === 'in-progress' ? 'Devam Ediyor' : 'Bekliyor'}
+                          {step.date}
                         </span>
-                        <button className="ml-2">
-                          <svg 
-                            xmlns="http://www.w3.org/2000/svg" 
-                            className={`h-5 w-5 transition-transform ${expandedStage === stage.id ? 'rotate-180' : ''}`} 
-                            fill="none" 
-                            viewBox="0 0 24 24" 
-                            stroke="currentColor"
-                          >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                          </svg>
-                        </button>
                       </div>
                     </div>
-                    <p className="text-sm font-medium text-[#444]">{stage.date}</p>
                   </div>
-                </div>
-
-                {/* Detay Alanı */}
-                {expandedStage === stage.id && (
-                  <motion.div 
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="mt-4 pt-4 border-t border-gray-200"
-                  >
-                    <p className="text-default">{stage.description}</p>
-                    {stage.status === 'in-progress' && (
-                      <div className="mt-4 flex justify-between">
-                        <button className="btn-primary">
-                          Bekleyen Görevleri Görüntüle
-                        </button>
-                        <button className="btn-secondary">
-                          Belge Yükle
-                        </button>
-                      </div>
-                    )}
-                  </motion.div>
-                )}
-              </motion.div>
-            ))}
-          </motion.div>
-
-          {/* Yardımcı Bilgiler */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1, duration: 0.5 }}
-            className="mt-8 bg-blue-50 p-6 rounded-lg border border-blue-200"
-          >
-            <h3 className="text-lg font-semibold text-[#002757] mb-2">Süreç ile İlgili Sorularınız mı var?</h3>
-            <p className="text-default mb-4">
-              Danışmanınız Ayşe Demir ile iletişime geçebilir veya sık sorulan soruları inceleyebilirsiniz.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <button className="btn-primary">
-                Danışmanınıza Mesaj Gönderin
-              </button>
-              <button className="btn-secondary">
-                Sık Sorulan Sorular
-              </button>
+                ))}
+              </div>
             </div>
-          </motion.div>
+          </div>
+
+          {/* Yapılacaklar Listesi */}
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold text-[#002757] mb-4">Yapılacaklar</h2>
+            
+            <div className="space-y-3">
+              <div className="flex items-center p-3 border border-yellow-200 bg-yellow-50 rounded-md">
+                <span className="text-yellow-500 mr-3 text-lg">⚠️</span>
+                <span className="text-default">Eksik belgeleri 1 hafta içinde yükleyin</span>
+              </div>
+              
+              <div className="flex items-center p-3 border border-blue-200 bg-blue-50 rounded-md">
+                <span className="text-blue-500 mr-3 text-lg">📝</span>
+                <span className="text-default">Vize randevusu için danışmanınızla iletişime geçin</span>
+              </div>
+              
+              <div className="flex items-center p-3 border border-green-200 bg-green-50 rounded-md">
+                <span className="text-green-500 mr-3 text-lg">🗓️</span>
+                <span className="text-default">Vize randevunuz için önümüzdeki tarihler kontrol ediliyor</span>
+              </div>
+            </div>
+            
+            <div className="mt-6">
+              <Link 
+                href="/dashboard/messages" 
+                className="btn-primary inline-block w-full text-center"
+              >
+                Danışmanla İletişime Geç
+              </Link>
+            </div>
+          </div>
         </motion.div>
       </ProtectedPanel>
     </Layout>

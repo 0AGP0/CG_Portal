@@ -1,0 +1,17 @@
+{
+  "advisors": [
+    {
+      "id": "adv-1",
+      "email": "emre.danisman@example.com",
+      "name": "Emre Danışman",
+      "studentIds": [
+        "akifgiraypusat@gmail.com",
+        "burcu.shut@gmail.com",
+        "bbb@gmail.com",
+        "aaa@gmail.com",
+        "ccc@gmail.com"
+      ],
+      "updatedAt": "2025-05-19T23:51:47.252Z"
+    }
+  ]
+}

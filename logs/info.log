@@ -12,3 +12,92 @@
   "name": "Akif",
   "action": "Send Webhook Notification(#1962)"
 }
+[2025-05-20T10:57:34.674Z] [INFO] Mesaj gönderme isteği alındı
+[2025-05-20T10:57:34.677Z] [INFO] Mesaj istenen parametreler:
+{
+  "sender": "akifgiraypusat@gmail.com",
+  "receiver": "ahmet.satis@example.com",
+  "role": "student",
+  "subject": "Voip.ms",
+  "hasContent": true
+}
+[2025-05-20T10:57:34.679Z] [INFO] Öğrenci mesajı, alıcı kontrolü atlanıyor
+[2025-05-20T10:57:34.681Z] [INFO] Çalışma dizini (CWD):
+"D:\\CG Portal\\campus-global-portal"
+[2025-05-20T10:57:34.682Z] [INFO] Veri yolu (data):
+"D:\\CG Portal\\campus-global-portal\\data"
+[2025-05-20T10:57:34.684Z] [INFO] Yeni mesaj oluşturuluyor
+[2025-05-20T10:57:34.690Z] [INFO] Mesaj başarıyla oluşturuldu:
+"msg-1747738654687"
+[2025-05-20T11:10:21.041Z] [INFO] Mesaj gönderme isteği alındı
+[2025-05-20T11:10:21.044Z] [INFO] Mesaj istenen parametreler:
+{
+  "sender": "akifgiraypusat@gmail.com",
+  "receiver": "zeynep.satis@example.com",
+  "role": "student",
+  "subject": "ddddd",
+  "hasContent": true
+}
+[2025-05-20T11:10:21.046Z] [INFO] Öğrenci mesajı, alıcı kontrolü atlanıyor
+[2025-05-20T11:10:21.048Z] [INFO] Çalışma dizini (CWD):
+"D:\\CG Portal\\campus-global-portal"
+[2025-05-20T11:10:21.049Z] [INFO] Veri yolu (data):
+"D:\\CG Portal\\campus-global-portal\\data"
+[2025-05-20T11:10:21.051Z] [INFO] Yeni mesaj oluşturuluyor
+[2025-05-20T11:10:21.056Z] [INFO] Mesaj başarıyla oluşturuldu:
+"msg-1747739421053"
+[2025-05-20T11:10:44.096Z] [INFO] Mesaj gönderme isteği alındı
+[2025-05-20T11:10:44.099Z] [INFO] Mesaj istenen parametreler:
+{
+  "sender": "zeynep.satis@example.com",
+  "receiver": "akifgiraypusat@gmail.com",
+  "role": "sales",
+  "subject": "ddddd",
+  "hasContent": true
+}
+[2025-05-20T11:10:44.101Z] [INFO] Danışman/Satış ekibi mesajı, öğrenci kontrolü yapılıyor
+[2025-05-20T11:10:44.103Z] [INFO] Öğrenci doğrulandı:
+"akifgiraypusat@gmail.com"
+[2025-05-20T11:10:44.106Z] [INFO] Çalışma dizini (CWD):
+"D:\\CG Portal\\campus-global-portal"
+[2025-05-20T11:10:44.108Z] [INFO] Veri yolu (data):
+"D:\\CG Portal\\campus-global-portal\\data"
+[2025-05-20T11:10:44.110Z] [INFO] Yeni mesaj oluşturuluyor
+[2025-05-20T11:10:44.115Z] [INFO] Mesaj başarıyla oluşturuldu:
+"msg-1747739444112"
+[2025-05-20T11:11:29.414Z] [INFO] Mesaj gönderme isteği alındı
+[2025-05-20T11:11:29.416Z] [INFO] Mesaj istenen parametreler:
+{
+  "sender": "akifgiraypusat@gmail.com",
+  "receiver": "emre.danisman@example.com",
+  "role": "student",
+  "subject": "ddddd",
+  "hasContent": true
+}
+[2025-05-20T11:11:29.420Z] [INFO] Öğrenci mesajı, alıcı kontrolü atlanıyor
+[2025-05-20T11:11:29.422Z] [INFO] Çalışma dizini (CWD):
+"D:\\CG Portal\\campus-global-portal"
+[2025-05-20T11:11:29.424Z] [INFO] Veri yolu (data):
+"D:\\CG Portal\\campus-global-portal\\data"
+[2025-05-20T11:11:29.426Z] [INFO] Yeni mesaj oluşturuluyor
+[2025-05-20T11:11:29.432Z] [INFO] Mesaj başarıyla oluşturuldu:
+"msg-1747739489429"
+[2025-05-20T11:20:41.630Z] [INFO] Mesaj gönderme isteği alındı
+[2025-05-20T11:20:41.633Z] [INFO] Mesaj istenen parametreler:
+{
+  "sender": "emre.danisman@example.com",
+  "receiver": "akifgiraypusat@gmail.com",
+  "role": "advisor",
+  "subject": "ddddd",
+  "hasContent": true
+}
+[2025-05-20T11:20:41.635Z] [INFO] Danışman/Satış ekibi mesajı, öğrenci kontrolü yapılıyor
+[2025-05-20T11:20:41.638Z] [INFO] Öğrenci doğrulandı:
+"akifgiraypusat@gmail.com"
+[2025-05-20T11:20:41.640Z] [INFO] Çalışma dizini (CWD):
+"D:\\CG Portal\\campus-global-portal"
+[2025-05-20T11:20:41.641Z] [INFO] Veri yolu (data):
+"D:\\CG Portal\\campus-global-portal\\data"
+[2025-05-20T11:20:41.643Z] [INFO] Yeni mesaj oluşturuluyor
+[2025-05-20T11:20:41.649Z] [INFO] Mesaj başarıyla oluşturuldu:
+"msg-1747740041646"

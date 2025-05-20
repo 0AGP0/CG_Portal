@@ -1,0 +1,143 @@
+{
+  "messages": [
+    {
+      "id": "msg-1",
+      "senderEmail": "emre.danisman@example.com",
+      "receiverEmail": "akifgiraypusat@gmail.com",
+      "senderRole": "advisor",
+      "content": "Merhaba Akif, başvuru sürecinle ilgili bilgilendirme için teşekkürler. Vize randevun için gerekli belgeleri hazırlamanı rica ederim.",
+      "createdAt": "2025-05-19T20:14:23.543Z",
+      "isRead": false,
+      "subject": "Vize Randevusu Hakkında",
+      "category": "visa"
+    },
+    {
+      "id": "msg-2",
+      "senderEmail": "akifgiraypusat@gmail.com",
+      "receiverEmail": "emre.danisman@example.com",
+      "senderRole": "student",
+      "content": "Merhaba Emre Bey, belgelerimi hazırlıyorum. Pasaport yenileme süreci biraz uzun sürebilir. Bu konuda nasıl bir yol izlemeliyim?",
+      "createdAt": "2025-05-19T20:15:23.543Z",
+      "isRead": true,
+      "replyToId": "msg-1",
+      "subject": "Re: Vize Randevusu Hakkında",
+      "category": "visa"
+    },
+    {
+      "id": "msg-1747701906135",
+      "senderEmail": "akifgiraypusat@gmail.com",
+      "receiverEmail": "emre.danisman@example.com",
+      "senderRole": "student",
+      "content": "Lütfen sorunuzu yazın...",
+      "subject": "Yeni Konu",
+      "category": "general",
+      "createdAt": "2025-05-20T00:45:06.135Z",
+      "isRead": false
+    },
+    {
+      "id": "msg-1747701909930",
+      "senderEmail": "akifgiraypusat@gmail.com",
+      "receiverEmail": "emre.danisman@example.com",
+      "senderRole": "student",
+      "content": "dasdasd",
+      "subject": "Yeni Konu",
+      "category": "general",
+      "replyToId": "1747701906135",
+      "createdAt": "2025-05-20T00:45:09.930Z",
+      "isRead": false
+    },
+    {
+      "id": "msg-1747702259973",
+      "senderEmail": "akifgiraypusat@gmail.com",
+      "receiverEmail": "emre.danisman@example.com",
+      "senderRole": "student",
+      "content": "Lütfen sorunuzu yazın...",
+      "subject": "Yeni Konu",
+      "category": "general",
+      "createdAt": "2025-05-20T00:50:59.973Z",
+      "isRead": false
+    },
+    {
+      "id": "msg-1747702263242",
+      "senderEmail": "akifgiraypusat@gmail.com",
+      "receiverEmail": "emre.danisman@example.com",
+      "senderRole": "student",
+      "content": "ssssssss",
+      "subject": "Yeni Konu",
+      "category": "general",
+      "replyToId": "1747702259973",
+      "createdAt": "2025-05-20T00:51:03.242Z",
+      "isRead": false
+    },
+    {
+      "id": "msg-1747737934473",
+      "senderEmail": "akifgiraypusat@gmail.com",
+      "receiverEmail": "emre.danisman@example.com",
+      "senderRole": "student",
+      "content": "srrrrrrr",
+      "subject": "Yeni Konu",
+      "category": "general",
+      "replyToId": "1747701906135",
+      "createdAt": "2025-05-20T10:45:34.473Z",
+      "isRead": false
+    },
+    {
+      "id": "msg-1747738654687",
+      "senderEmail": "akifgiraypusat@gmail.com",
+      "receiverEmail": "ahmet.satis@example.com",
+      "senderRole": "student",
+      "content": "gfdgdfg",
+      "subject": "Voip.ms",
+      "category": "general",
+      "createdAt": "2025-05-20T10:57:34.687Z",
+      "isRead": false
+    },
+    {
+      "id": "msg-1747739421053",
+      "senderEmail": "akifgiraypusat@gmail.com",
+      "receiverEmail": "zeynep.satis@example.com",
+      "senderRole": "student",
+      "content": "wwwww",
+      "subject": "ddddd",
+      "category": "general",
+      "createdAt": "2025-05-20T11:10:21.053Z",
+      "isRead": false
+    },
+    {
+      "id": "msg-1747739444112",
+      "senderEmail": "zeynep.satis@example.com",
+      "receiverEmail": "akifgiraypusat@gmail.com",
+      "senderRole": "sales",
+      "content": "ssssswwwww",
+      "subject": "ddddd",
+      "category": "general",
+      "replyToId": "1747739421053",
+      "createdAt": "2025-05-20T11:10:44.112Z",
+      "isRead": false
+    },
+    {
+      "id": "msg-1747739489429",
+      "senderEmail": "akifgiraypusat@gmail.com",
+      "receiverEmail": "emre.danisman@example.com",
+      "senderRole": "student",
+      "content": "Merhaba nasılsınız",
+      "subject": "ddddd",
+      "category": "general",
+      "replyToId": "1747739421053",
+      "createdAt": "2025-05-20T11:11:29.429Z",
+      "isRead": false
+    },
+    {
+      "id": "msg-1747740041646",
+      "senderEmail": "emre.danisman@example.com",
+      "receiverEmail": "akifgiraypusat@gmail.com",
+      "senderRole": "advisor",
+      "content": "iyiyim siz nasılsınız",
+      "subject": "ddddd",
+      "category": "general",
+      "replyToId": "1747739489429",
+      "createdAt": "2025-05-20T11:20:41.646Z",
+      "isRead": false
+    }
+  ]
+}

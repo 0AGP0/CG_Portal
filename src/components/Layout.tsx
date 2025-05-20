@@ -2,8 +2,9 @@
 
 import React, { ReactNode, useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { useAuth } from '@/context/AuthContext';
 
 type LayoutProps = {
   children: ReactNode;
@@ -17,6 +18,13 @@ const sidebarVariants = {
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { user, logout } = useAuth();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    logout();
+    router.push('/login');
+  };
 
   return (
     <header className="bg-[#002757] text-white shadow-md py-4">
@@ -48,18 +56,35 @@ const Header = () => {
           
           {/* Masaüstü navigasyon */}
           <div className="hidden md:flex gap-6">
-            <Link href="/dashboard" className="hover:text-[#ffc105] transition-colors">
-              Dashboard
-            </Link>
-            <Link href="/login" className="hover:text-[#ffc105] transition-colors">
-              Giriş Yap
-            </Link>
-            <Link href="/register" className="hover:text-[#ffc105] transition-colors">
-              Kayıt Ol
-            </Link>
-            <Link href="#" className="bg-[#ffc105] text-[#002757] px-3 py-1 rounded-full hover:bg-opacity-90 transition-colors">
-              Çıkış
-            </Link>
+            {user ? (
+              <>
+                <span className="text-[#ffc105]">
+                  {user.role === 'advisor' ? 'Danışman: ' : 'Öğrenci: '}
+                  {user.name}
+                </span>
+                <Link 
+                  href={user.role === 'advisor' ? '/advisor/dashboard' : '/dashboard'} 
+                  className="hover:text-[#ffc105] transition-colors"
+                >
+                  Dashboard
+                </Link>
+                <button 
+                  onClick={handleLogout} 
+                  className="bg-[#ffc105] text-[#002757] px-3 py-1 rounded-full hover:bg-opacity-90 transition-colors"
+                >
+                  Çıkış
+                </button>
+              </>
+            ) : (
+              <>
+                <Link href="/login" className="hover:text-[#ffc105] transition-colors">
+                  Giriş Yap
+                </Link>
+                <Link href="/register" className="hover:text-[#ffc105] transition-colors">
+                  Kayıt Ol
+                </Link>
+              </>
+            )}
           </div>
         </div>
         
@@ -72,18 +97,35 @@ const Header = () => {
             transition={{ duration: 0.3 }}
             className="mt-4 flex flex-col gap-3"
           >
-            <Link href="/dashboard" className="py-2 hover:bg-blue-800 px-2 rounded">
-              Dashboard
-            </Link>
-            <Link href="/login" className="py-2 hover:bg-blue-800 px-2 rounded">
-              Giriş Yap
-            </Link>
-            <Link href="/register" className="py-2 hover:bg-blue-800 px-2 rounded">
-              Kayıt Ol
-            </Link>
-            <Link href="#" className="py-2 bg-[#ffc105] text-[#002757] px-2 rounded">
-              Çıkış
-            </Link>
+            {user ? (
+              <>
+                <span className="py-2 text-[#ffc105]">
+                  {user.role === 'advisor' ? 'Danışman: ' : 'Öğrenci: '}
+                  {user.name}
+                </span>
+                <Link 
+                  href={user.role === 'advisor' ? '/advisor/dashboard' : '/dashboard'}
+                  className="py-2 hover:bg-blue-800 px-2 rounded"
+                >
+                  Dashboard
+                </Link>
+                <button 
+                  onClick={handleLogout}
+                  className="py-2 bg-[#ffc105] text-[#002757] px-2 rounded text-left"
+                >
+                  Çıkış
+                </button>
+              </>
+            ) : (
+              <>
+                <Link href="/login" className="py-2 hover:bg-blue-800 px-2 rounded">
+                  Giriş Yap
+                </Link>
+                <Link href="/register" className="py-2 hover:bg-blue-800 px-2 rounded">
+                  Kayıt Ol
+                </Link>
+              </>
+            )}
           </motion.div>
         )}
       </div>
@@ -94,16 +136,44 @@ const Header = () => {
 const Sidebar = () => {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const { user, isAdvisor, isSales } = useAuth();
   
-  const menuItems = [
+  // Öğrenci için menü öğeleri
+  const studentMenuItems = [
     { path: '/dashboard', label: 'Genel Bakış', icon: '🏠' },
     { path: '/dashboard/process', label: 'Süreç Durumu', icon: '⏱️' },
     { path: '/dashboard/visa', label: 'Vize Bilgileri', icon: '🛂' },
     { path: '/dashboard/education', label: 'Eğitim Bilgisi', icon: '🎓' },
     { path: '/dashboard/documents', label: 'Dokümanlar', icon: '📄' },
     { path: '/dashboard/applications', label: 'Başvurular', icon: '📝' },
-    { path: '/dashboard/offers', label: 'Teklifler', icon: '🏆' },
+    { path: '/dashboard/messages', label: 'Mesajlarım', icon: '💬' },
   ];
+  
+  // Danışman için menü öğeleri
+  const advisorMenuItems = [
+    { path: '/advisor/dashboard', label: 'Genel Bakış', icon: '🏠' },
+    { path: '/advisor/students', label: 'Öğrencilerim', icon: '👥' },
+    { path: '/advisor/messages', label: 'Mesajlar', icon: '✉️' },
+    { path: '/advisor/applications', label: 'Başvurular', icon: '📝' },
+    { path: '/advisor/documents', label: 'Dokümanlar', icon: '📄' },
+    { path: '/advisor/reports', label: 'Raporlar', icon: '📊' },
+  ];
+  
+  // Satış ekibi için menü öğeleri
+  const salesMenuItems = [
+    { path: '/sales/dashboard', label: 'Genel Bakış', icon: '🏠' },
+    { path: '/sales/dashboard/messages', label: 'Mesajlar', icon: '💬' },
+    { path: '/sales/students', label: 'Öğrenciler', icon: '👥' },
+    { path: '/sales/applications', label: 'Başvurular', icon: '📝' },
+    { path: '/sales/reports', label: 'Raporlar', icon: '📊' },
+  ];
+  
+  // Kullanıcının rolüne göre menüyü belirle
+  const menuItems = user && isAdvisor() 
+    ? advisorMenuItems 
+    : user && isSales()
+      ? salesMenuItems
+      : studentMenuItems;
 
   return (
     <motion.div 
@@ -113,7 +183,9 @@ const Sidebar = () => {
       animate={isCollapsed ? "closed" : "open"}
     >
       <div className="flex justify-between items-center p-4 border-b">
-        <h2 className={`text-[#002757] font-bold ${isCollapsed ? 'hidden' : 'block'}`}>Paneller</h2>
+        <h2 className={`text-[#002757] font-bold ${isCollapsed ? 'hidden' : 'block'}`}>
+          {user && isAdvisor() ? 'Danışman Paneli' : user && isSales() ? 'Satış Ekibi Paneli' : 'Öğrenci Paneli'}
+        </h2>
         <button 
           onClick={() => setIsCollapsed(!isCollapsed)}
           className="p-1 rounded-full bg-gray-100 hover:bg-gray-200"

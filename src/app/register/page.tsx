@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import Layout from '@/components/Layout';
 
 export default function Register() {
@@ -12,6 +13,7 @@ export default function Register() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [toast, setToast] = useState<{ show: boolean; message: string; type: 'success' | 'error' } | null>(null);
+  const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -36,17 +38,49 @@ export default function Register() {
     
     setIsLoading(true);
     
-    // Burada API entegrasyonu gelecek
-    // Şimdilik sadece başarılı bir kayıt simülasyonu yapıyoruz
-    setTimeout(() => {
+    try {
+      // API'ye kayıt isteği gönder
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phoneNumber || null
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Kayıt işlemi başarısız oldu');
+      }
+      
+      // Başarılı kayıt
       setToast({
         show: true,
-        message: 'Hesabınız oluşturuldu. Giriş yapabilirsiniz.',
+        message: 'Hesabınız başarıyla oluşturuldu. Giriş sayfasına yönlendiriliyorsunuz.',
         type: 'success'
       });
-      setIsLoading(false);
+      
+      // 3 saniye sonra giriş sayfasına yönlendir
+      setTimeout(() => {
+        router.push('/login');
+      }, 3000);
+      
+    } catch (error) {
+      // Hata mesajı
+      setToast({
+        show: true,
+        message: error instanceof Error ? error.message : 'Bir hata oluştu',
+        type: 'error'
+      });
       setTimeout(() => setToast(null), 5000);
-    }, 1500);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

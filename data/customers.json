@@ -1,12 +1,72 @@
 {
   "customers": [
     {
+      "email": "aaa@gmail.com",
+      "name": "aaa",
+      "phone": null,
+      "stage": "Süreç Başlatıldı",
+      "updatedAt": "2025-05-19T23:46:03.613Z",
+      "createdAt": "2025-05-19T21:49:28.142Z",
+      "processStarted": true,
+      "advisorId": "adv-1",
+      "advisorName": "Emre Danışman",
+      "advisorEmail": "emre.danisman@example.com",
+      "salesId": "sales-1",
+      "salesName": "Ahmet Satış",
+      "salesEmail": "ahmet.satis@example.com",
+      "documents": [],
+      "processStartDate": "2025-05-19T23:46:03.612Z"
+    },
+    {
+      "email": "bbb@gmail.com",
+      "name": "bbb",
+      "phone": null,
+      "stage": "Süreç Başlatıldı",
+      "updatedAt": "2025-05-19T23:05:53.012Z",
+      "createdAt": "2025-05-19T22:53:12.434Z",
+      "processStarted": true,
+      "advisorId": "adv-1",
+      "advisorName": "Emre Danışman",
+      "advisorEmail": "emre.danisman@example.com",
+      "salesId": "sales-2",
+      "salesName": "Ayşe Satış",
+      "salesEmail": "ayse.satis@example.com",
+      "documents": [],
+      "processStartDate": "2025-05-19T23:05:53.011Z"
+    },
+    {
+      "email": "ccc@gmail.com",
+      "name": "ccc",
+      "phone": null,
+      "stage": "Süreç Başlatıldı",
+      "updatedAt": "2025-05-19T23:51:47.249Z",
+      "createdAt": "2025-05-19T23:34:26.708Z",
+      "processStarted": true,
+      "advisorId": "adv-1",
+      "advisorName": "Emre Danışman",
+      "advisorEmail": "emre.danisman@example.com",
+      "salesId": "sales-3",
+      "salesName": "Mehmet Satış",
+      "salesEmail": "mehmet.satis@example.com",
+      "documents": [],
+      "processStartDate": "2025-05-19T23:51:47.248Z"
+    },
+    {
       "email": "akifgiraypusat@gmail.com",
-      "lead_id": 1041,
-      "stage": "yeni",
-      "name": "Akif",
-      "updatedAt": "2025-05-08T13:37:28.304Z",
-      "documents": []
+      "name": "Akif Giray Pusat",
+      "phone": null,
+      "stage": "Süreç Başlatıldı",
+      "updatedAt": "2025-05-19T23:53:42.556Z",
+      "createdAt": "2025-05-19T23:52:58.887Z",
+      "processStarted": true,
+      "advisorId": "adv-1",
+      "advisorName": "Emre Danışman",
+      "advisorEmail": "emre.danisman@example.com",
+      "salesId": "sales-4",
+      "salesName": "Zeynep Satış",
+      "salesEmail": "zeynep.satis@example.com",
+      "documents": [],
+      "processStartDate": "2025-05-19T23:53:42.555Z"
     }
   ]
 }
