@@ -101,3 +101,41 @@
 [2025-05-20T11:20:41.643Z] [INFO] Yeni mesaj oluşturuluyor
 [2025-05-20T11:20:41.649Z] [INFO] Mesaj başarıyla oluşturuldu:
 "msg-1747740041646"
+[2025-05-20T13:03:26.473Z] [INFO] Mesaj gönderme isteği alındı
+[2025-05-20T13:03:26.475Z] [INFO] Mesaj istenen parametreler:
+{
+  "sender": "emre.danisman@example.com",
+  "receiver": "aaa@gmail.com",
+  "role": "advisor",
+  "subject": "Yeni Konu",
+  "hasContent": true
+}
+[2025-05-20T13:03:26.476Z] [INFO] Danışman/Satış ekibi mesajı, öğrenci kontrolü yapılıyor
+[2025-05-20T13:03:26.477Z] [INFO] Öğrenci doğrulandı:
+"aaa@gmail.com"
+[2025-05-20T13:03:26.477Z] [INFO] Çalışma dizini (CWD):
+"D:\\CG Portal\\campus-global-portal"
+[2025-05-20T13:03:26.478Z] [INFO] Veri yolu (data):
+"D:\\CG Portal\\campus-global-portal\\data"
+[2025-05-20T13:03:26.478Z] [INFO] Yeni mesaj oluşturuluyor
+[2025-05-20T13:03:26.482Z] [INFO] Mesaj başarıyla oluşturuldu:
+"msg-1747746206480"
+[2025-05-20T13:03:29.773Z] [INFO] Mesaj gönderme isteği alındı
+[2025-05-20T13:03:29.774Z] [INFO] Mesaj istenen parametreler:
+{
+  "sender": "emre.danisman@example.com",
+  "receiver": "aaa@gmail.com",
+  "role": "advisor",
+  "subject": "Yeni Konu",
+  "hasContent": true
+}
+[2025-05-20T13:03:29.775Z] [INFO] Danışman/Satış ekibi mesajı, öğrenci kontrolü yapılıyor
+[2025-05-20T13:03:29.776Z] [INFO] Öğrenci doğrulandı:
+"aaa@gmail.com"
+[2025-05-20T13:03:29.777Z] [INFO] Çalışma dizini (CWD):
+"D:\\CG Portal\\campus-global-portal"
+[2025-05-20T13:03:29.777Z] [INFO] Veri yolu (data):
+"D:\\CG Portal\\campus-global-portal\\data"
+[2025-05-20T13:03:29.778Z] [INFO] Yeni mesaj oluşturuluyor
+[2025-05-20T13:03:29.781Z] [INFO] Mesaj başarıyla oluşturuldu:
+"msg-1747746209779"

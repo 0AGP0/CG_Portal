@@ -67,6 +67,22 @@
       "salesEmail": "zeynep.satis@example.com",
       "documents": [],
       "processStartDate": "2025-05-19T23:53:42.555Z"
+    },
+    {
+      "email": "arif@gmail.com",
+      "name": "arif",
+      "phone": null,
+      "stage": "new",
+      "updatedAt": "2025-05-20T13:19:32.090Z",
+      "createdAt": "2025-05-20T13:19:32.078Z",
+      "processStarted": false,
+      "advisorId": null,
+      "advisorName": null,
+      "advisorEmail": null,
+      "salesId": "sales-1",
+      "salesName": "Ahmet Satış",
+      "salesEmail": "ahmet.satis@example.com",
+      "documents": []
     }
   ]
 }

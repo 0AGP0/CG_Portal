@@ -39,13 +39,13 @@ export default function VisaPanel() {
           </div>
 
           {/* Vize Randevu Bilgileri */}
-          <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+          <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-6 rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30 mb-8">
             <h2 className="text-xl font-semibold text-[#002757] mb-4">Randevu Bilgileri</h2>
             
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <div className="flex items-center mb-2">
-                  <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3">
+                  <div className="w-10 h-10 rounded-full bg-blue-100/70 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 flex items-center justify-center mr-3">
                     <span className="text-xl">📅</span>
                   </div>
                   <div>
@@ -55,7 +55,7 @@ export default function VisaPanel() {
                 </div>
                 
                 <div className="flex items-center">
-                  <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3">
+                  <div className="w-10 h-10 rounded-full bg-blue-100/70 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 flex items-center justify-center mr-3">
                     <span className="text-xl">⏰</span>
                   </div>
                   <div>
@@ -67,7 +67,7 @@ export default function VisaPanel() {
               
               <div>
                 <div className="flex items-center mb-2">
-                  <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3">
+                  <div className="w-10 h-10 rounded-full bg-blue-100/70 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 flex items-center justify-center mr-3">
                     <span className="text-xl">📍</span>
                   </div>
                   <div>
@@ -77,7 +77,7 @@ export default function VisaPanel() {
                 </div>
                 
                 <div className="flex items-center">
-                  <div className="w-10 h-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-3">
+                  <div className="w-10 h-10 rounded-full bg-green-100/70 dark:bg-green-900/30 text-green-600 dark:text-green-300 flex items-center justify-center mr-3">
                     <span className="text-xl">✅</span>
                   </div>
                   <div>
@@ -95,18 +95,18 @@ export default function VisaPanel() {
           </div>
 
           {/* Gerekli Evraklar */}
-          <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+          <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-6 rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30 mb-8">
             <h2 className="text-xl font-semibold text-[#002757] mb-4">Gerekli Evraklar</h2>
             
             <div className="space-y-3">
               {visaData.requiredDocuments.map(doc => (
                 <div 
                   key={doc.id} 
-                  className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors"
+                  className="flex items-center justify-between p-3 border border-gray-200/60 dark:border-gray-700/30 rounded-lg hover:bg-gray-50/80 dark:hover:bg-gray-700/30 transition-colors"
                 >
                   <div className="flex items-center">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 ${
-                      doc.status === 'completed' ? 'bg-green-100 text-green-600' : 'bg-yellow-100 text-yellow-600'
+                      doc.status === 'completed' ? 'bg-green-100/70 dark:bg-green-900/30 text-green-600 dark:text-green-300' : 'bg-yellow-100/70 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-300'
                     }`}>
                       {doc.status === 'completed' ? '✓' : '!'}
                     </div>
@@ -115,7 +115,7 @@ export default function VisaPanel() {
                   
                   <div>
                     {doc.status === 'completed' ? (
-                      <span className="text-sm px-3 py-1 bg-green-100 text-green-600 rounded-full">
+                      <span className="text-sm px-3 py-1 bg-green-100/70 dark:bg-green-900/30 text-green-600 dark:text-green-300 rounded-full">
                         Tamamlandı
                       </span>
                     ) : (
@@ -130,18 +130,18 @@ export default function VisaPanel() {
             
             <div className="mt-6">
               <div className="flex items-center mb-2">
-                <div className="w-2 h-2 rounded-full bg-green-500 mr-2"></div>
+                <div className="w-2 h-2 rounded-full bg-green-500 dark:bg-green-400 mr-2"></div>
                 <span className="text-sm text-default">Yeşil: Tamamlandı</span>
               </div>
               <div className="flex items-center">
-                <div className="w-2 h-2 rounded-full bg-yellow-500 mr-2"></div>
+                <div className="w-2 h-2 rounded-full bg-yellow-500 dark:bg-yellow-400 mr-2"></div>
                 <span className="text-sm text-default">Sarı: Bekliyor</span>
               </div>
             </div>
           </div>
 
           {/* Vize Süreci Bilgilendirme */}
-          <div className="bg-blue-50 p-6 rounded-lg border border-blue-200">
+          <div className="bg-blue-50/70 dark:bg-blue-900/20 backdrop-blur-sm p-6 rounded-lg border border-blue-200/60 dark:border-blue-700/30">
             <h3 className="text-lg font-semibold text-[#002757] mb-2">Vize Süreci Bilgilendirme</h3>
             <p className="text-default mb-4">
               Vize başvurunuzun sorunsuz ilerlemesi için gerekli tüm belgeleri eksiksiz ve doğru bir şekilde hazırlamanız önemlidir. Eksik veya hatalı belgeler başvurunuzun reddedilmesine sebep olabilir.
@@ -150,7 +150,7 @@ export default function VisaPanel() {
               <button className="btn-primary">
                 Vize Kontrol Listesini İndir
               </button>
-              <button className="btn-secondary">
+              <button className="px-4 py-2 rounded-lg text-primary-600 dark:text-primary-400 bg-white/80 dark:bg-gray-800/80 hover:bg-white dark:hover:bg-gray-700 shadow-sm border border-gray-100/60 dark:border-gray-700/30 transition-colors">
                 Vize Başvurusu Hakkında SSS
               </button>
             </div>

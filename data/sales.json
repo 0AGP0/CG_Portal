@@ -5,9 +5,10 @@
       "email": "ahmet.satis@example.com",
       "name": "Ahmet Satış",
       "studentIds": [
-        "aaa@gmail.com"
+        "aaa@gmail.com",
+        "arif@gmail.com"
       ],
-      "updatedAt": "2025-05-19T21:49:28.154Z"
+      "updatedAt": "2025-05-20T13:19:32.086Z"
     },
     {
       "id": "sales-2",

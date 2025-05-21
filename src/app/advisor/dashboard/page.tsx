@@ -156,7 +156,7 @@ export default function AdvisorDashboard() {
             variants={itemVariants}
             initial="hidden"
             animate="visible"
-            className="bg-white p-5 rounded-lg shadow border-l-4 border-blue-500"
+            className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-5 rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30 border-l-4 border-l-blue-500"
           >
             <div className="flex justify-between items-center">
               <div>
@@ -172,7 +172,7 @@ export default function AdvisorDashboard() {
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.1 }}
-            className="bg-white p-5 rounded-lg shadow border-l-4 border-green-500"
+            className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-5 rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30 border-l-4 border-l-green-500"
           >
             <div className="flex justify-between items-center">
               <div>
@@ -188,7 +188,7 @@ export default function AdvisorDashboard() {
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.2 }}
-            className="bg-white p-5 rounded-lg shadow border-l-4 border-yellow-500"
+            className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-5 rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30 border-l-4 border-l-yellow-500"
           >
             <div className="flex justify-between items-center">
               <div>
@@ -204,7 +204,7 @@ export default function AdvisorDashboard() {
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.3 }}
-            className="bg-white p-5 rounded-lg shadow border-l-4 border-purple-500"
+            className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-5 rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30 border-l-4 border-l-purple-500"
           >
             <div className="flex justify-between items-center">
               <div>
@@ -217,7 +217,7 @@ export default function AdvisorDashboard() {
         </div>
 
         {/* Öğrenci Arama ve Filtreleme */}
-        <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+        <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-6 rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30 mb-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-4">
             <div className="w-full md:w-1/2">
               <div className="relative">
@@ -239,25 +239,25 @@ export default function AdvisorDashboard() {
             <div className="flex space-x-2">
               <button 
                 onClick={() => setSelectedFilter("all")}
-                className={`px-3 py-1.5 rounded-lg text-sm ${selectedFilter === "all" ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                className={`px-3 py-1.5 rounded-lg text-sm ${selectedFilter === "all" ? 'bg-blue-600 text-white' : 'bg-gray-100/80 dark:bg-gray-700/50 text-gray-600 dark:text-gray-300 hover:bg-gray-200/80 dark:hover:bg-gray-600/50'}`}
               >
                 Tümü
               </button>
               <button 
                 onClick={() => setSelectedFilter("active")}
-                className={`px-3 py-1.5 rounded-lg text-sm ${selectedFilter === "active" ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                className={`px-3 py-1.5 rounded-lg text-sm ${selectedFilter === "active" ? 'bg-green-600 text-white' : 'bg-gray-100/80 dark:bg-gray-700/50 text-gray-600 dark:text-gray-300 hover:bg-gray-200/80 dark:hover:bg-gray-600/50'}`}
               >
                 Aktif Süreçler
               </button>
               <button 
                 onClick={() => setSelectedFilter("new")}
-                className={`px-3 py-1.5 rounded-lg text-sm ${selectedFilter === "new" ? 'bg-yellow-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                className={`px-3 py-1.5 rounded-lg text-sm ${selectedFilter === "new" ? 'bg-yellow-600 text-white' : 'bg-gray-100/80 dark:bg-gray-700/50 text-gray-600 dark:text-gray-300 hover:bg-gray-200/80 dark:hover:bg-gray-600/50'}`}
               >
                 Yeni Kayıtlar
               </button>
               <button 
                 onClick={() => setSelectedFilter("messages")}
-                className={`px-3 py-1.5 rounded-lg text-sm ${selectedFilter === "messages" ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                className={`px-3 py-1.5 rounded-lg text-sm ${selectedFilter === "messages" ? 'bg-red-600 text-white' : 'bg-gray-100/80 dark:bg-gray-700/50 text-gray-600 dark:text-gray-300 hover:bg-gray-200/80 dark:hover:bg-gray-600/50'}`}
               >
                 Okunmamış Mesajlar
               </button>
@@ -266,7 +266,7 @@ export default function AdvisorDashboard() {
         </div>
 
         {/* Öğrenci Listesi */}
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30 overflow-hidden">
           {filteredStudents.length === 0 ? (
             <div className="p-8 text-center">
               <p className="text-lg text-gray-500">Öğrenci bulunamadı</p>
@@ -282,7 +282,7 @@ export default function AdvisorDashboard() {
           ) : (
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+                <thead className="bg-gray-50/70 dark:bg-gray-700/30">
                   <tr>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Öğrenci
@@ -301,9 +301,9 @@ export default function AdvisorDashboard() {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm divide-y divide-gray-200 dark:divide-gray-700/30">
                   {filteredStudents.map((student: Student) => (
-                    <tr key={student.id} className="hover:bg-gray-50">
+                    <tr key={student.id} className="hover:bg-gray-50/80 dark:hover:bg-gray-700/30">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-10 w-10 relative">

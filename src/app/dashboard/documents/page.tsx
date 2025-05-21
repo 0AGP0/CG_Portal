@@ -53,10 +53,10 @@ export default function DocumentsPanel() {
           </div>
 
           {/* Bekleyen Belgeler */}
-          <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+          <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-6 rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30 mb-8">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold text-[#002757]">Bekleyen Belgeler</h2>
-              <span className="bg-yellow-100 text-yellow-800 text-sm font-medium px-3 py-1 rounded-full">
+              <span className="bg-yellow-100/70 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 text-sm font-medium px-3 py-1 rounded-full">
                 {documentsData.pendingDocuments.length} bekleyen belge
               </span>
             </div>
@@ -64,14 +64,14 @@ export default function DocumentsPanel() {
             {documentsData.pendingDocuments.length > 0 ? (
               <div className="space-y-3">
                 {documentsData.pendingDocuments.map(doc => (
-                  <div key={doc.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                  <div key={doc.id} className="flex items-center justify-between p-4 border border-gray-200/60 dark:border-gray-700/30 rounded-lg hover:bg-gray-50/80 dark:hover:bg-gray-700/30 transition-colors">
                     <div className="flex items-center">
                       <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3">
                         <span className="text-xl">{getFileIcon(doc.type)}</span>
                       </div>
                       <div>
                         <h3 className="font-medium">{doc.name}</h3>
-                        <p className="text-sm text-gray-500">{doc.type.toUpperCase()} • {doc.size}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{doc.type.toUpperCase()} • {doc.size}</p>
                       </div>
                     </div>
                     <div>
@@ -87,10 +87,10 @@ export default function DocumentsPanel() {
           </div>
 
           {/* Yüklenen Belgeler */}
-          <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+          <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-6 rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30 mb-8">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold text-[#002757]">Yüklenen Belgeler</h2>
-              <span className="bg-green-100 text-green-800 text-sm font-medium px-3 py-1 rounded-full">
+              <span className="bg-green-100/70 dark:bg-green-900/30 text-green-800 dark:text-green-300 text-sm font-medium px-3 py-1 rounded-full">
                 {documentsData.uploadedDocuments.length} belge yüklendi
               </span>
             </div>
@@ -98,18 +98,18 @@ export default function DocumentsPanel() {
             {documentsData.uploadedDocuments.length > 0 ? (
               <div className="space-y-3">
                 {documentsData.uploadedDocuments.map(doc => (
-                  <div key={doc.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                  <div key={doc.id} className="flex items-center justify-between p-4 border border-gray-200/60 dark:border-gray-700/30 rounded-lg hover:bg-gray-50/80 dark:hover:bg-gray-700/30 transition-colors">
                     <div className="flex items-center">
-                      <div className="w-10 h-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-3">
+                      <div className="w-10 h-10 rounded-full bg-green-100/70 dark:bg-green-900/30 text-green-600 dark:text-green-300 flex items-center justify-center mr-3">
                         <span className="text-xl">{getFileIcon(doc.type)}</span>
                       </div>
                       <div>
                         <h3 className="font-medium">{doc.name}</h3>
-                        <p className="text-sm text-gray-500">{doc.type.toUpperCase()} • {doc.size}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{doc.type.toUpperCase()} • {doc.size}</p>
                       </div>
                     </div>
                     <div>
-                      <div className="text-sm text-gray-600 mb-2">Yükleme: {doc.uploadDate}</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">Yükleme: {doc.uploadDate}</div>
                       <div className="flex space-x-2">
                         <button className="btn-sm btn-secondary">Görüntüle</button>
                         <button className="btn-sm btn-secondary text-red-600">Sil</button>

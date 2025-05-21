@@ -138,6 +138,28 @@
       "replyToId": "1747739489429",
       "createdAt": "2025-05-20T11:20:41.646Z",
       "isRead": false
+    },
+    {
+      "id": "msg-1747746206480",
+      "senderEmail": "emre.danisman@example.com",
+      "receiverEmail": "aaa@gmail.com",
+      "senderRole": "advisor",
+      "content": "Merhaba aaa",
+      "subject": "Yeni Konu",
+      "category": "general",
+      "createdAt": "2025-05-20T13:03:26.481Z",
+      "isRead": false
+    },
+    {
+      "id": "msg-1747746209779",
+      "senderEmail": "emre.danisman@example.com",
+      "receiverEmail": "aaa@gmail.com",
+      "senderRole": "advisor",
+      "content": "Merhaba aaa",
+      "subject": "Yeni Konu",
+      "category": "general",
+      "createdAt": "2025-05-20T13:03:29.779Z",
+      "isRead": false
     }
   ]
 }

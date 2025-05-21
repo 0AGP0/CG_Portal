@@ -9,7 +9,7 @@ import { useAuth } from '@/context/AuthContext';
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState<'student' | 'advisor' | 'sales'>('student');
+  const [role, setRole] = useState<'student' | 'advisor' | 'admin'>('student');
   const [isLoading, setIsLoading] = useState(false);
   const [toast, setToast] = useState<{ show: boolean; message: string; type: 'success' | 'error' } | null>(null);
   
@@ -29,10 +29,10 @@ export default function Login() {
       return;
     }
     
-    if ((role === 'advisor' || role === 'sales') && !password) {
+    if ((role === 'advisor' || role === 'admin') && !password) {
       setToast({
         show: true,
-        message: `${role === 'advisor' ? 'Danışman' : 'Satış Ekibi'} girişi için şifre gereklidir.`,
+        message: `${role === 'advisor' ? 'Danışman' : 'Admin'} girişi için şifre gereklidir.`,
         type: 'error'
       });
       setTimeout(() => setToast(null), 3000);
@@ -50,9 +50,9 @@ export default function Login() {
         if (role === 'advisor') {
           // Danışman dashboard'a yönlendir
           router.push('/advisor/dashboard');
-        } else if (role === 'sales') {
-          // Satış ekibi dashboard'a yönlendir
-          router.push('/sales/dashboard');
+        } else if (role === 'admin') {
+          // Admin dashboard'a yönlendir
+          router.push('/admin');
         } else {
           // Öğrenci dashboard'a yönlendir
           router.push('/dashboard');
@@ -108,10 +108,10 @@ export default function Login() {
                   <span>Danışman</span>
                 </div>
                 <div 
-                  className={`p-3 border rounded-md cursor-pointer text-center ${role === 'sales' ? 'bg-blue-100 border-blue-400' : 'bg-white border-gray-300'}`}
-                  onClick={() => setRole('sales')}
+                  className={`p-3 border rounded-md cursor-pointer text-center ${role === 'admin' ? 'bg-blue-100 border-blue-400' : 'bg-white border-gray-300'}`}
+                  onClick={() => setRole('admin')}
                 >
-                  <span>Satış Ekibi</span>
+                  <span>Admin</span>
                 </div>
               </div>
 
@@ -130,8 +130,8 @@ export default function Login() {
                 />
               </div>
               
-              {/* Danışman ve Satış Ekibi girişi için şifre alanı */}
-              {(role === 'advisor' || role === 'sales') && (
+              {/* Danışman ve Admin girişi için şifre alanı */}
+              {(role === 'advisor' || role === 'admin') && (
                 <div>
                   <label htmlFor="password" className="block text-sm font-medium text-[#002757] mb-1">
                     Şifre <span className="text-red-500">*</span>
@@ -153,7 +153,7 @@ export default function Login() {
                 className={`w-full py-2 px-4 border border-transparent rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 mt-4 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
                 disabled={isLoading}
               >
-                {isLoading ? 'Giriş yapılıyor...' : role === 'student' ? 'Giriş Bağlantısı Al' : 'Giriş Yap'}
+                {isLoading ? 'Giriş yapılıyor...' : role === 'student' ? 'Giriş Bağlantısı Al' : role === 'admin' ? 'Admin Girişi' : 'Giriş Yap'}
               </button>
               
               <p className="text-center mt-4">

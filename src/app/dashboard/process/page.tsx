@@ -168,12 +168,12 @@ export default function ProcessPanel() {
           </div>
 
           {/* Süreç İlerleme Aşamaları */}
-          <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+          <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-6 rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30 mb-8">
             <h2 className="text-xl font-semibold text-[#002757] mb-4">Genel Süreç Durumu</h2>
             
             <div className="relative">
               {/* İlerleme çubuğu */}
-              <div className="absolute left-7 top-0 bottom-0 w-1 bg-gray-200 z-0"></div>
+              <div className="absolute left-7 top-0 bottom-0 w-1 bg-gray-200 dark:bg-gray-600 z-0"></div>
               
               {/* Aşamalar */}
               <div className="space-y-8 relative z-10">
@@ -182,7 +182,7 @@ export default function ProcessPanel() {
                     <div className={`w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0 z-10 ${
                       step.status === 'completed' ? 'bg-green-500 text-white' :
                       step.status === 'in-progress' ? 'bg-blue-500 text-white' :
-                      'bg-gray-200 text-gray-500'
+                      'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
                     }`}>
                       {step.status === 'completed' ? (
                         <span className="text-xl">✓</span>
@@ -204,9 +204,9 @@ export default function ProcessPanel() {
                           <p className="text-default mt-1">{step.description}</p>
                         </div>
                         <span className={`px-3 py-1 rounded-full text-sm ${
-                          step.status === 'completed' ? 'bg-green-100 text-green-800' :
-                          step.status === 'in-progress' ? 'bg-blue-100 text-blue-800' :
-                          'bg-gray-100 text-gray-600'
+                          step.status === 'completed' ? 'bg-green-100/80 dark:bg-green-900/30 text-green-800 dark:text-green-300' :
+                          step.status === 'in-progress' ? 'bg-blue-100/80 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300' :
+                          'bg-gray-100/80 dark:bg-gray-700/50 text-gray-600 dark:text-gray-300'
                         }`}>
                           {step.date}
                         </span>
@@ -219,21 +219,21 @@ export default function ProcessPanel() {
           </div>
 
           {/* Yapılacaklar Listesi */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-6 rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30">
             <h2 className="text-xl font-semibold text-[#002757] mb-4">Yapılacaklar</h2>
             
             <div className="space-y-3">
-              <div className="flex items-center p-3 border border-yellow-200 bg-yellow-50 rounded-md">
+              <div className="flex items-center p-3 border border-yellow-200/70 bg-yellow-50/70 dark:bg-yellow-900/20 dark:border-yellow-700/30 rounded-md">
                 <span className="text-yellow-500 mr-3 text-lg">⚠️</span>
                 <span className="text-default">Eksik belgeleri 1 hafta içinde yükleyin</span>
               </div>
               
-              <div className="flex items-center p-3 border border-blue-200 bg-blue-50 rounded-md">
+              <div className="flex items-center p-3 border border-blue-200/70 bg-blue-50/70 dark:bg-blue-900/20 dark:border-blue-700/30 rounded-md">
                 <span className="text-blue-500 mr-3 text-lg">📝</span>
                 <span className="text-default">Vize randevusu için danışmanınızla iletişime geçin</span>
               </div>
               
-              <div className="flex items-center p-3 border border-green-200 bg-green-50 rounded-md">
+              <div className="flex items-center p-3 border border-green-200/70 bg-green-50/70 dark:bg-green-900/20 dark:border-green-700/30 rounded-md">
                 <span className="text-green-500 mr-3 text-lg">🗓️</span>
                 <span className="text-default">Vize randevunuz için önümüzdeki tarihler kontrol ediliyor</span>
               </div>

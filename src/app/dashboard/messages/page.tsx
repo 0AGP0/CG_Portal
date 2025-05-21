@@ -97,7 +97,7 @@ export default function MessagesPage() {
       >
         <div className="mb-6 flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-[#002757]">
+            <h1 className="text-3xl font-bold text-[#002757] dark:text-blue-300">
               Mesajlarım
             </h1>
             <p className="text-default mt-1">
@@ -121,13 +121,13 @@ export default function MessagesPage() {
           <motion.div 
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
-            className="mb-6 bg-white p-4 rounded-lg shadow-md"
+            className="mb-6 bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-6 rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30"
           >
-            <h2 className="text-xl font-semibold mb-4 text-[#002757]">Yeni Konu Oluştur</h2>
+            <h2 className="text-xl font-semibold mb-4 text-[#002757] dark:text-blue-300">Yeni Konu Oluştur</h2>
             <form onSubmit={handleCreateNewTicket} className="space-y-4">
               {user.role === 'student' && (
                 <div>
-                  <label className="block text-sm font-medium mb-1">Alıcı</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Alıcı</label>
                   <div className="flex gap-4">
                     <label className="flex items-center">
                       <input
@@ -162,7 +162,7 @@ export default function MessagesPage() {
                   value={newTicketSubject}
                   onChange={(e) => setNewTicketSubject(e.target.value)}
                   placeholder="Konu başlığı girin"
-                  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white/90 dark:bg-gray-700/90 focus:outline-none focus:ring-2 focus:ring-blue-500/70"
                   required
                 />
               </div>
@@ -174,7 +174,7 @@ export default function MessagesPage() {
                   onChange={(e) => setNewTicketContent(e.target.value)}
                   rows={4}
                   placeholder="Mesajınızı yazın"
-                  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white/90 dark:bg-gray-700/90 focus:outline-none focus:ring-2 focus:ring-blue-500/70"
                   required
                 />
               </div>
@@ -182,13 +182,13 @@ export default function MessagesPage() {
                 <button 
                   type="button"
                   onClick={() => setShowNewTicketForm(false)}
-                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
+                  className="px-4 py-2 bg-gray-200/80 dark:bg-gray-700/80 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300/80 dark:hover:bg-gray-600/80 transition-colors"
                 >
                   İptal
                 </button>
                 <button 
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   Gönder
                 </button>
@@ -203,13 +203,13 @@ export default function MessagesPage() {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="md:col-span-1 bg-white rounded-lg shadow-md overflow-hidden"
+            className="md:col-span-1 bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30 overflow-hidden"
           >
-            <div className="p-4 border-b border-gray-200">
-              <h2 className="font-semibold text-[#002757]">Konularım</h2>
+            <div className="p-4 border-b border-gray-200/60 dark:border-gray-700/30">
+              <h2 className="font-semibold text-[#002757] dark:text-blue-300">Konularım</h2>
             </div>
             
-            <div className="divide-y">
+            <div className="divide-y divide-gray-200/60 dark:divide-gray-700/30">
               {tickets.map((ticket) => (
                 <motion.div
                   key={ticket.id}
@@ -217,8 +217,8 @@ export default function MessagesPage() {
                   onClick={() => selectTicket(ticket.id)}
                   className={`p-4 cursor-pointer transition-colors ${
                     selectedTicketId === ticket.id 
-                      ? 'bg-blue-50 border-l-4 border-blue-500' 
-                      : ticket.isRead ? 'hover:bg-gray-50' : 'hover:bg-gray-50 bg-yellow-50'
+                      ? 'bg-blue-50/70 dark:bg-blue-900/20 border-l-4 border-blue-500' 
+                      : ticket.isRead ? 'hover:bg-gray-50/70 dark:hover:bg-gray-700/30' : 'hover:bg-gray-50/70 dark:hover:bg-gray-700/30 bg-yellow-50/70 dark:bg-yellow-900/20'
                   }`}
                 >
                   <div className="flex justify-between items-start mb-1">
@@ -229,13 +229,13 @@ export default function MessagesPage() {
                       <span className="bg-blue-500 rounded-full w-2 h-2"></span>
                     )}
                   </div>
-                  <p className="text-sm text-gray-600 truncate">{ticket.preview}</p>
-                  <p className="text-xs text-gray-500 mt-1">{ticket.date}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 truncate">{ticket.preview}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{ticket.date}</p>
                 </motion.div>
               ))}
               
               {tickets.length === 0 && (
-                <div className="p-6 text-center text-gray-500">
+                <div className="p-6 text-center text-gray-500 dark:text-gray-400">
                   <p>Henüz mesajınız bulunmuyor.</p>
                 </div>
               )}
@@ -244,72 +244,73 @@ export default function MessagesPage() {
           
           {/* Mesaj İçeriği */}
           <motion.div 
-            className="md:col-span-3 bg-white rounded-lg shadow-md flex flex-col h-[600px]"
+            className="md:col-span-3 bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30 flex flex-col h-[600px]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
           >
             {selectedTicket ? (
               <>
-                <div className="p-4 border-b border-gray-200">
-                  <h2 className="font-semibold text-lg text-[#002757]">{selectedTicket.subject}</h2>
-                  <p className="text-sm text-gray-500">{selectedTicket.date}</p>
+                <div className="p-4 border-b border-gray-200/60 dark:border-gray-700/30">
+                  <h2 className="text-lg font-semibold text-[#002757] dark:text-blue-300 mb-1">{selectedTicket.subject}</h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">{selectedTicket.date}</p>
                 </div>
                 
-                <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ maxHeight: '450px' }}>
-                  {selectedTicket.messages.length > 0 ? (
-                    selectedTicket.messages.map((message, index) => (
+                <div className="flex-1 overflow-y-auto p-4 bg-gray-50/50 dark:bg-gray-800/50">
+                  <div className="space-y-4">
+                    {selectedTicket.messages.map((message, index) => (
                       <div 
-                        key={index}
-                        className={`p-3 rounded-lg max-w-[80%] ${
-                          message.sender === 'user' 
-                            ? 'bg-blue-100 ml-auto' 
-                            : message.sender === 'advisor'
-                              ? 'bg-gray-100'
-                              : 'bg-orange-100'
-                        }`}
+                        key={index} 
+                        className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                       >
-                        <p className="text-sm mb-1">{message.content}</p>
-                        <p className="text-xs text-gray-500">
-                          {message.sender === 'user' ? 'Siz' : 
-                           message.sender === 'advisor' ? 'Danışman' : 'Satış Temsilcisi'} - {message.timestamp}
-                        </p>
+                        <div 
+                          className={`max-w-[70%] rounded-lg p-3 ${
+                            message.sender === 'user' 
+                              ? 'bg-blue-500 text-white' 
+                              : 'bg-gray-200/80 dark:bg-gray-700/80 text-gray-800 dark:text-gray-200'
+                          }`}
+                        >
+                          <p>{message.content}</p>
+                          <p className="text-xs opacity-70 text-right mt-1">
+                            {message.timestamp || ""}
+                          </p>
+                        </div>
                       </div>
-                    ))
-                  ) : (
-                    <div className="text-center text-gray-500 my-8">
-                      <p>Yeni bir mesaj göndererek konuşmayı başlatın.</p>
-                    </div>
-                  )}
+                    ))}
+                  </div>
                 </div>
                 
-                <div className="p-4 border-t border-gray-200">
+                <div className="p-4 border-t border-gray-200/60 dark:border-gray-700/30">
                   <form onSubmit={handleSendMessage} className="flex gap-2">
-                    <input
+                    <input 
                       type="text"
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
                       placeholder="Mesajınızı yazın..."
-                      className="flex-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white/90 dark:bg-gray-700/90 focus:outline-none focus:ring-2 focus:ring-blue-500/70"
                     />
-                    <button
+                    <button 
                       type="submit"
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1"
                       disabled={!newMessage.trim()}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Gönder
+                      <span>Gönder</span>
+                      <span className="text-lg">→</span>
                     </button>
                   </form>
                 </div>
               </>
             ) : (
-              <div className="flex items-center justify-center h-full text-center p-6">
-                <div>
-                  <div className="text-5xl mb-4">💬</div>
-                  <h3 className="text-xl font-semibold mb-2 text-[#002757]">Mesajlarınız</h3>
-                  <p className="text-gray-600 max-w-md">
-                    Soldaki listeden bir konuşma seçin veya yeni bir konu başlatın.
-                  </p>
+              <div className="flex items-center justify-center h-full">
+                <div className="text-center p-8">
+                  <p className="text-gray-500 dark:text-gray-400 mb-4">Lütfen görüntülemek için bir mesaj seçin</p>
+                  <p className="text-gray-400 dark:text-gray-500 text-sm">veya</p>
+                  <button 
+                    onClick={() => setShowNewTicketForm(true)}
+                    className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Yeni Bir Konu Başlat
+                  </button>
                 </div>
               </div>
             )}

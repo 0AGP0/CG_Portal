@@ -6,23 +6,21 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'student' | 'advisor' | 'sales'; // Kullanıcı tipi: öğrenci, danışman veya satış ekibi
+  role: 'student' | 'advisor' | 'admin'; // Kullanıcı tipi: öğrenci, danışman veya admin
   processStarted?: boolean; // Süreç başlatılmış mı? (sadece öğrenciler için)
   advisorId?: string; // Atanmış danışman ID'si (sadece öğrenciler için)
-  salesId?: string; // Atanmış satış ekibi üyesi ID'si (sadece öğrenciler için)
   studentIds?: string[]; // Danışmana atanmış öğrenciler (sadece danışmanlar için)
-  salesStudentIds?: string[]; // Satış ekibi üyesine atanmış öğrenciler (sadece satış ekibi için)
 }
 
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
-  login: (email: string, password: string, role?: 'student' | 'advisor' | 'sales') => Promise<boolean>;
+  login: (email: string, password: string, role?: 'student' | 'advisor' | 'admin') => Promise<boolean>;
   logout: () => void;
-  startProcess: () => void; // Süreci başlatma fonksiyonu (artık kullanılmıyor - satış ekibi tarafından kullanılacak)
+  startProcess: () => void; // Süreci başlatma fonksiyonu
   resetProcess: () => void; // Süreci sıfırlama fonksiyonu
   isAdvisor: () => boolean; // Kullanıcının danışman olup olmadığını kontrol et
-  isSales: () => boolean; // Kullanıcının satış ekibi üyesi olup olmadığını kontrol et
+  isAdmin: () => boolean; // Kullanıcının admin olup olmadığını kontrol et
 }
 
 // Başlangıç değerleri
@@ -31,10 +29,10 @@ const defaultContext: AuthContextType = {
   isLoading: true,
   login: async () => false,
   logout: () => {},
-  startProcess: () => {},
+  startProcess: () => {}, // Varsayılan boş fonksiyon
   resetProcess: () => {},
   isAdvisor: () => false,
-  isSales: () => false
+  isAdmin: () => false
 };
 
 // Context'i oluştur
@@ -80,8 +78,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     checkAuth();
   }, []);
 
-  // Giriş işlemi - öğrenci, danışman veya satış ekibi girişi
-  const login = async (email: string, password: string, role: 'student' | 'advisor' | 'sales' = 'student') => {
+  // Giriş işlemi - öğrenci, danışman veya admin girişi
+  const login = async (email: string, password: string, role: 'student' | 'advisor' | 'admin' = 'student') => {
     setIsLoading(true);
     
     // Gerçek uygulamada API çağrısı yapılacak
@@ -139,57 +137,30 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         
         setIsLoading(false);
         return true;
-      } else if (role === 'sales') {
-        // Satış ekibi girişi
-        const response = await fetch('/api/auth/sales', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email, password }),
-        });
-        
-        if (!response.ok) {
-          throw new Error('Satış ekibi girişi başarısız');
-        }
-        
-        const data = await response.json();
-        const salesPerson = data.salesPerson;
-        
-        // Eğer API'den veri gelmezse basit bir satış ekibi üyesi nesnesi oluştur
-        if (!salesPerson) {
+      } else if (role === 'admin') {
+        // Admin girişi
+        try {
           // İsim oluşturma - e-posta adresinden basit bir şekilde
           const nameParts = email.split('@')[0].split('.');
           const displayName = nameParts.map(part => 
             part.charAt(0).toUpperCase() + part.slice(1)
           ).join(' ');
           
-          const mockSalesPerson: User = {
-            id: 'sales-1',
-            name: displayName || 'Satış Ekibi Üyesi',
+          const mockAdmin: User = {
+            id: 'admin-1',
+            name: displayName || 'Admin Kullanıcı',
             email: email,
-            role: 'sales',
-            salesStudentIds: []
+            role: 'admin'
           };
           
-          setUser(mockSalesPerson);
-          localStorage.setItem('user', JSON.stringify(mockSalesPerson));
-        } else {
-          // API'den gelen satış ekibi bilgilerini kullan
-          const salesUser: User = {
-            id: salesPerson.id,
-            name: salesPerson.name,
-            email: salesPerson.email,
-            role: 'sales',
-            salesStudentIds: salesPerson.studentIds || []
-          };
-          
-          setUser(salesUser);
-          localStorage.setItem('user', JSON.stringify(salesUser));
+          setUser(mockAdmin);
+          localStorage.setItem('user', JSON.stringify(mockAdmin));
+          setIsLoading(false);
+          return true;
+        } catch (error) {
+          console.error('Admin girişi hatası:', error);
+          throw error;
         }
-        
-        setIsLoading(false);
-        return true;
       } else {
         // Öğrenci girişi
         const response = await fetch('/api/auth/student', {
@@ -282,17 +253,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         
         setUser(mockAdvisor);
         localStorage.setItem('user', JSON.stringify(mockAdvisor));
-      } else if (role === 'sales') {
-        const mockSalesPerson: User = {
-          id: 'sales-1',
-          name: displayName || 'Satış Ekibi Üyesi',
+      } else if (role === 'admin') {
+        const mockAdmin: User = {
+          id: 'admin-1',
+          name: displayName || 'Admin Kullanıcı',
           email: email,
-          role: 'sales',
-          salesStudentIds: []
+          role: 'admin'
         };
         
-        setUser(mockSalesPerson);
-        localStorage.setItem('user', JSON.stringify(mockSalesPerson));
+        setUser(mockAdmin);
+        localStorage.setItem('user', JSON.stringify(mockAdmin));
       } else {
         const mockUser: User = {
           id: '1',
@@ -318,12 +288,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     localStorage.removeItem('user');
   };
 
-  // Süreci başlatma işlemi (artık kullanılmıyor - satış ekibi tarafından kullanılacak)
-  const startProcess = () => {
-    // İşlevi tutuyoruz ama kullanmıyoruz - yeni versiyonda satış ekibi başlatacak
-    console.log("Bu işlev artık öğrenci panelinde kullanılmıyor. Satış ekibi tarafından yönetilecek.");
-  };
-
   // Süreci sıfırlama işlemi
   const resetProcess = () => {
     if (user && user.role === 'student') {
@@ -347,14 +311,37 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
   
+  // Süreci başlatma işlemi
+  const startProcess = () => {
+    if (user && user.role === 'student') {
+      const updatedUser = { ...user, processStarted: true };
+      setUser(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      
+      // API'ye süreç başlatma bildirimi gönder
+      try {
+        fetch('/api/student/process', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-user-email': user.email
+          },
+          body: JSON.stringify({ processStarted: true })
+        }).catch(err => console.error('Süreç başlatma API hatası:', err));
+      } catch (error) {
+        console.error('Süreç başlatma hatası:', error);
+      }
+    }
+  };
+  
   // Kullanıcının danışman olup olmadığını kontrol et
   const isAdvisor = () => {
     return user?.role === 'advisor';
   };
   
-  // Kullanıcının satış ekibi üyesi olup olmadığını kontrol et
-  const isSales = () => {
-    return user?.role === 'sales';
+  // Kullanıcının admin olup olmadığını kontrol et
+  const isAdmin = () => {
+    return user?.role === 'admin';
   };
 
   const value = {
@@ -365,7 +352,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     startProcess,
     resetProcess,
     isAdvisor,
-    isSales
+    isAdmin
   };
 
   return (
