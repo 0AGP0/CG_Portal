@@ -129,39 +129,39 @@ export default function StudentDetailPage() {
             {/* Temel Profil Bilgileri */}
             <motion.div 
               variants={itemVariants}
-              className="bg-white p-6 rounded-lg shadow-md"
+              className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-6 rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30"
             >
-              <h2 className="text-xl font-semibold mb-4 text-[#002757] border-b pb-2">
+              <h2 className="text-xl font-semibold mb-4 text-[#002757] dark:text-blue-300 border-b border-gray-200/80 dark:border-gray-700/50 pb-2">
                 Kişisel Bilgiler
               </h2>
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">E-posta:</span>
-                  <span>{student.email}</span>
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">E-posta:</span>
+                  <span className="dark:text-gray-100">{student.email}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Telefon:</span>
-                  <span>{student.phone || '---'}</span>
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">Telefon:</span>
+                  <span className="dark:text-gray-100">{student.phone || '---'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Yaş:</span>
-                  <span>{student.age || '---'}</span>
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">Yaş:</span>
+                  <span className="dark:text-gray-100">{student.age || '---'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Doğum Tarihi:</span>
-                  <span>{student.birth_date || '---'}</span>
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">Doğum Tarihi:</span>
+                  <span className="dark:text-gray-100">{student.birth_date || '---'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Doğum Yeri:</span>
-                  <span>{student.birth_place || '---'}</span>
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">Doğum Yeri:</span>
+                  <span className="dark:text-gray-100">{student.birth_place || '---'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Medeni Durum:</span>
-                  <span>{student.marital_status || '---'}</span>
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">Medeni Durum:</span>
+                  <span className="dark:text-gray-100">{student.marital_status || '---'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Adres:</span>
-                  <span className="text-right max-w-[250px]">{student.contact_address || '---'}</span>
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">Adres:</span>
+                  <span className="text-right max-w-[250px] dark:text-gray-100">{student.contact_address || '---'}</span>
                 </div>
               </div>
             </motion.div>
@@ -169,43 +169,43 @@ export default function StudentDetailPage() {
             {/* Vize ve Pasaport Bilgileri */}
             <motion.div 
               variants={itemVariants}
-              className="bg-white p-6 rounded-lg shadow-md"
+              className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-6 rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30"
             >
-              <h2 className="text-xl font-semibold mb-4 text-[#002757] border-b pb-2">
+              <h2 className="text-xl font-semibold mb-4 text-[#002757] dark:text-blue-300 border-b border-gray-200/80 dark:border-gray-700/50 pb-2">
                 Vize & Pasaport Bilgileri
               </h2>
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Pasaport No:</span>
-                  <span>{student.passport_number || '---'}</span>
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">Pasaport No:</span>
+                  <span className="dark:text-gray-100">{student.passport_number || '---'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Pasaport Tipi:</span>
-                  <span>{student.passport_type || '---'}</span>
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">Pasaport Tipi:</span>
+                  <span className="dark:text-gray-100">{student.passport_type || '---'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Veren Makam:</span>
-                  <span>{student.issuing_authority || '---'}</span>
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">Veren Makam:</span>
+                  <span className="dark:text-gray-100">{student.issuing_authority || '---'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">PNR No:</span>
-                  <span>{student.pnr_number || '---'}</span>
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">PNR No:</span>
+                  <span className="dark:text-gray-100">{student.pnr_number || '---'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Vize Başvuru:</span>
-                  <span>{student.visa_application_date || '---'}</span>
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">Vize Başvuru:</span>
+                  <span className="dark:text-gray-100">{student.visa_application_date || '---'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Vize Randevu:</span>
-                  <span className="font-semibold text-green-600">{student.visa_appointment_date || '---'}</span>
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">Vize Randevu:</span>
+                  <span className="font-semibold text-green-600 dark:text-green-400">{student.visa_appointment_date || '---'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Konsolosluk:</span>
-                  <span>{student.consulate || '---'}</span>
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">Konsolosluk:</span>
+                  <span className="dark:text-gray-100">{student.consulate || '---'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Almanya'da Bulunma:</span>
-                  <span>{student.has_been_to_germany ? 'Evet' : 'Hayır'}</span>
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">Almanya'da Bulunma:</span>
+                  <span className="dark:text-gray-100">{student.has_been_to_germany ? 'Evet' : 'Hayır'}</span>
                 </div>
               </div>
             </motion.div>
@@ -213,35 +213,35 @@ export default function StudentDetailPage() {
             {/* Eğitim Bilgileri */}
             <motion.div 
               variants={itemVariants}
-              className="bg-white p-6 rounded-lg shadow-md"
+              className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-6 rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30"
             >
-              <h2 className="text-xl font-semibold mb-4 text-[#002757] border-b pb-2">
+              <h2 className="text-xl font-semibold mb-4 text-[#002757] dark:text-blue-300 border-b border-gray-200/80 dark:border-gray-700/50 pb-2">
                 Eğitim Bilgileri
               </h2>
               <div className="space-y-4">
                 <div>
-                  <h3 className="font-medium text-blue-700">Üniversite</h3>
-                  <p className="mt-1">{student.university_name || '---'}</p>
-                  <p className="text-sm text-gray-600">{student.university_department || '---'}</p>
-                  <div className="flex justify-between mt-1 text-sm">
+                  <h3 className="font-medium text-blue-700 dark:text-blue-400">Üniversite</h3>
+                  <p className="mt-1 dark:text-gray-100">{student.university_name || '---'}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{student.university_department || '---'}</p>
+                  <div className="flex justify-between mt-1 text-sm dark:text-gray-300">
                     <span>Başlangıç: {student.university_start_date || '---'}</span>
                     <span>Bitiş: {student.university_end_date || '---'}</span>
                   </div>
-                  <p className="text-sm mt-1">
+                  <p className="text-sm mt-1 dark:text-gray-300">
                     Mezuniyet Durumu: {student.graduation_status || '---'}
                   </p>
-                  <p className="text-sm">
+                  <p className="text-sm dark:text-gray-300">
                     Mezuniyet Yılı: {student.graduation_year || '---'}
                   </p>
                 </div>
                 
                 <div>
-                  <h3 className="font-medium text-blue-700">Lise</h3>
-                  <p className="mt-1">{student.high_school_name || '---'}</p>
-                  <p className="text-sm text-gray-600">
+                  <h3 className="font-medium text-blue-700 dark:text-blue-400">Lise</h3>
+                  <p className="mt-1 dark:text-gray-100">{student.high_school_name || '---'}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
                     {student.high_school_type || '---'} / {student.high_school_city || '---'}
                   </p>
-                  <div className="flex justify-between mt-1 text-sm">
+                  <div className="flex justify-between mt-1 text-sm dark:text-gray-300">
                     <span>Başlangıç: {student.high_school_start_date || '---'}</span>
                     <span>Mezuniyet: {student.high_school_graduation_date || '---'}</span>
                   </div>
@@ -252,27 +252,27 @@ export default function StudentDetailPage() {
             {/* Dil Bilgileri */}
             <motion.div 
               variants={itemVariants}
-              className="bg-white p-6 rounded-lg shadow-md"
+              className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-6 rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30"
             >
-              <h2 className="text-xl font-semibold mb-4 text-[#002757] border-b pb-2">
+              <h2 className="text-xl font-semibold mb-4 text-[#002757] dark:text-blue-300 border-b border-gray-200/80 dark:border-gray-700/50 pb-2">
                 Dil Bilgileri
               </h2>
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Almanca Seviyesi:</span>
-                  <span>{student.language_level || '---'}</span>
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">Almanca Seviyesi:</span>
+                  <span className="dark:text-gray-100">{student.language_level || '---'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Sertifika:</span>
-                  <span>{student.language_certificate || '---'}</span>
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">Sertifika:</span>
+                  <span className="dark:text-gray-100">{student.language_certificate || '---'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Dil Öğrenim Durumu:</span>
-                  <span>{student.language_learning_status || '---'}</span>
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">Dil Öğrenim Durumu:</span>
+                  <span className="dark:text-gray-100">{student.language_learning_status || '---'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Dil Kursu Kaydı:</span>
-                  <span>{student.language_course_registration ? 'Var' : 'Yok'}</span>
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">Dil Kursu Kaydı:</span>
+                  <span className="dark:text-gray-100">{student.language_course_registration ? 'Var' : 'Yok'}</span>
                 </div>
               </div>
             </motion.div>
@@ -280,21 +280,21 @@ export default function StudentDetailPage() {
             {/* Süreç Durumu */}
             <motion.div 
               variants={itemVariants}
-              className="bg-white p-6 rounded-lg shadow-md"
+              className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-6 rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30"
             >
-              <h2 className="text-xl font-semibold mb-4 text-[#002757] border-b pb-2">
+              <h2 className="text-xl font-semibold mb-4 text-[#002757] dark:text-blue-300 border-b border-gray-200/80 dark:border-gray-700/50 pb-2">
                 Süreç Durumu
               </h2>
               <div className="flex items-center justify-center p-4">
                 <div className="text-center">
                   <div className={`text-4xl font-bold mb-2 ${
                     student.stage === 'BİTEN' || student.stage === 'biten' 
-                      ? 'text-green-600' 
-                      : 'text-blue-600'
+                      ? 'text-green-600 dark:text-green-400' 
+                      : 'text-blue-600 dark:text-blue-400'
                   }`}>
                     {student.stage || 'Yeni'}
                   </div>
-                  <div className="text-sm text-gray-500">
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
                     Son güncelleme: {new Date(student.updatedAt).toLocaleDateString('tr-TR')}
                   </div>
                 </div>
@@ -304,27 +304,27 @@ export default function StudentDetailPage() {
             {/* Sınav Bilgileri */}
             <motion.div 
               variants={itemVariants}
-              className="bg-white p-6 rounded-lg shadow-md"
+              className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-6 rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30"
             >
-              <h2 className="text-xl font-semibold mb-4 text-[#002757] border-b pb-2">
+              <h2 className="text-xl font-semibold mb-4 text-[#002757] dark:text-blue-300 border-b border-gray-200/80 dark:border-gray-700/50 pb-2">
                 Sınav Bilgileri
               </h2>
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Sınav Girişi:</span>
-                  <span>{student.exam_entry ? 'Evet' : 'Hayır'}</span>
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">Sınav Girişi:</span>
+                  <span className="dark:text-gray-100">{student.exam_entry ? 'Evet' : 'Hayır'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Sınav Sonuç Tarihi:</span>
-                  <span>{student.exam_result_date || '---'}</span>
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">Sınav Sonuç Tarihi:</span>
+                  <span className="dark:text-gray-100">{student.exam_result_date || '---'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Üniversite Tercihleri:</span>
-                  <span>{student.university_preferences || '---'}</span>
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">Üniversite Tercihleri:</span>
+                  <span className="dark:text-gray-100">{student.university_preferences || '---'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Almanya Bölüm Tercihi:</span>
-                  <span>{student.german_department_preference || '---'}</span>
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">Almanya Bölüm Tercihi:</span>
+                  <span className="dark:text-gray-100">{student.german_department_preference || '---'}</span>
                 </div>
               </div>
             </motion.div>
@@ -332,19 +332,19 @@ export default function StudentDetailPage() {
             {/* Finansal Bilgiler */}
             <motion.div 
               variants={itemVariants}
-              className="bg-white p-6 rounded-lg shadow-md"
+              className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-6 rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30"
             >
-              <h2 className="text-xl font-semibold mb-4 text-[#002757] border-b pb-2">
+              <h2 className="text-xl font-semibold mb-4 text-[#002757] dark:text-blue-300 border-b border-gray-200/80 dark:border-gray-700/50 pb-2">
                 Finansal Bilgiler
               </h2>
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Finansal Kanıt:</span>
-                  <span>{student.financial_proof || '---'}</span>
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">Finansal Kanıt:</span>
+                  <span className="dark:text-gray-100">{student.financial_proof || '---'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Maddi Kanıt Durumu:</span>
-                  <span>{student.financial_proof_status ? 'Tamam' : 'Bekliyor'}</span>
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">Maddi Kanıt Durumu:</span>
+                  <span className="dark:text-gray-100">{student.financial_proof_status ? 'Tamam' : 'Bekliyor'}</span>
                 </div>
               </div>
             </motion.div>
@@ -352,31 +352,31 @@ export default function StudentDetailPage() {
             {/* Anne Bilgileri */}
             <motion.div 
               variants={itemVariants}
-              className="bg-white p-6 rounded-lg shadow-md"
+              className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-6 rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30"
             >
-              <h2 className="text-xl font-semibold mb-4 text-[#002757] border-b pb-2">
+              <h2 className="text-xl font-semibold mb-4 text-[#002757] dark:text-blue-300 border-b border-gray-200/80 dark:border-gray-700/50 pb-2">
                 Anne Bilgileri
               </h2>
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Ad Soyad:</span>
-                  <span>{`${student.mother_name || '---'} ${student.mother_surname || '---'}`}</span>
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">Ad Soyad:</span>
+                  <span className="dark:text-gray-100">{`${student.mother_name || '---'} ${student.mother_surname || '---'}`}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Doğum Tarihi:</span>
-                  <span>{student.mother_birth_date || '---'}</span>
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">Doğum Tarihi:</span>
+                  <span className="dark:text-gray-100">{student.mother_birth_date || '---'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Doğum Yeri:</span>
-                  <span>{student.mother_birth_place || '---'}</span>
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">Doğum Yeri:</span>
+                  <span className="dark:text-gray-100">{student.mother_birth_place || '---'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">İkamet:</span>
-                  <span>{student.mother_residence || '---'}</span>
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">İkamet:</span>
+                  <span className="dark:text-gray-100">{student.mother_residence || '---'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Telefon:</span>
-                  <span>{student.mother_phone || '---'}</span>
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">Telefon:</span>
+                  <span className="dark:text-gray-100">{student.mother_phone || '---'}</span>
                 </div>
               </div>
             </motion.div>
@@ -384,31 +384,31 @@ export default function StudentDetailPage() {
             {/* Baba Bilgileri */}
             <motion.div 
               variants={itemVariants}
-              className="bg-white p-6 rounded-lg shadow-md"
+              className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-6 rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30"
             >
-              <h2 className="text-xl font-semibold mb-4 text-[#002757] border-b pb-2">
+              <h2 className="text-xl font-semibold mb-4 text-[#002757] dark:text-blue-300 border-b border-gray-200/80 dark:border-gray-700/50 pb-2">
                 Baba Bilgileri
               </h2>
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Ad Soyad:</span>
-                  <span>{`${student.father_name || '---'} ${student.father_surname || '---'}`}</span>
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">Ad Soyad:</span>
+                  <span className="dark:text-gray-100">{`${student.father_name || '---'} ${student.father_surname || '---'}`}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Doğum Tarihi:</span>
-                  <span>{student.father_birth_date || '---'}</span>
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">Doğum Tarihi:</span>
+                  <span className="dark:text-gray-100">{student.father_birth_date || '---'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Doğum Yeri:</span>
-                  <span>{student.father_birth_place || '---'}</span>
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">Doğum Yeri:</span>
+                  <span className="dark:text-gray-100">{student.father_birth_place || '---'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">İkamet:</span>
-                  <span>{student.father_residence || '---'}</span>
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">İkamet:</span>
+                  <span className="dark:text-gray-100">{student.father_residence || '---'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 font-medium">Telefon:</span>
-                  <span>{student.father_phone || '---'}</span>
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">Telefon:</span>
+                  <span className="dark:text-gray-100">{student.father_phone || '---'}</span>
                 </div>
               </div>
             </motion.div>

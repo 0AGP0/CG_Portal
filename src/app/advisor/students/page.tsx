@@ -250,29 +250,29 @@ export default function AdvisorStudentsPage() {
         </div>
         
         {filteredStudents.length === 0 ? (
-          <div className="bg-white p-8 rounded-lg shadow-md text-center">
-            <p className="text-lg text-gray-600 mb-4">
+          <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-8 rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30 text-center">
+            <p className="text-lg text-gray-600 dark:text-gray-300 mb-4">
               {searchQuery || filterStatus !== 'all' 
                 ? 'Arama kriterlerine uygun öğrenci bulunamadı.' 
                 : 'Henüz atanmış öğrenciniz bulunmuyor.'}
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full bg-white shadow-md rounded-lg">
-              <thead className="bg-gray-50 border-b">
+          <div className="overflow-x-auto rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30">
+            <table className="w-full bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-lg">
+              <thead className="bg-gray-50/70 dark:bg-gray-700/30 border-b border-gray-200/60 dark:border-gray-700/30">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Öğrenci</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">İletişim</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Durum</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Süreç</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Son Aktivite</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">İşlemler</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Öğrenci</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">İletişim</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Durum</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Süreç</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Son Aktivite</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">İşlemler</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-gray-200/60 dark:divide-gray-700/30">
                 {filteredStudents.map((student) => (
-                  <tr key={student.id} className="hover:bg-gray-50">
+                  <tr key={student.id} className="hover:bg-gray-50/70 dark:hover:bg-gray-700/30 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10">
@@ -283,23 +283,23 @@ export default function AdvisorStudentsPage() {
                           />
                         </div>
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-[#002757]">{student.name}</div>
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm font-medium text-[#002757] dark:text-blue-300">{student.name}</div>
+                          <div className="text-sm text-gray-500 dark:text-gray-400">
                             {student.university ? (
                               <>
                                 {student.university}
                                 {student.program && <span> • {student.program}</span>}
                               </>
                             ) : (
-                              <span className="text-gray-400">Henüz üniversite seçilmedi</span>
+                              <span className="text-gray-400 dark:text-gray-500">Henüz üniversite seçilmedi</span>
                             )}
                           </div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{student.email}</div>
-                      <div className="text-sm text-gray-500">{student.phone}</div>
+                      <div className="text-sm text-gray-900 dark:text-gray-100">{student.email}</div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">{student.phone}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(student.status)}`}>
@@ -307,27 +307,27 @@ export default function AdvisorStudentsPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{getProcessStepText(student.processStep)}</div>
-                      <div className="w-24 bg-gray-200 rounded-full h-2 mt-1">
+                      <div className="text-sm text-gray-900 dark:text-gray-100">{getProcessStepText(student.processStep)}</div>
+                      <div className="w-24 bg-gray-200 dark:bg-gray-600 rounded-full h-2 mt-1">
                         <div 
                           className="bg-blue-600 h-2 rounded-full" 
                           style={{ width: `${(student.processStep / 5) * 100}%` }}
                         ></div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                       {new Date(student.lastActivity).toLocaleDateString('tr-TR')}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button 
                         onClick={() => handleViewStudent(student)}
-                        className="text-blue-600 hover:text-blue-900 mr-3"
+                        className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 mr-3"
                       >
                         Detaylar
                       </button>
                       <Link
                         href={`/advisor/messages?student=${student.email}`}
-                        className="text-green-600 hover:text-green-900"
+                        className="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300"
                       >
                         Mesaj
                       </Link>
@@ -341,8 +341,8 @@ export default function AdvisorStudentsPage() {
         
         {/* Öğrenci Detayları Modalı */}
         {isViewingDetails && selectedStudent && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-4xl">
+          <div className="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-lg p-6 w-full max-w-4xl shadow-xl border border-gray-100/60 dark:border-gray-700/30">
               <div className="flex justify-between items-start mb-6">
                 <div className="flex items-start gap-4">
                   <img 
@@ -351,31 +351,31 @@ export default function AdvisorStudentsPage() {
                     className="w-16 h-16 rounded-full object-cover"
                   />
                   <div>
-                    <h2 className="text-2xl font-bold text-[#002757]">{selectedStudent.name}</h2>
-                    <p className="text-gray-600">{selectedStudent.email}</p>
-                    <p className="text-gray-600">{selectedStudent.phone}</p>
+                    <h2 className="text-2xl font-bold text-[#002757] dark:text-blue-300">{selectedStudent.name}</h2>
+                    <p className="text-gray-600 dark:text-gray-300">{selectedStudent.email}</p>
+                    <p className="text-gray-600 dark:text-gray-300">{selectedStudent.phone}</p>
                   </div>
                 </div>
                 <button 
                   onClick={() => setIsViewingDetails(false)}
-                  className="text-gray-500 hover:text-gray-800"
+                  className="text-gray-500 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white"
                 >
                   ✕
                 </button>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <div className="bg-white p-4 rounded-lg border">
-                  <h3 className="font-semibold text-[#002757] mb-1">Durum</h3>
+                <div className="bg-white/70 dark:bg-gray-700/50 backdrop-blur-sm p-4 rounded-lg border border-gray-100/60 dark:border-gray-700/30">
+                  <h3 className="font-semibold text-[#002757] dark:text-blue-300 mb-1">Durum</h3>
                   <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(selectedStudent.status)}`}>
                     {getStatusText(selectedStudent.status)}
                   </span>
                 </div>
                 
-                <div className="bg-white p-4 rounded-lg border">
-                  <h3 className="font-semibold text-[#002757] mb-1">Süreç Adımı</h3>
-                  <p>{getProcessStepText(selectedStudent.processStep)}</p>
-                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                <div className="bg-white/70 dark:bg-gray-700/50 backdrop-blur-sm p-4 rounded-lg border border-gray-100/60 dark:border-gray-700/30">
+                  <h3 className="font-semibold text-[#002757] dark:text-blue-300 mb-1">Süreç Adımı</h3>
+                  <p className="text-gray-600 dark:text-gray-300">{getProcessStepText(selectedStudent.processStep)}</p>
+                  <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2 mt-2">
                     <div 
                       className="bg-blue-600 h-2 rounded-full" 
                       style={{ width: `${(selectedStudent.processStep / 5) * 100}%` }}
@@ -383,39 +383,39 @@ export default function AdvisorStudentsPage() {
                   </div>
                 </div>
                 
-                <div className="bg-white p-4 rounded-lg border">
-                  <h3 className="font-semibold text-[#002757] mb-1">Son Aktivite</h3>
-                  <p>{new Date(selectedStudent.lastActivity).toLocaleDateString('tr-TR')}</p>
+                <div className="bg-white/70 dark:bg-gray-700/50 backdrop-blur-sm p-4 rounded-lg border border-gray-100/60 dark:border-gray-700/30">
+                  <h3 className="font-semibold text-[#002757] dark:text-blue-300 mb-1">Son Aktivite</h3>
+                  <p className="text-gray-600 dark:text-gray-300">{new Date(selectedStudent.lastActivity).toLocaleDateString('tr-TR')}</p>
                 </div>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h3 className="font-semibold text-[#002757] mb-3 pb-2 border-b">Eğitim Bilgileri</h3>
+                <div className="bg-white/70 dark:bg-gray-700/50 backdrop-blur-sm p-4 rounded-lg border border-gray-100/60 dark:border-gray-700/30">
+                  <h3 className="font-semibold text-[#002757] dark:text-blue-300 mb-3 pb-2 border-b border-gray-200/60 dark:border-gray-700/30">Eğitim Bilgileri</h3>
                   {selectedStudent.university ? (
                     <div>
-                      <p><span className="font-medium">Üniversite:</span> {selectedStudent.university}</p>
+                      <p className="text-gray-600 dark:text-gray-300"><span className="font-medium">Üniversite:</span> {selectedStudent.university}</p>
                       {selectedStudent.program && (
-                        <p><span className="font-medium">Program:</span> {selectedStudent.program}</p>
+                        <p className="text-gray-600 dark:text-gray-300"><span className="font-medium">Program:</span> {selectedStudent.program}</p>
                       )}
                     </div>
                   ) : (
-                    <p className="text-gray-500">Henüz üniversite bilgisi yok</p>
+                    <p className="text-gray-500 dark:text-gray-400">Henüz üniversite bilgisi yok</p>
                   )}
                 </div>
                 
-                <div>
-                  <h3 className="font-semibold text-[#002757] mb-3 pb-2 border-b">Başvuru & Döküman Özeti</h3>
+                <div className="bg-white/70 dark:bg-gray-700/50 backdrop-blur-sm p-4 rounded-lg border border-gray-100/60 dark:border-gray-700/30">
+                  <h3 className="font-semibold text-[#002757] dark:text-blue-300 mb-3 pb-2 border-b border-gray-200/60 dark:border-gray-700/30">Başvuru & Döküman Özeti</h3>
                   <div className="space-y-2">
-                    <p>
+                    <p className="text-gray-600 dark:text-gray-300">
                       <span className="font-medium">Başvurular:</span> {selectedStudent.applicationCount} adet
                     </p>
                     <div>
                       <div className="flex justify-between mb-1">
-                        <span className="font-medium">Dökümanlar:</span> 
-                        <span>{selectedStudent.documentsCount} / {selectedStudent.documentsRequired}</span>
+                        <span className="font-medium text-gray-600 dark:text-gray-300">Dökümanlar:</span> 
+                        <span className="text-gray-600 dark:text-gray-300">{selectedStudent.documentsCount} / {selectedStudent.documentsRequired}</span>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
                         <div 
                           className={`h-2 rounded-full ${selectedStudent.documentsCount === selectedStudent.documentsRequired ? 'bg-green-600' : 'bg-yellow-600'}`} 
                           style={{ width: `${(selectedStudent.documentsCount / selectedStudent.documentsRequired) * 100}%` }}
@@ -429,13 +429,13 @@ export default function AdvisorStudentsPage() {
               <div className="flex justify-end gap-3 mt-8">
                 <Link
                   href={`/advisor/messages?student=${selectedStudent.email}`}
-                  className="px-4 py-2 bg-[#002757] text-white rounded-lg hover:bg-opacity-90"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   Mesaj Gönder
                 </Link>
                 <button 
                   onClick={() => setIsViewingDetails(false)}
-                  className="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-100"
+                  className="px-4 py-2 bg-gray-200/80 dark:bg-gray-700/80 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300/80 dark:hover:bg-gray-600/80 transition-colors"
                 >
                   Kapat
                 </button>

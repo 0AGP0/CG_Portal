@@ -3,13 +3,22 @@ import { getAdvisorByEmail, getRecordByEmail } from '@/utils/database';
 
 interface RouteParams {
   params: {
-    email: string;
+    email: string | Promise<string>;
   };
 }
 
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function GET(request: NextRequest, context: RouteParams) {
   try {
-    const studentEmail = decodeURIComponent(params.email);
+    // params'ı await ile beklemeliyiz
+    const params = await context.params;
+    // Parametreyi güvenli bir şekilde al
+    const email = typeof params.email === 'string' ? params.email : await params.email;
+    const studentEmail = email ? decodeURIComponent(email) : '';
+    
+    if (!studentEmail) {
+      return NextResponse.json({ error: 'Geçerli bir öğrenci e-postası gerekli' }, { status: 400 });
+    }
+    
     // Oturum doğrulama işlemi normalde burada yapılır
     // Şu an için basit bir gelen header doğrulaması yapacağız
     const advisorEmail = request.headers.get('x-user-email') || '';

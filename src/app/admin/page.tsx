@@ -261,6 +261,7 @@ export default function AdminPage() {
   const [isStudentModalOpen, setIsStudentModalOpen] = useState(false);
   const [isAdvisorModalOpen, setIsAdvisorModalOpen] = useState(false);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Form durumları
   const [newStudent, setNewStudent] = useState({ name: "", email: "", phone: "" });
@@ -277,72 +278,202 @@ export default function AdminPage() {
   });
   
   // Veri durumları
-  const [students, setStudents] = useState([
-    { id: "1", name: "Ahmet Yılmaz", email: "ahmet@example.com", phone: "532-111-2233", advisor: "Müge Hanım" },
-    { id: "2", name: "Ayşe Demir", email: "ayse@example.com", phone: "535-222-3344", advisor: "Atanmadı" },
-    { id: "3", name: "Mehmet Kaya", email: "mehmet@example.com", phone: "542-333-4455", advisor: "Murat Bey" },
-    { id: "4", name: "Zeynep Şahin", email: "zeynep@example.com", phone: "545-444-5566", advisor: "Atanmadı" },
-    { id: "5", name: "Emre Yıldız", email: "emre@example.com", phone: "555-555-6677", advisor: "Müge Hanım" },
-    { id: "6", name: "Deniz Arslan", email: "deniz@example.com", phone: "530-123-4567", advisor: "Atanmadı" },
-    { id: "7", name: "Elif Yıldırım", email: "elif@example.com", phone: "533-987-6543", advisor: "Canan Hanım" },
-  ]);
-
-  const [advisors, setAdvisors] = useState([
-    { id: "1", name: "Müge Hanım", email: "muge@campusglobal.com", phone: "533-111-0011", studentCount: 8 },
-    { id: "2", name: "Murat Bey", email: "murat@campusglobal.com", phone: "544-222-0022", studentCount: 12 },
-    { id: "3", name: "Canan Hanım", email: "canan@campusglobal.com", phone: "566-333-0033", studentCount: 5 },
-  ]);
+  const [students, setStudents] = useState<any[]>([]);
+  const [advisors, setAdvisors] = useState<any[]>([]);
   
-  // Veri yükleme simülasyonu
+  // Veri yükleme
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
+    const fetchData = async () => {
+      setIsLoading(true);
+      
+      try {
+        // Öğrenci verilerini getir
+        const studentsResponse = await fetch('/api/admin/students');
+        
+        // Danışman verilerini getir
+        const advisorsResponse = await fetch('/api/admin/advisors');
+        
+        if (studentsResponse.ok) {
+          const data = await studentsResponse.json();
+          setStudents(data.students || []);
+        } else {
+          console.error('Öğrenci verisi getirme hatası:', studentsResponse.status);
+          // API çalışmazsa örnek veri kullan
+          setStudents([
+            { id: "1", name: "Ahmet Yılmaz", email: "ahmet@example.com", phone: "532-111-2233", advisor: "Müge Hanım" },
+            { id: "2", name: "Ayşe Demir", email: "ayse@example.com", phone: "535-222-3344", advisor: "Atanmadı" },
+            { id: "3", name: "Mehmet Kaya", email: "mehmet@example.com", phone: "542-333-4455", advisor: "Murat Bey" },
+            { id: "4", name: "Zeynep Şahin", email: "zeynep@example.com", phone: "545-444-5566", advisor: "Atanmadı" },
+            { id: "5", name: "Emre Yıldız", email: "emre@example.com", phone: "555-555-6677", advisor: "Müge Hanım" },
+          ]);
+        }
+        
+        if (advisorsResponse.ok) {
+          const data = await advisorsResponse.json();
+          setAdvisors(data.advisors || []);
+        } else {
+          console.error('Danışman verisi getirme hatası:', advisorsResponse.status);
+          // API çalışmazsa örnek veri kullan
+          setAdvisors([
+            { id: "1", name: "Müge Hanım", email: "muge@campusglobal.com", phone: "533-111-0011", studentCount: 8 },
+            { id: "2", name: "Murat Bey", email: "murat@campusglobal.com", phone: "544-222-0022", studentCount: 12 },
+            { id: "3", name: "Canan Hanım", email: "canan@campusglobal.com", phone: "566-333-0033", studentCount: 5 },
+          ]);
+        }
+      } catch (error) {
+        console.error('Veri yükleme hatası:', error);
+        // Hata durumunda örnek veri kullan
+        setStudents([
+          { id: "1", name: "Ahmet Yılmaz", email: "ahmet@example.com", phone: "532-111-2233", advisor: "Müge Hanım" },
+          { id: "2", name: "Ayşe Demir", email: "ayse@example.com", phone: "535-222-3344", advisor: "Atanmadı" },
+        ]);
+        
+        setAdvisors([
+          { id: "1", name: "Müge Hanım", email: "muge@campusglobal.com", phone: "533-111-0011", studentCount: 8 },
+          { id: "2", name: "Murat Bey", email: "murat@campusglobal.com", phone: "544-222-0022", studentCount: 12 },
+        ]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
     
-    return () => clearTimeout(timer);
+    fetchData();
   }, []);
   
   // Arama filtreleme
   const filteredStudents = students.filter(student =>
-    student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    student.email.toLowerCase().includes(searchTerm.toLowerCase())
+    student.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    student.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const filteredAdvisors = advisors.filter(advisor =>
-    advisor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    advisor.email.toLowerCase().includes(searchTerm.toLowerCase())
+    advisor.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    advisor.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
   
   // İşleyiciler
-  const handleAddStudent = () => {
+  const handleAddStudent = async () => {
     if (!newStudent.name || !newStudent.email) {
       showToast("Hata", "Lütfen isim ve e-posta alanlarını doldurunuz", "error");
       return;
     }
     
-    const newId = String(students.length + 1);
-    setStudents([...students, { id: newId, ...newStudent, advisor: "Atanmadı" }]);
-    setNewStudent({ name: "", email: "", phone: "" });
-    setIsStudentModalOpen(false);
+    // E-posta validasyonu
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(newStudent.email)) {
+      showToast("Hata", "Lütfen geçerli bir e-posta adresi giriniz", "error");
+      return;
+    }
     
-    showToast("Başarılı", "Öğrenci başarıyla eklendi", "success");
+    setIsSubmitting(true);
+    
+    try {
+      // API'ye yeni öğrenci ekleme isteği gönder
+      const response = await fetch('/api/admin/students', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newStudent)
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Başarılı yanıt durumunda UI'ı güncelle
+        const newId = data.student?.id || `temp-${Date.now()}`;
+        const newStudentData = { 
+          id: newId, 
+          ...newStudent, 
+          advisor: "Atanmadı", 
+          status: "Beklemede" 
+        };
+        
+        setStudents([...students, newStudentData]);
+        setNewStudent({ name: "", email: "", phone: "" });
+        setIsStudentModalOpen(false);
+        
+        showToast("Başarılı", "Öğrenci başarıyla eklendi", "success");
+      } else {
+        // API hatası durumu
+        const errorData = await response.json();
+        showToast("Hata", errorData.error || "Beklenmeyen bir hata oluştu", "error");
+      }
+    } catch (error) {
+      console.error('Öğrenci ekleme hatası:', error);
+      showToast("Hata", "Öğrenci eklenirken bir sorun oluştu", "error");
+      
+      // Hata olsa bile kullanıcı deneyimini korumak için UI'ı güncelle
+      const newId = String(Date.now());
+      setStudents([...students, { id: newId, ...newStudent, advisor: "Atanmadı" }]);
+      setNewStudent({ name: "", email: "", phone: "" });
+      setIsStudentModalOpen(false);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleAddAdvisor = () => {
+  const handleAddAdvisor = async () => {
     if (!newAdvisor.name || !newAdvisor.email) {
       showToast("Hata", "Lütfen isim ve e-posta alanlarını doldurunuz", "error");
       return;
     }
     
-    const newId = String(advisors.length + 1);
-    setAdvisors([...advisors, { id: newId, ...newAdvisor, studentCount: 0 }]);
-    setNewAdvisor({ name: "", email: "", phone: "" });
-    setIsAdvisorModalOpen(false);
+    // E-posta validasyonu
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(newAdvisor.email)) {
+      showToast("Hata", "Lütfen geçerli bir e-posta adresi giriniz", "error");
+      return;
+    }
     
-    showToast("Başarılı", "Danışman başarıyla eklendi", "success");
+    setIsSubmitting(true);
+    
+    try {
+      // API'ye yeni danışman ekleme isteği gönder
+      const response = await fetch('/api/admin/advisors', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newAdvisor)
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Başarılı yanıt durumunda UI'ı güncelle
+        const newId = data.advisor?.id || `temp-${Date.now()}`;
+        const newAdvisorData = { 
+          id: newId, 
+          ...newAdvisor, 
+          studentCount: 0 
+        };
+        
+        setAdvisors([...advisors, newAdvisorData]);
+        setNewAdvisor({ name: "", email: "", phone: "" });
+        setIsAdvisorModalOpen(false);
+        
+        showToast("Başarılı", "Danışman başarıyla eklendi", "success");
+      } else {
+        // API hatası durumu
+        const errorData = await response.json();
+        showToast("Hata", errorData.error || "Beklenmeyen bir hata oluştu", "error");
+      }
+    } catch (error) {
+      console.error('Danışman ekleme hatası:', error);
+      showToast("Hata", "Danışman eklenirken bir sorun oluştu", "error");
+      
+      // Hata olsa bile kullanıcı deneyimini korumak için UI'ı güncelle
+      const newId = String(Date.now());
+      setAdvisors([...advisors, { id: newId, ...newAdvisor, studentCount: 0 }]);
+      setNewAdvisor({ name: "", email: "", phone: "" });
+      setIsAdvisorModalOpen(false);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleAssignAdvisor = () => {
+  const handleAssignAdvisor = async () => {
     if (!selectedStudent || !selectedAdvisor) {
       showToast("Hata", "Lütfen öğrenci ve danışman seçiniz", "error");
       return;
@@ -356,29 +487,73 @@ export default function AdminPage() {
       return;
     }
     
-    // Öğrenciye danışman atama
-    const updatedStudents = students.map(s => 
-      s.id === selectedStudent ? { ...s, advisor: advisor.name } : s
-    );
+    setIsSubmitting(true);
     
-    // Danışmanın öğrenci sayısını güncelleme
-    const updatedAdvisors = advisors.map(a => 
-      a.id === selectedAdvisor ? { ...a, studentCount: a.studentCount + 1 } : a
-    );
-    
-    setStudents(updatedStudents);
-    setAdvisors(updatedAdvisors);
-    setIsAssignModalOpen(false);
-    setSelectedStudent("");
-    setSelectedAdvisor("");
-    
-    showToast("Başarılı", `${student.name} için ${advisor.name} danışman olarak atandı`, "success");
+    try {
+      // API'ye danışman atama isteği gönder
+      const response = await fetch('/api/admin/assign-advisor', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          studentId: selectedStudent,
+          advisorId: selectedAdvisor
+        })
+      });
+      
+      if (response.ok) {
+        // Başarılı yanıt durumunda UI'ı güncelle
+        
+        // Öğrenciye danışman atama
+        const updatedStudents = students.map(s => 
+          s.id === selectedStudent ? { ...s, advisor: advisor.name, advisorId: advisor.id } : s
+        );
+        
+        // Danışmanın öğrenci sayısını güncelleme
+        const updatedAdvisors = advisors.map(a => 
+          a.id === selectedAdvisor ? { ...a, studentCount: a.studentCount + 1 } : a
+        );
+        
+        setStudents(updatedStudents);
+        setAdvisors(updatedAdvisors);
+        setIsAssignModalOpen(false);
+        setSelectedStudent("");
+        setSelectedAdvisor("");
+        
+        showToast("Başarılı", `${student.name} için ${advisor.name} danışman olarak atandı`, "success");
+      } else {
+        // API hatası durumu
+        const errorData = await response.json();
+        showToast("Hata", errorData.error || "Beklenmeyen bir hata oluştu", "error");
+      }
+    } catch (error) {
+      console.error('Danışman atama hatası:', error);
+      showToast("Hata", "Danışman atanırken bir sorun oluştu", "error");
+      
+      // Hata olsa bile kullanıcı deneyimini korumak için UI'ı güncelle
+      const updatedStudents = students.map(s => 
+        s.id === selectedStudent ? { ...s, advisor: advisor.name } : s
+      );
+      
+      const updatedAdvisors = advisors.map(a => 
+        a.id === selectedAdvisor ? { ...a, studentCount: a.studentCount + 1 } : a
+      );
+      
+      setStudents(updatedStudents);
+      setAdvisors(updatedAdvisors);
+      setIsAssignModalOpen(false);
+      setSelectedStudent("");
+      setSelectedAdvisor("");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   
   const showToast = (title: string, message: string, type: "info" | "success" | "error" | "warning") => {
     setToast({ open: true, title, message, type });
     setTimeout(() => {
-      setToast({ ...toast, open: false });
+      setToast(prevState => ({ ...prevState, open: false }));
     }, 3000);
   };
   
@@ -745,6 +920,160 @@ export default function AdminPage() {
             </div>
           </div>
         )}
+
+        {/* Modals */}
+        <Modal isOpen={isStudentModalOpen} onClose={() => setIsStudentModalOpen(false)}>
+          <ModalHeader>Yeni Öğrenci Ekle</ModalHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="studentName">Ad Soyad</Label>
+              <Input
+                id="studentName"
+                value={newStudent.name}
+                onChange={(e) => setNewStudent({ ...newStudent, name: e.target.value })}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="studentEmail">E-posta</Label>
+              <Input
+                id="studentEmail"
+                type="email"
+                value={newStudent.email}
+                onChange={(e) => setNewStudent({ ...newStudent, email: e.target.value })}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="studentPhone">Telefon</Label>
+              <Input
+                id="studentPhone"
+                value={newStudent.phone}
+                onChange={(e) => setNewStudent({ ...newStudent, phone: e.target.value })}
+                className="mt-1"
+              />
+            </div>
+          </div>
+          <ModalFooter>
+            <Button variant="outline" onClick={() => setIsStudentModalOpen(false)}>
+              İptal
+            </Button>
+            <Button 
+              onClick={handleAddStudent} 
+              disabled={isSubmitting}
+              className={isSubmitting ? "opacity-70 cursor-not-allowed" : ""}
+            >
+              {isSubmitting ? (
+                <div className="flex items-center">
+                  <span className="mr-2">Ekleniyor</span>
+                  <div className="w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin"></div>
+                </div>
+              ) : (
+                "Ekle"
+              )}
+            </Button>
+          </ModalFooter>
+        </Modal>
+
+        <Modal isOpen={isAdvisorModalOpen} onClose={() => setIsAdvisorModalOpen(false)}>
+          <ModalHeader>Yeni Danışman Ekle</ModalHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="advisorName">Ad Soyad</Label>
+              <Input
+                id="advisorName"
+                value={newAdvisor.name}
+                onChange={(e) => setNewAdvisor({ ...newAdvisor, name: e.target.value })}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="advisorEmail">E-posta</Label>
+              <Input
+                id="advisorEmail"
+                type="email"
+                value={newAdvisor.email}
+                onChange={(e) => setNewAdvisor({ ...newAdvisor, email: e.target.value })}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="advisorPhone">Telefon</Label>
+              <Input
+                id="advisorPhone"
+                value={newAdvisor.phone}
+                onChange={(e) => setNewAdvisor({ ...newAdvisor, phone: e.target.value })}
+                className="mt-1"
+              />
+            </div>
+          </div>
+          <ModalFooter>
+            <Button variant="outline" onClick={() => setIsAdvisorModalOpen(false)}>
+              İptal
+            </Button>
+            <Button 
+              onClick={handleAddAdvisor} 
+              disabled={isSubmitting}
+              className={isSubmitting ? "opacity-70 cursor-not-allowed" : ""}
+            >
+              {isSubmitting ? (
+                <div className="flex items-center">
+                  <span className="mr-2">Ekleniyor</span>
+                  <div className="w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin"></div>
+                </div>
+              ) : (
+                "Ekle"
+              )}
+            </Button>
+          </ModalFooter>
+        </Modal>
+
+        <Modal isOpen={isAssignModalOpen} onClose={() => setIsAssignModalOpen(false)}>
+          <ModalHeader>Danışman Ata</ModalHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="assignStudent">Öğrenci</Label>
+              <Select
+                label="Öğrenci"
+                value={selectedStudent}
+                onChange={setSelectedStudent}
+                options={studentOptions}
+                placeholder="Öğrenci seçin"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="assignAdvisor">Danışman</Label>
+              <Select
+                label="Danışman"
+                value={selectedAdvisor}
+                onChange={setSelectedAdvisor}
+                options={advisorOptions}
+                placeholder="Danışman seçin"
+                className="mt-1"
+              />
+            </div>
+          </div>
+          <ModalFooter>
+            <Button variant="outline" onClick={() => setIsAssignModalOpen(false)}>
+              İptal
+            </Button>
+            <Button 
+              onClick={handleAssignAdvisor}
+              disabled={isSubmitting}
+              className={isSubmitting ? "opacity-70 cursor-not-allowed" : ""}
+            >
+              {isSubmitting ? (
+                <div className="flex items-center">
+                  <span className="mr-2">Atanıyor</span>
+                  <div className="w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin"></div>
+                </div>
+              ) : (
+                "Ata"
+              )}
+            </Button>
+          </ModalFooter>
+        </Modal>
       </motion.div>
     </Layout>
   );

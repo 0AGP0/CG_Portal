@@ -269,11 +269,11 @@ export default function AdvisorDashboard() {
         <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30 overflow-hidden">
           {filteredStudents.length === 0 ? (
             <div className="p-8 text-center">
-              <p className="text-lg text-gray-500">Öğrenci bulunamadı</p>
+              <p className="text-lg text-gray-500 dark:text-gray-400">Öğrenci bulunamadı</p>
               {selectedFilter !== "all" && (
                 <button 
                   onClick={() => setSelectedFilter("all")}
-                  className="mt-2 text-blue-500 hover:underline"
+                  className="mt-2 text-blue-500 dark:text-blue-400 hover:underline"
                 >
                   Tüm öğrencileri göster
                 </button>
@@ -281,33 +281,33 @@ export default function AdvisorDashboard() {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700/30">
                 <thead className="bg-gray-50/70 dark:bg-gray-700/30">
                   <tr>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Öğrenci
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Durum
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Üniversite / Program
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Son İşlem
                     </th>
-                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       İşlemler
                     </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm divide-y divide-gray-200 dark:divide-gray-700/30">
                   {filteredStudents.map((student: Student) => (
-                    <tr key={student.id} className="hover:bg-gray-50/80 dark:hover:bg-gray-700/30">
+                    <tr key={student.id || student.email} className="hover:bg-gray-50/80 dark:hover:bg-gray-700/30">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-10 w-10 relative">
-                            <div className="h-full w-full rounded-full bg-blue-100 flex items-center justify-center text-blue-800 font-bold">
+                            <div className="h-full w-full rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-800 dark:text-blue-300 font-bold">
                               {student.name?.substring(0, 2).toUpperCase() || '??'}
                             </div>
                             {(student.unreadMessages ?? 0) > 0 && (
@@ -317,25 +317,25 @@ export default function AdvisorDashboard() {
                             )}
                           </div>
                           <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">{student.name}</div>
-                            <div className="text-sm text-gray-500">{student.email}</div>
+                            <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{student.name}</div>
+                            <div className="text-sm text-gray-500 dark:text-gray-400">{student.email}</div>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className={`inline-flex px-2 py-1 text-xs rounded-full ${
                           student.processStarted 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-yellow-100 text-yellow-800'
+                            ? 'bg-green-100/70 dark:bg-green-900/30 text-green-800 dark:text-green-300' 
+                            : 'bg-yellow-100/70 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300'
                         }`}>
                           {student.stage || (student.processStarted ? 'Aktif' : 'Yeni')}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{student.university || 'Henüz Seçilmedi'}</div>
-                        <div className="text-sm text-gray-500">{student.program || 'Henüz Seçilmedi'}</div>
+                        <div className="text-sm text-gray-900 dark:text-gray-100">{student.university || 'Henüz Seçilmedi'}</div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400">{student.program || 'Henüz Seçilmedi'}</div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                         {new Date(student.updatedAt || '').toLocaleDateString('tr-TR')}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

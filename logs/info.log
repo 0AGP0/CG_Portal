@@ -139,3 +139,88 @@
 [2025-05-20T13:03:29.778Z] [INFO] Yeni mesaj oluşturuluyor
 [2025-05-20T13:03:29.781Z] [INFO] Mesaj başarıyla oluşturuldu:
 "msg-1747746209779"
+[2025-05-22T11:47:56.649Z] [INFO] Webhook alındı: odoo-webhook - Durum: success
+{
+  "email": "burcu.shut@gmail.com",
+  "name": "AKİLE BURCU ŞAT",
+  "action": "Send Webhook Notification(#1962)",
+  "stage": "BİTEN"
+}
+[2025-05-22T12:01:55.268Z] [INFO] Odoo'dan burcu.shut@gmail.com için veri çekiliyor
+[2025-05-22T12:53:29.677Z] [INFO] Webhook alındı: odoo-webhook - Durum: success
+{
+  "email": "burcu.shut@gmail.com",
+  "name": "AKİLE BURCU ŞAT",
+  "action": "Send Webhook Notification(#1962)",
+  "stage": "BİTEN"
+}
+[2025-05-22T13:04:43.576Z] [INFO] Webhook alındı: odoo-webhook - Durum: success
+{
+  "email": "akifgiraypusat@gmail.com",
+  "name": "Akif",
+  "action": "Send Webhook Notification(#1962)",
+  "stage": "BİTEN"
+}
+[2025-05-22T13:08:41.710Z] [INFO] Webhook alındı: odoo-webhook - Durum: success
+{
+  "email": "burcu.shut@gmail.com",
+  "name": "AKİLE BURCU ŞAT",
+  "action": "Send Webhook Notification(#1962)",
+  "stage": "BİTEN"
+}
+[2025-05-22T13:09:43.459Z] [INFO] Webhook alındı: odoo-webhook - Durum: success
+{
+  "email": "akifgiraypusat@gmail.com",
+  "name": "Akif",
+  "action": "Send Webhook Notification(#1962)",
+  "stage": "İşlemde"
+}
+[2025-05-22T13:10:44.626Z] [INFO] Webhook alındı: odoo-webhook - Durum: success
+{
+  "email": "burcu.shut@gmail.com",
+  "name": "AKİLE BURCU ŞAT",
+  "action": "Send Webhook Notification(#1962)",
+  "stage": "İşlemde"
+}
+[2025-05-22T13:10:48.966Z] [INFO] Webhook alındı: odoo-webhook - Durum: success
+{
+  "email": "burcu.shut@gmail.com",
+  "name": "AKİLE BURCU ŞAT",
+  "action": "Send Webhook Notification(#1962)",
+  "stage": "BİTEN"
+}
+[2025-05-22T13:20:05.196Z] [INFO] Webhook alındı: odoo-webhook - Durum: success
+{
+  "email": "yagmurgokttass@icloud.com",
+  "name": "Yağmur Göktaş",
+  "action": "Send Webhook Notification(#1962)",
+  "stage": false
+}
+[2025-05-22T13:34:15.442Z] [INFO] Webhook alındı: odoo-webhook - Durum: success
+{
+  "email": "seda.yenturk@gmail.com",
+  "name": "Sedanur Yentürk",
+  "action": "Send Webhook Notification(#1962)",
+  "stage": false
+}
+[2025-05-22T13:38:01.440Z] [INFO] Webhook alındı: odoo-webhook - Durum: success
+{
+  "email": "kutay.okbay@gmail.com /murat.okbay@gmail.com",
+  "name": "Ali Kutay Okbay",
+  "action": "Send Webhook Notification(#1962)",
+  "stage": false
+}
+[2025-05-22T14:03:13.651Z] [INFO] Webhook alındı: odoo-webhook - Durum: success
+{
+  "email": "burcu.shut@gmail.com",
+  "name": "AKİLE BURCU ŞAT",
+  "action": "Send Webhook Notification(#1962)",
+  "stage": "BİTEN"
+}
+[2025-05-22T14:05:45.042Z] [INFO] Webhook alındı: odoo-webhook - Durum: success
+{
+  "email": "elifyildirim0102@outlook.com",
+  "name": "Elif Yıldırım",
+  "action": "Send Webhook Notification(#1962)",
+  "stage": false
+}

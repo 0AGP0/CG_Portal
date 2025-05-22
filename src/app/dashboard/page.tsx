@@ -133,12 +133,12 @@ export default function Dashboard() {
           <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary-100/50 dark:bg-primary-900/20 rounded-full blur-2xl"></div>
           <div className="absolute top-10 -left-10 w-40 h-40 bg-secondary-100/30 dark:bg-secondary-900/10 rounded-full blur-xl"></div>
           
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             className="relative p-6 md:p-8 rounded-2xl bg-gradient-to-r from-white to-primary-50/70 dark:from-gray-800/80 dark:to-primary-900/20 border border-white/40 dark:border-gray-700/30 shadow-xl"
-          >
+      >
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
               <div className="flex items-center gap-4">
                 <div className="relative group">
@@ -152,11 +152,11 @@ export default function Dashboard() {
                   </div>
                 </div>
                 
-                <div>
+          <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{greeting},</p>
                   <h1 className="text-2xl sm:text-3xl font-bold">
                     <span className="text-gray-800 dark:text-gray-100">{userData?.name}</span>
-                  </h1>
+            </h1>
                   <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
                     <span className="inline-flex items-center bg-accent-50 dark:bg-accent-900/30 text-accent-700 dark:text-accent-300 px-2 py-0.5 rounded-md text-xs mr-2">
                       Öğrenci ID: {userData?.studentId}
@@ -164,24 +164,24 @@ export default function Dashboard() {
                     Son giriş: {userData?.lastLogin}
                   </p>
                 </div>
-              </div>
-              
+          </div>
+          
               <div className="flex flex-wrap items-center gap-3">
-                {user && user.processStarted && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
+            {user && user.processStarted && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
                     className="flex items-center px-4 py-2 bg-success-100 dark:bg-success-900/30 text-success-800 dark:text-success-300 rounded-full gap-2"
                   >
                     <span className="flex h-2 w-2 rounded-full bg-success-500 dark:bg-success-400"></span>
                     <span className="text-sm font-medium">Süreç Aktif</span>
-                  </motion.div>
-                )}
-                
+              </motion.div>
+            )}
+            
                 <Link href="/dashboard/messages">
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.1 }}
                     className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 rounded-full shadow-sm hover:shadow-md transition-shadow border border-gray-200 dark:border-gray-700"
                   >
@@ -195,16 +195,16 @@ export default function Dashboard() {
                         {unreadCount}
                       </span>
                     )}
-                  </motion.div>
+              </motion.div>
                 </Link>
               </div>
-            </div>
+          </div>
           </motion.div>
         </div>
-        
+
         {/* Uyarılar ve Bildirimler */}
         {userData?.alerts?.length > 0 && (
-          <motion.div
+          <motion.div 
             variants={containerVariants}
             initial="hidden"
             animate="visible"
@@ -257,7 +257,7 @@ export default function Dashboard() {
             ))}
           </motion.div>
         )}
-        
+
         {/* Özet Bilgiler */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <motion.div 
@@ -267,7 +267,7 @@ export default function Dashboard() {
             className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-xl shadow-sm border border-gray-100/60 dark:border-gray-700/30 overflow-hidden"
           >
             <div className="p-5 border-b border-gray-100 dark:border-gray-700/30 flex justify-between items-center">
-              <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Eğitim Bilgileri</h2>
+              <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Kişisel Bilgiler</h2>
               <Link href="/dashboard/education" className="text-xs font-medium text-primary-600 dark:text-primary-400 hover:underline">
                 Detay Görüntüle
               </Link>
@@ -307,7 +307,10 @@ export default function Dashboard() {
             <div className="p-5">
               <div className="relative pt-2">
                 <div className="overflow-hidden h-2 text-xs flex rounded-full bg-gray-200 dark:bg-gray-700">
-                  <div style={{ width: "40%" }} className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-primary-500 dark:bg-primary-600"></div>
+                  <div 
+                    style={{ width: `${studentData?.systemDetails?.stagePercentage || 40}%` }} 
+                    className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-primary-500 dark:bg-primary-600"
+                  ></div>
                 </div>
                 <div className="flex justify-between mt-2 text-xs text-gray-600 dark:text-gray-400">
                   <span>Başlangıç</span>
@@ -315,6 +318,27 @@ export default function Dashboard() {
                   <span>Tamamlandı</span>
                 </div>
               </div>
+              
+              {/* Sistem güncellemesi bildirimi */}
+              {studentData?.systemDetails?.isUpdated && (
+                <div className="mt-3 mb-4 p-3 bg-success-50 dark:bg-success-900/20 text-success-800 dark:text-success-300 rounded-lg text-sm">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 mt-0.5">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm font-medium">
+                        Süreciniz güncellendi: <span className="font-bold">{studentData?.systemDetails?.stage}</span>
+                      </p>
+                      <p className="mt-1 text-xs opacity-80">
+                        Son güncelleme: {studentData?.systemDetails?.lastUpdateTime || 'yakın zamanda'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
               
               <div className="mt-6 space-y-3">
                 <div className="flex items-center">
@@ -339,28 +363,59 @@ export default function Dashboard() {
                   </div>
                 </div>
                 
-                <div className="flex items-center">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 flex items-center justify-center mr-3">
-                    <div className="h-2 w-2 rounded-full bg-primary-500 dark:bg-primary-400 animate-pulse"></div>
+                {/* Dinamik adım - gelen durum bilgisine göre */}
+                <div className={`flex items-center ${studentData?.systemDetails?.stage === 'BİTEN' ? '' : 'opacity-70'}`}>
+                  <div className={`flex-shrink-0 w-8 h-8 rounded-full 
+                    ${studentData?.systemDetails?.stage === 'BİTEN' 
+                      ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300' 
+                      : 'bg-primary-100/50 dark:bg-primary-900/10 text-primary-400 dark:text-primary-500'} 
+                    flex items-center justify-center mr-3`}>
+                    {studentData?.systemDetails?.stage === 'BİTEN' ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    ) : (
+                      <div className="h-2 w-2 rounded-full bg-primary-500 dark:bg-primary-400 animate-pulse"></div>
+                    )}
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-800 dark:text-gray-200">Başvuru Dosyası Hazırlanıyor</p>
+                    <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                      {studentData?.systemDetails?.stage === 'BİTEN' 
+                        ? 'Süreç Tamamlandı' 
+                        : 'Başvuru Dosyası Hazırlanıyor'}
+                    </p>
                   </div>
                 </div>
                 
-                <div className="flex items-center opacity-40">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 flex items-center justify-center mr-3">
-                    <span className="text-xs">4</span>
+                {/* Vize adımı */}
+                <div className={`flex items-center ${studentData?.systemDetails?.stage === 'BİTEN' ? '' : 'opacity-40'}`}>
+                  <div className={`flex-shrink-0 w-8 h-8 rounded-full 
+                    ${studentData?.systemDetails?.stage === 'BİTEN' 
+                      ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300' 
+                      : 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500'} 
+                    flex items-center justify-center mr-3`}>
+                    {studentData?.systemDetails?.stage === 'BİTEN' ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    ) : (
+                      <span className="text-xs">4</span>
+                    )}
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-800 dark:text-gray-200">Vize Süreci</p>
+                    {studentData?.visa?.appointmentDate && (
+                      <p className="text-xs text-primary-600 dark:text-primary-400">
+                        Randevu: {studentData.visa.appointmentDate}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
             </div>
           </motion.div>
         </div>
-        
+
         {/* Hızlı Erişim Kart Menüsü */}
         <motion.div 
           variants={containerVariants}
@@ -371,7 +426,7 @@ export default function Dashboard() {
           <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">Hızlı Erişim</h2>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            <motion.div variants={itemVariants}>
+          <motion.div variants={itemVariants}>
               <Link href="/dashboard/process" className="block h-full">
                 <div className="h-full bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-xl shadow-sm border border-gray-100/60 dark:border-gray-700/30 hover:shadow-md transition-shadow p-5 group">
                   <div className="p-2 rounded-full bg-primary-100 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400 inline-block mb-3 group-hover:scale-110 transition-transform">
@@ -381,11 +436,11 @@ export default function Dashboard() {
                   </div>
                   <h3 className="font-semibold text-gray-800 dark:text-gray-100 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">Süreç Durumu</h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Başvuru sürecinizi takip edin</p>
-                </div>
-              </Link>
-            </motion.div>
-            
-            <motion.div variants={itemVariants}>
+              </div>
+            </Link>
+          </motion.div>
+          
+          <motion.div variants={itemVariants}>
               <Link href="/dashboard/visa" className="block h-full">
                 <div className="h-full bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-xl shadow-sm border border-gray-100/60 dark:border-gray-700/30 hover:shadow-md transition-shadow p-5 group">
                   <div className="p-2 rounded-full bg-secondary-100 dark:bg-secondary-900/40 text-secondary-600 dark:text-secondary-400 inline-block mb-3 group-hover:scale-110 transition-transform">
@@ -395,11 +450,11 @@ export default function Dashboard() {
                   </div>
                   <h3 className="font-semibold text-gray-800 dark:text-gray-100 group-hover:text-secondary-600 dark:group-hover:text-secondary-400 transition-colors">Vize Bilgileri</h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Vize başvurunuzun durumu</p>
-                </div>
-              </Link>
-            </motion.div>
-            
-            <motion.div variants={itemVariants}>
+              </div>
+            </Link>
+          </motion.div>
+          
+          <motion.div variants={itemVariants}>
               <Link href="/dashboard/documents" className="block h-full">
                 <div className="h-full bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-xl shadow-sm border border-gray-100/60 dark:border-gray-700/30 hover:shadow-md transition-shadow p-5 group">
                   <div className="p-2 rounded-full bg-accent-100 dark:bg-accent-900/40 text-accent-600 dark:text-accent-400 inline-block mb-3 group-hover:scale-110 transition-transform">
@@ -409,11 +464,11 @@ export default function Dashboard() {
                   </div>
                   <h3 className="font-semibold text-gray-800 dark:text-gray-100 group-hover:text-accent-600 dark:group-hover:text-accent-400 transition-colors">Dokümanlar</h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Belgelerinizi yönetin</p>
-                </div>
-              </Link>
-            </motion.div>
-            
-            <motion.div variants={itemVariants}>
+              </div>
+            </Link>
+          </motion.div>
+          
+          <motion.div variants={itemVariants}>
               <Link href="/dashboard/messages" className="block h-full">
                 <div className="h-full bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-xl shadow-sm border border-gray-100/60 dark:border-gray-700/30 hover:shadow-md transition-shadow p-5 group">
                   <div className="p-2 rounded-full bg-success-100 dark:bg-success-900/40 text-success-600 dark:text-success-400 inline-block mb-3 group-hover:scale-110 transition-transform">
@@ -423,16 +478,102 @@ export default function Dashboard() {
                   </div>
                   <div className="flex justify-between items-center">
                     <h3 className="font-semibold text-gray-800 dark:text-gray-100 group-hover:text-success-600 dark:group-hover:text-success-400 transition-colors">Mesajlar</h3>
-                    {unreadCount > 0 && (
+                  {unreadCount > 0 && (
                       <span className="flex items-center justify-center h-5 w-5 rounded-full bg-red-500 text-white text-xs font-bold">
-                        {unreadCount}
+                      {unreadCount}
                       </span>
                     )}
-                  </div>
+                    </div>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Danışmanınızla iletişime geçin</p>
+              </div>
+            </Link>
+          </motion.div>
+          </div>
+        </motion.div>
+
+        {/* Kişisel Bilgiler Kartı */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-xl shadow-sm border border-gray-100/60 dark:border-gray-700/30 overflow-hidden mt-6"
+        >
+          <div className="p-5 border-b border-gray-100 dark:border-gray-700/30 flex justify-between items-center">
+            <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Kişisel Bilgiler</h2>
+            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+              studentData?.systemDetails?.stage === 'BİTEN' 
+                ? 'bg-success-100 text-success-800 dark:bg-success-900/30 dark:text-success-300' 
+                : 'bg-warning-100 text-warning-800 dark:bg-warning-900/30 dark:text-warning-300'
+            }`}>
+              {studentData?.systemDetails?.stage || 'Yeni'}
+            </span>
+          </div>
+          <div className="p-5 space-y-4">
+            {/* Pasaport Bilgileri */}
+            {studentData?.passport?.number && (
+              <div>
+                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Pasaport Bilgileri</h3>
+                <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-gray-600 dark:text-gray-400">Pasaport No</span>
+                    <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{studentData?.passport?.number}</span>
+                  </div>
+                  {studentData?.passport?.type && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-600 dark:text-gray-400">Pasaport Tipi</span>
+                      <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{studentData?.passport?.type}</span>
+                    </div>
+                  )}
+                  {studentData?.passport?.issueDate && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-600 dark:text-gray-400">Veriliş Tarihi</span>
+                      <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{studentData?.passport?.issueDate}</span>
+                    </div>
+                  )}
+                  {studentData?.passport?.expiryDate && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-600 dark:text-gray-400">Geçerlilik Tarihi</span>
+                      <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{studentData?.passport?.expiryDate}</span>
+                    </div>
+                  )}
                 </div>
-              </Link>
-            </motion.div>
+              </div>
+            )}
+            
+            {/* Vize Bilgileri */}
+            {studentData?.visa?.appointmentDate && (
+              <div>
+                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Vize Bilgileri</h3>
+                <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 space-y-2">
+                  {studentData?.visa?.applicationDate && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-600 dark:text-gray-400">Başvuru Tarihi</span>
+                      <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{studentData?.visa?.applicationDate}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-gray-600 dark:text-gray-400">Randevu Tarihi</span>
+                    <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{studentData?.visa?.appointmentDate}</span>
+                  </div>
+                  {studentData?.visa?.consulate && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-600 dark:text-gray-400">Konsolosluk</span>
+                      <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{studentData?.visa?.consulate}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            
+            {/* Son Güncelleme Bilgisi */}
+            <div className="border-t border-gray-100 dark:border-gray-700/30 pt-3 mt-3 text-xs text-gray-500 dark:text-gray-400">
+              <p>Son güncelleme: {studentData?.systemDetails?.lastUpdated || 'Bilinmiyor'}</p>
+              {studentData?.systemDetails?.isUpdated && (
+                <p className="mt-1">
+                  Otomatik güncelleme: {studentData.systemDetails.lastUpdateTime || 'yakın zamanda'}
+                </p>
+              )}
+            </div>
           </div>
         </motion.div>
       </div>

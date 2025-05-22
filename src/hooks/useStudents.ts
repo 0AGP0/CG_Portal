@@ -4,7 +4,12 @@ import { User } from '@/context/AuthContext';
 
 // SWR fetcher fonksiyonu
 const fetcher = async (url: string) => {
-  const res = await fetch(url);
+  const res = await fetch(url, {
+    headers: {
+      'x-user-email': localStorage.getItem('userEmail') || '',
+      'Content-Type': 'application/json'
+    }
+  });
   
   if (!res.ok) {
     const error = new Error('Veri çekme başarısız oldu');

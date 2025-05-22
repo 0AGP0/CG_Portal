@@ -192,7 +192,7 @@ export default function AdvisorMessagesPage() {
         transition={{ duration: 0.5 }}
       >
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-[#002757]">
+          <h1 className="text-3xl font-bold text-[#002757] dark:text-blue-300">
             Mesajlaşma Paneli
           </h1>
           <p className="text-default mt-1">
@@ -206,31 +206,31 @@ export default function AdvisorMessagesPage() {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="md:col-span-3 bg-white rounded-lg shadow-md overflow-hidden"
+            className="md:col-span-3 bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30 overflow-hidden"
           >
-            <div className="p-4 border-b">
+            <div className="p-4 border-b border-gray-200/60 dark:border-gray-700/30">
               <div className="relative mb-4">
                 <input
                   type="text"
                   placeholder="Öğrenci ara..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full p-2 pl-8 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-2 pl-8 border border-gray-300 dark:border-gray-600 rounded-md bg-white/90 dark:bg-gray-700/90 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 absolute left-2.5 top-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
-              <h2 className="font-semibold text-[#002757]">Öğrencilerim</h2>
+              <h2 className="font-semibold text-[#002757] dark:text-blue-300">Öğrencilerim</h2>
             </div>
             
-            <div className="divide-y max-h-[600px] overflow-y-auto">
+            <div className="divide-y divide-gray-200/60 dark:divide-gray-700/30 max-h-[600px] overflow-y-auto">
               {isLoading ? (
-                <div className="p-6 text-center text-gray-500">
+                <div className="p-6 text-center text-gray-500 dark:text-gray-400">
                   <p>Öğrenciler yükleniyor...</p>
                 </div>
               ) : filteredStudents.length === 0 ? (
-                <div className="p-4 text-center text-gray-500">
+                <div className="p-4 text-center text-gray-500 dark:text-gray-400">
                   <p>Sonuç bulunamadı</p>
                 </div>
               ) : (
@@ -241,17 +241,17 @@ export default function AdvisorMessagesPage() {
                     onClick={() => selectStudent(student.id)}
                     className={`p-3 cursor-pointer transition-colors ${
                       selectedStudentId === student.id 
-                        ? 'bg-blue-50 border-l-4 border-blue-500' 
-                        : 'hover:bg-gray-50 border-l-4 border-transparent'
+                        ? 'bg-blue-50/70 dark:bg-blue-900/20 border-l-4 border-blue-500' 
+                        : 'hover:bg-gray-50/70 dark:hover:bg-gray-700/30 border-l-4 border-transparent'
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-medium">
+                      <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300 font-medium">
                         {student.name.split(' ').map(n => n[0]).join('')}
                       </div>
                       <div>
-                        <h3 className="font-medium">{student.name}</h3>
-                        <p className="text-xs text-gray-500">{student.email}</p>
+                        <h3 className="font-medium text-gray-900 dark:text-gray-100">{student.name}</h3>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{student.email}</p>
                       </div>
                     </div>
                   </motion.div>
@@ -265,10 +265,10 @@ export default function AdvisorMessagesPage() {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="md:col-span-3 bg-white rounded-lg shadow-md overflow-hidden"
+            className="md:col-span-3 bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30 overflow-hidden"
           >
-            <div className="p-4 border-b flex justify-between items-center">
-              <h2 className="font-semibold text-[#002757]">Konular</h2>
+            <div className="p-4 border-b border-gray-200/60 dark:border-gray-700/30 flex justify-between items-center">
+              <h2 className="font-semibold text-[#002757] dark:text-blue-300">Konular</h2>
               
               {selectedStudentId && (
                 <button 
@@ -283,13 +283,13 @@ export default function AdvisorMessagesPage() {
               )}
             </div>
             
-            <div className="divide-y max-h-[600px] overflow-y-auto">
+            <div className="divide-y divide-gray-200/60 dark:divide-gray-700/30 max-h-[600px] overflow-y-auto">
               {!selectedStudentId ? (
-                <div className="p-4 text-center text-gray-500">
+                <div className="p-4 text-center text-gray-500 dark:text-gray-400">
                   <p>Lütfen bir öğrenci seçin</p>
                 </div>
               ) : studentTickets.length === 0 ? (
-                <div className="p-4 text-center text-gray-500">
+                <div className="p-4 text-center text-gray-500 dark:text-gray-400">
                   <p className="mb-2">Mesaj bulunamadı</p>
                   <button 
                     onClick={handleCreateNewTicket}
@@ -306,20 +306,20 @@ export default function AdvisorMessagesPage() {
                     onClick={() => selectTicket(ticket.id)}
                     className={`p-3 cursor-pointer transition-colors ${
                       selectedTicketId === ticket.id 
-                        ? 'bg-blue-50 border-l-4 border-blue-500' 
-                        : ticket.isRead ? 'hover:bg-gray-50' : 'hover:bg-gray-50 bg-yellow-50'
+                        ? 'bg-blue-50/70 dark:bg-blue-900/20 border-l-4 border-blue-500' 
+                        : ticket.isRead ? 'hover:bg-gray-50/70 dark:hover:bg-gray-700/30' : 'hover:bg-gray-50/70 bg-yellow-50/70 dark:hover:bg-gray-700/30 dark:bg-yellow-900/20'
                     }`}
                   >
                     <div className="flex justify-between items-start mb-1">
-                      <h3 className={`font-medium ${!ticket.isRead ? 'font-bold' : ''}`}>
+                      <h3 className={`font-medium text-gray-900 dark:text-gray-100 ${!ticket.isRead ? 'font-bold' : ''}`}>
                         {ticket.subject}
                       </h3>
                       {!ticket.isRead && (
                         <span className="bg-blue-500 rounded-full w-2 h-2"></span>
                       )}
                     </div>
-                    <p className="text-sm text-gray-600 truncate">{ticket.preview}</p>
-                    <p className="text-xs text-gray-500 mt-1">{ticket.date}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-300 truncate">{ticket.preview}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{ticket.date}</p>
                   </motion.div>
                 ))
               )}
@@ -328,7 +328,7 @@ export default function AdvisorMessagesPage() {
           
           {/* Mesaj İçeriği */}
           <motion.div 
-            className="md:col-span-6 bg-white rounded-lg shadow-md flex flex-col h-[600px]"
+            className="md:col-span-6 bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30 flex flex-col h-[600px]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
@@ -337,8 +337,8 @@ export default function AdvisorMessagesPage() {
               <div className="flex items-center justify-center h-full text-center p-6">
                 <div>
                   <div className="text-5xl mb-4">👤</div>
-                  <h3 className="text-xl font-semibold mb-2 text-[#002757]">Öğrenci Seçin</h3>
-                  <p className="text-gray-600 max-w-md">
+                  <h3 className="text-xl font-semibold mb-2 text-[#002757] dark:text-blue-300">Öğrenci Seçin</h3>
+                  <p className="text-gray-600 dark:text-gray-300 max-w-md">
                     Mesajlaşmak için soldaki listeden bir öğrenci seçin.
                   </p>
                 </div>
@@ -347,8 +347,8 @@ export default function AdvisorMessagesPage() {
               <div className="flex items-center justify-center h-full text-center p-6">
                 <div>
                   <div className="text-5xl mb-4">💬</div>
-                  <h3 className="text-xl font-semibold mb-2 text-[#002757]">Mesaj Seçin</h3>
-                  <p className="text-gray-600 max-w-md">
+                  <h3 className="text-xl font-semibold mb-2 text-[#002757] dark:text-blue-300">Mesaj Seçin</h3>
+                  <p className="text-gray-600 dark:text-gray-300 max-w-md">
                     {selectedStudent?.name} ile olan mesajlarınızı görüntülemek için bir konu seçin veya yeni bir konu başlatın.
                   </p>
                   {studentTickets.length === 0 && (
@@ -363,46 +363,46 @@ export default function AdvisorMessagesPage() {
               </div>
             ) : (
               <>
-                <div className="p-4 border-b border-gray-200">
-                  <h2 className="font-semibold text-lg text-[#002757]">
+                <div className="p-4 border-b border-gray-200/60 dark:border-gray-700/30">
+                  <h2 className="font-semibold text-lg text-[#002757] dark:text-blue-300">
                     {selectedTicket?.subject} 
-                    <span className="text-gray-500 text-sm ml-2">
+                    <span className="text-gray-500 dark:text-gray-400 text-sm ml-2">
                       ({selectedStudent?.name})
                     </span>
                   </h2>
-                  <p className="text-sm text-gray-500">{selectedTicket?.date}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{selectedTicket?.date}</p>
                 </div>
                 
-                <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ maxHeight: '450px' }}>
+                <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50/50 dark:bg-gray-800/50" style={{ maxHeight: '450px' }}>
                   {selectedTicket?.messages && selectedTicket.messages.length > 0 ? (
                     selectedTicket.messages.map((message, index) => (
                       <div 
                         key={index}
                         className={`p-3 rounded-lg max-w-[80%] ${
                           message.sender === 'advisor' 
-                            ? 'bg-blue-100 ml-auto' 
-                            : 'bg-gray-100'
+                            ? 'bg-blue-100/80 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 ml-auto' 
+                            : 'bg-gray-100/80 dark:bg-gray-700/50 text-gray-800 dark:text-gray-200'
                         }`}
                       >
                         <p className="text-sm mb-1">{message.content}</p>
-                        <p className="text-xs text-gray-500 text-right">{message.timestamp}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 text-right">{message.timestamp}</p>
                       </div>
                     ))
                   ) : (
-                    <div className="text-center text-gray-500 my-8">
+                    <div className="text-center text-gray-500 dark:text-gray-400 my-8">
                       <p>Bu konuda henüz mesaj bulunmuyor. Bir mesaj göndererek konuşmayı başlatın.</p>
                     </div>
                   )}
                 </div>
                 
-                <div className="p-4 border-t border-gray-200">
+                <div className="p-4 border-t border-gray-200/60 dark:border-gray-700/30">
                   <form onSubmit={handleSendMessage} className="flex gap-2">
                     <input
                       type="text"
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
                       placeholder="Mesajınızı yazın..."
-                      className="flex-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white/90 dark:bg-gray-700/90 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <button
                       type="submit"

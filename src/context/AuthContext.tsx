@@ -82,6 +82,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const login = async (email: string, password: string, role: 'student' | 'advisor' | 'admin' = 'student') => {
     setIsLoading(true);
     
+    // Kullanıcı e-postasını localStorage'a kaydet (API istekleri için)
+    localStorage.setItem('userEmail', email);
+    
     // Gerçek uygulamada API çağrısı yapılacak
     // Şimdilik API'ye basit bir istek göndereceğiz
     
@@ -286,6 +289,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
+    localStorage.removeItem('userEmail'); // Email'i de temizle
   };
 
   // Süreci sıfırlama işlemi

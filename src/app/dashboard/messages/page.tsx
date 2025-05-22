@@ -260,7 +260,7 @@ export default function MessagesPage() {
                   <div className="space-y-4">
                     {selectedTicket.messages.map((message, index) => (
                       <div 
-                        key={index} 
+                        key={index}
                         className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                       >
                         <div 
@@ -268,28 +268,28 @@ export default function MessagesPage() {
                             message.sender === 'user' 
                               ? 'bg-blue-500 text-white' 
                               : 'bg-gray-200/80 dark:bg-gray-700/80 text-gray-800 dark:text-gray-200'
-                          }`}
-                        >
+                        }`}
+                      >
                           <p>{message.content}</p>
                           <p className="text-xs opacity-70 text-right mt-1">
                             {message.timestamp || ""}
-                          </p>
+                        </p>
                         </div>
                       </div>
                     ))}
-                  </div>
+                    </div>
                 </div>
                 
                 <div className="p-4 border-t border-gray-200/60 dark:border-gray-700/30">
                   <form onSubmit={handleSendMessage} className="flex gap-2">
-                    <input 
+                    <input
                       type="text"
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
                       placeholder="Mesajınızı yazın..."
                       className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white/90 dark:bg-gray-700/90 focus:outline-none focus:ring-2 focus:ring-blue-500/70"
                     />
-                    <button 
+                    <button
                       type="submit"
                       className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1"
                       disabled={!newMessage.trim()}

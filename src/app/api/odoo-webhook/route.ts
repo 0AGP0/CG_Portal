@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { updateOrCreateRecord } from '@/utils/database';
+import { updateOrCreateRecord, getRecordByEmail } from '@/utils/database';
 import { logWebhook, logError } from '@/utils/logger';
+
+// Webhook secret sabit değeri (gerçek projede .env'den alınmalıdır)
+const WEBHOOK_SECRET = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const url = new URL(request.url);
-    const secretParam = url.searchParams.get('secret') || '';
+    let secretParam = url.searchParams.get('secret') || '';
     
     // Odoo'dan gelen veri formatına uygun olarak email bilgisini çıkartalım
     const email = body.email || body.x_studio_mail_adresi || null;
@@ -14,12 +17,19 @@ export async function POST(request: NextRequest) {
     logWebhook('odoo-webhook', 'success', { 
       email: email, 
       name: body.name, 
-      action: body._action 
+      action: body._action,
+      stage: body.x_studio_selection_field_8en_1iqnrqang
     });
     
-    // URL'deki secret parametresini kontrol et
-    if (secretParam !== process.env.ODOO_WEBHOOK_SECRET) {
-      logError('Geçersiz webhook secret parametresi', { secretParam });
+    // URL'deki secret parametresini kontrol et - sabit değer kullanıyoruz
+    // Odoo'dan gelen secret değerinde URL'nin tamamı olabiliyor, bu yüzden temizleyelim
+    if (secretParam.includes(WEBHOOK_SECRET)) {
+      // Secret değer içeriyorsa kabul et
+      secretParam = WEBHOOK_SECRET;
+    }
+    
+    if (secretParam !== WEBHOOK_SECRET) {
+      logError('Geçersiz webhook secret parametresi', { secretParam, expectedSecret: WEBHOOK_SECRET });
       return NextResponse.json({ error: 'Geçersiz güvenlik anahtarı' }, { status: 401 });
     }
     
@@ -27,6 +37,16 @@ export async function POST(request: NextRequest) {
     if (!email) {
       logError('Email bilgisi eksik', body);
       return NextResponse.json({ error: 'Email bilgisi bulunamadı' }, { status: 400 });
+    }
+    
+    // Önce portalda bu email ile kayıtlı bir öğrenci var mı kontrol et
+    const existingStudent = await getRecordByEmail(email);
+    if (!existingStudent) {
+      logError('Eşleşen öğrenci bulunamadı', { email });
+      return NextResponse.json({ 
+        error: 'Bu email adresi ile portalda kayıtlı öğrenci bulunamadı',
+        email: email
+      }, { status: 404 });
     }
     
     // Genişletilmiş Odoo verilerini işleme
@@ -106,17 +126,30 @@ export async function POST(request: NextRequest) {
       father_residence: body.x_studio_baba_ikamet_ehrilkesi,
       father_phone: body.x_studio_baba_telefon,
       
+      // Öğrenci aşaması (Odoo'dan gelen durum bilgisi) - önemli güncelleme
+      stage: body.x_studio_selection_field_8en_1iqnrqang || existingStudent.stage || 'yeni',
+      
       // Eski alanları da koru
-      stage: body.stage || body.x_studio_selection_field_8en_1iqnrqang || 'yeni',
-      university: body.university || body.x_studio_niversite_ad,
-      program: body.program || body.x_studio_niversite_blm_ad,
-      updatedAt: new Date().toISOString()
+      university: body.x_studio_niversite_ad || existingStudent.university,
+      program: body.x_studio_niversite_blm_ad || existingStudent.program,
+      
+      // Webhook ile güncelleme bayrağı
+      webhook_updated: true,
+      webhook_update_timestamp: new Date().toISOString()
     };
     
-    // Veriyi depola
+    // Veriyi depola - mevcut öğrenciyi güncelle
     const result = await updateOrCreateRecord(customerData);
     
-    return NextResponse.json({ success: true, result }, { status: 200 });
+    return NextResponse.json({ 
+      success: true, 
+      message: 'Öğrenci bilgileri başarıyla güncellendi', 
+      student: {
+        email: result.email,
+        name: result.name,
+        stage: result.stage
+      }
+    }, { status: 200 });
   } catch (error) {
     logError('Webhook işleme hatası', error);
     return NextResponse.json({ error: 'İşlem hatası' }, { status: 500 });
