@@ -2,19 +2,24 @@ import useSWR from 'swr';
 import { useAuth } from '@/context/AuthContext';
 import { useMessages as useMessagesContext } from '@/context/MessagesContext';
 
-// Basit fetch fonksiyonu
+// SWR fetcher fonksiyonu
 const fetcher = async (url: string) => {
-  const response = await fetch(url, {
+  const res = await fetch(url, {
     headers: {
-      'x-user-email': localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')!).email : '',
+      'x-user-email': localStorage.getItem('userEmail') || '',
+      'Content-Type': 'application/json'
     }
   });
   
-  if (!response.ok) {
-    throw new Error('API isteği başarısız oldu');
+  if (!res.ok) {
+    const error = new Error('Veri çekme başarısız oldu');
+    const errorInfo = await res.json().catch(() => ({}));
+    (error as any).info = errorInfo;
+    (error as any).status = res.status;
+    throw error;
   }
   
-  return response.json();
+  return res.json();
 };
 
 /**

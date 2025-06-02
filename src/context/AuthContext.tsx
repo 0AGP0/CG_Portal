@@ -6,7 +6,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'student' | 'advisor' | 'admin'; // Kullanıcı tipi: öğrenci, danışman veya admin
+  role: 'student' | 'advisor' | 'admin' | 'sales'; // Kullanıcı tipi: öğrenci, danışman, admin veya satış ekibi
   processStarted?: boolean; // Süreç başlatılmış mı? (sadece öğrenciler için)
   advisorId?: string; // Atanmış danışman ID'si (sadece öğrenciler için)
   studentIds?: string[]; // Danışmana atanmış öğrenciler (sadece danışmanlar için)
@@ -15,12 +15,13 @@ export interface User {
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
-  login: (email: string, password: string, role?: 'student' | 'advisor' | 'admin') => Promise<boolean>;
+  login: (email: string, password: string, role?: 'student' | 'advisor' | 'admin' | 'sales') => Promise<boolean>;
   logout: () => void;
   startProcess: () => void; // Süreci başlatma fonksiyonu
   resetProcess: () => void; // Süreci sıfırlama fonksiyonu
   isAdvisor: () => boolean; // Kullanıcının danışman olup olmadığını kontrol et
   isAdmin: () => boolean; // Kullanıcının admin olup olmadığını kontrol et
+  isSales: () => boolean; // Kullanıcının satış ekibi üyesi olup olmadığını kontrol et
 }
 
 // Başlangıç değerleri
@@ -32,7 +33,8 @@ const defaultContext: AuthContextType = {
   startProcess: () => {}, // Varsayılan boş fonksiyon
   resetProcess: () => {},
   isAdvisor: () => false,
-  isAdmin: () => false
+  isAdmin: () => false,
+  isSales: () => false
 };
 
 // Context'i oluştur
@@ -79,7 +81,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, []);
 
   // Giriş işlemi - öğrenci, danışman veya admin girişi
-  const login = async (email: string, password: string, role: 'student' | 'advisor' | 'admin' = 'student') => {
+  const login = async (email: string, password: string, role: 'student' | 'advisor' | 'admin' | 'sales' = 'student') => {
     setIsLoading(true);
     
     // Kullanıcı e-postasını localStorage'a kaydet (API istekleri için)
@@ -348,6 +350,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     return user?.role === 'admin';
   };
 
+  // Kullanıcının satış ekibi üyesi olup olmadığını kontrol et
+  const isSales = () => {
+    return user?.role === 'sales';
+  };
+
   const value = {
     user,
     isLoading,
@@ -356,7 +363,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     startProcess,
     resetProcess,
     isAdvisor,
-    isAdmin
+    isAdmin,
+    isSales
   };
 
   return (

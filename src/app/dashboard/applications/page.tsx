@@ -30,17 +30,8 @@ export default function ApplicationsPage() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [universities, setUniversities] = useState<University[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isCreating, setIsCreating] = useState(false);
   const [isViewingDetails, setIsViewingDetails] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
-  const [newApplication, setNewApplication] = useState<Partial<Application>>({
-    universityId: '',
-    program: '',
-    status: 'draft',
-    submissionDate: null,
-    notes: '',
-    documents: []
-  });
   
   useEffect(() => {
     // Başvuruları ve üniversiteleri API'den çek
@@ -130,98 +121,9 @@ export default function ApplicationsPage() {
     fetchData();
   }, [user]);
   
-  const handleCreateApplication = async () => {
-    try {
-      // Seçilen üniversite bilgilerini al
-      const selectedUniversity = universities.find(uni => uni.id === newApplication.universityId);
-      
-      if (!selectedUniversity) {
-        alert('Lütfen bir üniversite seçin');
-        return;
-      }
-      
-      // Yeni başvuru oluştur
-      const application: Application = {
-        id: Date.now().toString(),
-        universityId: newApplication.universityId || '',
-        university: selectedUniversity.name,
-        program: newApplication.program || '',
-        status: 'draft',
-        submissionDate: null,
-        decisionDate: null,
-        notes: newApplication.notes || null,
-        documents: []
-      };
-      
-      // API'ye kaydet (gerçek uygulamada)
-      // const response = await fetch('/api/student/applications', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     'x-user-email': user?.email || ''
-      //   },
-      //   body: JSON.stringify(application)
-      // });
-      
-      // API response beklemeden state güncelle
-      setApplications([...applications, application]);
-      
-      // Formu temizle ve kapat
-      setNewApplication({
-        universityId: '',
-        program: '',
-        status: 'draft',
-        submissionDate: null,
-        notes: '',
-        documents: []
-      });
-      setIsCreating(false);
-      
-    } catch (error) {
-      console.error('Başvuru oluşturma hatası:', error);
-    }
-  };
-  
   const handleViewDetails = (application: Application) => {
     setSelectedApplication(application);
     setIsViewingDetails(true);
-  };
-  
-  const handleUpdateStatus = async (id: string, newStatus: Application['status']) => {
-    try {
-      // API'ye güncelleme gönder (gerçek uygulamada)
-      // await fetch(`/api/student/applications/${id}/status`, {
-      //   method: 'PUT',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     'x-user-email': user?.email || ''
-      //   },
-      //   body: JSON.stringify({ status: newStatus })
-      // });
-      
-      // Başarılı olduğunu varsayalım ve state'i güncelle
-      setApplications(applications.map(app => 
-        app.id === id 
-          ? { 
-              ...app, 
-              status: newStatus, 
-              submissionDate: newStatus === 'submitted' ? new Date().toISOString().split('T')[0] : app.submissionDate 
-            } 
-          : app
-      ));
-      
-      // Eğer detaylar açıksa ve değişen başvuruysa onu da güncelle
-      if (selectedApplication && selectedApplication.id === id) {
-        setSelectedApplication({
-          ...selectedApplication,
-          status: newStatus,
-          submissionDate: newStatus === 'submitted' ? new Date().toISOString().split('T')[0] : selectedApplication.submissionDate
-        });
-      }
-      
-    } catch (error) {
-      console.error('Durum güncelleme hatası:', error);
-    }
   };
   
   const getStatusText = (status: Application['status']) => {
@@ -263,30 +165,15 @@ export default function ApplicationsPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="mb-6 flex justify-between items-center">
-          <div>
+        <div className="mb-6">
             <h1 className="text-3xl font-bold text-[#002757]">Başvurularım</h1>
-            <p className="text-default mt-1">Üniversite başvurularınızı buradan takip edebilirsiniz.</p>
-          </div>
-          
-          <button 
-            onClick={() => setIsCreating(true)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-          >
-            <span>Yeni Başvuru</span>
-            <span className="text-lg">+</span>
-          </button>
+          <p className="text-default mt-1">Danışmanınız tarafından yapılan üniversite başvurularınızı buradan takip edebilirsiniz.</p>
         </div>
         
         {applications.length === 0 ? (
           <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-8 rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30 text-center">
-            <p className="text-lg text-gray-600 dark:text-gray-300 mb-4">Henüz başvurunuz bulunmuyor.</p>
-            <button 
-              onClick={() => setIsCreating(true)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Yeni Başvuru Oluştur
-            </button>
+            <p className="text-lg text-gray-600 dark:text-gray-300">Henüz başvurunuz bulunmuyor.</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Danışmanınız başvurularınızı oluşturduğunda burada listelenecektir.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -299,13 +186,7 @@ export default function ApplicationsPage() {
               >
                 <div className="flex justify-between items-start mb-4">
                   <h2 className="text-xl font-semibold text-[#002757] dark:text-blue-300">{app.university}</h2>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    app.status === 'draft' ? 'bg-gray-100/70 dark:bg-gray-700/50 text-gray-800 dark:text-gray-300' : 
-                    app.status === 'submitted' ? 'bg-blue-100/70 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300' : 
-                    app.status === 'in_review' ? 'bg-yellow-100/70 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300' :
-                    app.status === 'accepted' ? 'bg-green-100/70 dark:bg-green-900/30 text-green-800 dark:text-green-300' :
-                    'bg-red-100/70 dark:bg-red-900/30 text-red-800 dark:text-red-300'
-                  }`}>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(app.status)}`}>
                     {getStatusText(app.status)}
                   </span>
                 </div>
@@ -340,22 +221,13 @@ export default function ApplicationsPage() {
                   </div>
                 )}
                 
-                <div className="mt-auto pt-4 flex space-x-2">
+                <div className="mt-auto pt-4">
                     <button 
                     onClick={() => handleViewDetails(app)}
-                    className="flex-1 py-2 px-3 bg-gray-100/70 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200/70 dark:hover:bg-gray-600/50 transition-colors text-sm"
+                    className="w-full py-2 px-3 bg-gray-100/70 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200/70 dark:hover:bg-gray-600/50 transition-colors text-sm"
                     >
                       Detaylar
                     </button>
-                  
-                  {app.status === 'draft' && (
-                    <button 
-                      onClick={() => handleUpdateStatus(app.id, 'submitted')}
-                      className="flex-1 py-2 px-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
-                    >
-                      Gönder
-                    </button>
-                  )}
                 </div>
               </motion.div>
             ))}
@@ -363,87 +235,13 @@ export default function ApplicationsPage() {
         )}
       </motion.div>
         
-      {/* Yeni Başvuru Modal */}
-        {isCreating && (
-        <div className="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md p-6 rounded-lg shadow-xl max-w-md w-full border border-gray-100/60 dark:border-gray-700/30"
-          >
-            <h2 className="text-2xl font-semibold text-[#002757] dark:text-blue-300 mb-4">Yeni Başvuru</h2>
-              
-            <div className="space-y-4">
-                <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Üniversite</label>
-                  <select 
-                  value={newApplication.universityId || ''}
-                    onChange={(e) => setNewApplication({...newApplication, universityId: e.target.value})}
-                  className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white/90 dark:bg-gray-700/90"
-                  >
-                    <option value="">Üniversite Seçin</option>
-                    {universities.map(uni => (
-                    <option key={uni.id} value={uni.id}>{uni.name} ({uni.country})</option>
-                    ))}
-                  </select>
-                </div>
-                
-                <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Program</label>
-                  <select 
-                  value={newApplication.program || ''}
-                    onChange={(e) => setNewApplication({...newApplication, program: e.target.value})}
-                  className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white/90 dark:bg-gray-700/90"
-                    disabled={!newApplication.universityId}
-                  >
-                    <option value="">Program Seçin</option>
-                  {newApplication.universityId && 
-                    universities
-                      .find(uni => uni.id === newApplication.universityId)
-                      ?.programs.map((program, index) => (
-                        <option key={index} value={program}>{program}</option>
-                      ))
-                  }
-                  </select>
-                </div>
-                
-                <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Notlar</label>
-                  <textarea 
-                    value={newApplication.notes || ''}
-                    onChange={(e) => setNewApplication({...newApplication, notes: e.target.value})}
-                    rows={3}
-                  className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white/90 dark:bg-gray-700/90"
-                  placeholder="İsteğe bağlı notlar..."
-                  />
-                </div>
-              </div>
-              
-            <div className="mt-6 flex justify-end space-x-3">
-                <button 
-                  onClick={() => setIsCreating(false)}
-                className="px-4 py-2 bg-gray-200/80 dark:bg-gray-700/80 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300/80 dark:hover:bg-gray-600/80 transition-colors"
-                >
-                  İptal
-                </button>
-                <button 
-                  onClick={handleCreateApplication}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                Oluştur
-                </button>
-            </div>
-          </motion.div>
-          </div>
-        )}
-        
       {/* Başvuru Detayları Modal */}
         {isViewingDetails && selectedApplication && (
         <div className="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
           <motion.div 
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white p-6 rounded-lg shadow-xl max-w-2xl w-full border border-gray-100/60 dark:border-gray-700/30"
+            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md p-6 rounded-lg shadow-xl max-w-2xl w-full border border-gray-100/60 dark:border-gray-700/30"
           >
               <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold text-[#002757] dark:text-blue-300">Başvuru Detayları</h2>
@@ -455,26 +253,21 @@ export default function ApplicationsPage() {
                 </button>
               </div>
               
-              <div className="flex items-center gap-4 mb-4 pb-4 border-b">
-                <img 
-                  src={universities.find(uni => uni.id === selectedApplication.universityId)?.logo || 'https://placehold.co/100x100/ffc105/002757?text=Uni'}
-                  alt={selectedApplication.university}
-                  className="w-16 h-16 rounded-md object-cover"
-                />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                 <h3 className="text-xl font-semibold text-[#002757] dark:text-blue-300">{selectedApplication.university}</h3>
                 <p className="text-gray-600 dark:text-gray-300">{selectedApplication.program}</p>
-                </div>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                 <p className="text-gray-500 dark:text-gray-400 text-sm">Durum</p>
                   <p className={`inline-block px-3 py-1 rounded-full text-sm ${getStatusColor(selectedApplication.status)}`}>
                     {getStatusText(selectedApplication.status)}
                   </p>
+              </div>
                 </div>
                 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                 <p className="text-gray-500 dark:text-gray-400 text-sm">Başvuru Tarihi</p>
                 <p className="text-gray-700 dark:text-gray-300">
@@ -487,7 +280,9 @@ export default function ApplicationsPage() {
                 {selectedApplication.decisionDate && (
                   <div>
                   <p className="text-gray-500 dark:text-gray-400 text-sm">Karar Tarihi</p>
-                  <p className="text-gray-700 dark:text-gray-300">{new Date(selectedApplication.decisionDate).toLocaleDateString('tr-TR')}</p>
+                  <p className="text-gray-700 dark:text-gray-300">
+                    {new Date(selectedApplication.decisionDate).toLocaleDateString('tr-TR')}
+                  </p>
                   </div>
                 )}
               </div>
@@ -495,34 +290,25 @@ export default function ApplicationsPage() {
               {selectedApplication.notes && (
                 <div className="mb-4">
                 <p className="text-gray-500 dark:text-gray-400 text-sm mb-1">Notlar</p>
-                <p className="bg-gray-50/80 dark:bg-gray-700/50 p-3 rounded-lg text-gray-700 dark:text-gray-300">{selectedApplication.notes}</p>
+                <p className="bg-gray-50/80 dark:bg-gray-700/50 p-3 rounded-lg text-gray-700 dark:text-gray-300">
+                  {selectedApplication.notes}
+                </p>
                 </div>
               )}
               
               {selectedApplication.documents && selectedApplication.documents.length > 0 && (
-                <div className="mb-4">
+              <div>
                 <p className="text-gray-500 dark:text-gray-400 text-sm mb-1">Dökümanlar</p>
                   <div className="flex flex-wrap gap-2">
                     {selectedApplication.documents.map((doc, index) => (
-                    <span key={index} className="bg-blue-100/70 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 px-3 py-1 rounded-full text-sm">
+                    <span 
+                      key={index} 
+                      className="bg-blue-100/70 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 px-3 py-1 rounded-full text-sm"
+                    >
                         {doc}
                       </span>
                     ))}
                   </div>
-                </div>
-              )}
-              
-              {selectedApplication.status === 'draft' && (
-                <div className="mt-6 flex justify-end gap-3">
-                  <button 
-                    onClick={() => {
-                      handleUpdateStatus(selectedApplication.id, 'submitted');
-                      setIsViewingDetails(false);
-                    }}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                  >
-                    Başvuruyu Gönder
-                  </button>
                 </div>
               )}
           </motion.div>

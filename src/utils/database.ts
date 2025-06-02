@@ -370,122 +370,6 @@ export async function getRecordByEmail(email: string): Promise<CustomerRecord | 
   return customer || null;
 }
 
-// Yeni kayıt oluşturma veya mevcut kaydı güncelleme
-export async function updateOrCreateRecord(data: Partial<CustomerRecord>): Promise<CustomerRecord> {
-  if (!data.email) {
-    throw new Error('Email alanı zorunludur');
-  }
-  
-  console.log('updateOrCreateRecord başlatıldı:', data.email);
-  
-  try {
-    const db = await loadDb();
-    const existingIndex = db.customers.findIndex(c => 
-      c.email.toLowerCase() === data.email!.toLowerCase()
-    );
-    
-    console.log('Mevcut kayıt durumu:', existingIndex >= 0 ? 'Mevcut kayıt bulundu' : 'Yeni kayıt oluşturulacak');
-    
-    if (existingIndex >= 0) {
-      // Mevcut kaydı güncelle
-      const updatedRecord = {
-        ...db.customers[existingIndex],
-        ...data,
-        updatedAt: new Date().toISOString()
-      };
-      
-      db.customers[existingIndex] = updatedRecord;
-      const saveResult = await saveDb(db);
-      console.log('Kayıt güncelleme sonucu:', saveResult ? 'Başarılı' : 'Başarısız');
-      
-      return updatedRecord;
-    } else {
-      // Yeni kayıt oluştur
-      const newRecord: CustomerRecord = {
-        ...(data as CustomerRecord),
-        updatedAt: new Date().toISOString(),
-        documents: data.documents || []
-      };
-      
-      db.customers.push(newRecord);
-      const saveResult = await saveDb(db);
-      console.log('Yeni kayıt oluşturma sonucu:', saveResult ? 'Başarılı' : 'Başarısız');
-      
-      return newRecord;
-    }
-  } catch (error) {
-    console.error('updateOrCreateRecord hatası:', error);
-    throw error;
-  }
-}
-
-// Doküman bilgisini güncelleme
-export async function updateDocumentRecord(data: {
-  email: string;
-  documentType: string;
-  documentUrl: string;
-  documentName: string;
-  updatedAt: string;
-  [key: string]: any;
-}): Promise<CustomerRecord | null> {
-  if (!data.email) {
-    throw new Error('Email alanı zorunludur');
-  }
-  
-  const db = await loadDb();
-  const customerIndex = db.customers.findIndex(c => 
-    c.email.toLowerCase() === data.email.toLowerCase()
-  );
-  
-  if (customerIndex < 0) {
-    return null; // Müşteri bulunamadı
-  }
-  
-  // Müşteri kaydını al
-  const customer = db.customers[customerIndex];
-  
-  // Dokümanlar dizisini oluştur veya mevcut olanı kullan
-  if (!customer.documents) {
-    customer.documents = [];
-  }
-  
-  // Aynı tipteki mevcut dokümanı bul
-  const docIndex = customer.documents.findIndex(
-    doc => doc.documentType === data.documentType
-  );
-  
-  if (docIndex >= 0) {
-    // Mevcut dokümanı güncelle
-    customer.documents[docIndex] = {
-      documentType: data.documentType,
-      documentUrl: data.documentUrl,
-      documentName: data.documentName,
-      updatedAt: data.updatedAt,
-      ...(data.uploadedBy ? { uploadedBy: data.uploadedBy } : {}),
-      ...(data.uploadedByRole ? { uploadedByRole: data.uploadedByRole } : {})
-    };
-  } else {
-    // Yeni doküman ekle
-    customer.documents.push({
-      documentType: data.documentType,
-      documentUrl: data.documentUrl,
-      documentName: data.documentName,
-      updatedAt: data.updatedAt,
-      ...(data.uploadedBy ? { uploadedBy: data.uploadedBy } : {}),
-      ...(data.uploadedByRole ? { uploadedByRole: data.uploadedByRole } : {})
-    });
-  }
-  
-  // Müşteri kaydını güncelle
-  customer.updatedAt = new Date().toISOString();
-  db.customers[customerIndex] = customer;
-  
-  // Değişiklikleri kaydet
-  await saveDb(db);
-  
-  return customer;
-}
-
 // E-posta adresine göre danışman bulma
 export async function getAdvisorByEmail(email: string): Promise<AdvisorRecord | null> {
   const db = await loadAdvisorsDb();
@@ -809,4 +693,162 @@ export async function startProcessAndAssignAdvisor(
     console.error('Süreç başlatma ve danışman atama hatası:', error);
     return null;
   }
+} 
+
+export async function updateStudentVisa(email: string, data: any) {
+  try {
+    // Öğrenciyi bul
+    const student = await getRecordByEmail(email);
+    
+    if (!student) {
+      return null;
+    }
+
+    // Vize bilgilerini güncelle
+    const updatedStudent = {
+      ...student,
+      ...data,
+      updatedAt: new Date()
+    };
+
+    // Güncellenmiş veriyi kaydet
+    await saveRecord(email, updatedStudent);
+
+    return updatedStudent;
+  } catch (error) {
+    console.error('Vize bilgileri güncelleme hatası:', error);
+    throw error;
+  }
+}
+
+export async function saveRecord(email: string, data: any) {
+  try {
+    // Veriyi localStorage'a kaydet
+    localStorage.setItem(`student_${email}`, JSON.stringify(data));
+    return true;
+  } catch (error) {
+    console.error('Veri kaydetme hatası:', error);
+    throw error;
+  }
+}
+
+// Email ile öğrenci ara
+export async function findStudentByEmail(email: string): Promise<CustomerRecord | null> {
+  return await getRecordByEmail(email);
+}
+
+// Öğrenci kaydını güncelle veya oluştur
+export async function updateOrCreateRecord(data: Partial<CustomerRecord>): Promise<CustomerRecord> {
+  if (!data.email) {
+    throw new Error('Email alanı zorunludur');
+  }
+  
+  console.log('updateOrCreateRecord başlatıldı:', data.email);
+  
+  try {
+    const db = await loadDb();
+    const existingIndex = db.customers.findIndex(c => 
+      c.email.toLowerCase() === data.email!.toLowerCase()
+    );
+    
+    console.log('Mevcut kayıt durumu:', existingIndex >= 0 ? 'Mevcut kayıt bulundu' : 'Yeni kayıt oluşturulacak');
+    
+    if (existingIndex >= 0) {
+      // Mevcut kaydı güncelle
+      const updatedRecord = {
+        ...db.customers[existingIndex],
+        ...data,
+        updatedAt: new Date().toISOString()
+      };
+      
+      db.customers[existingIndex] = updatedRecord;
+      const saveResult = await saveDb(db);
+      console.log('Kayıt güncelleme sonucu:', saveResult ? 'Başarılı' : 'Başarısız');
+      
+      return updatedRecord;
+    } else {
+      // Yeni kayıt oluştur
+      const newRecord: CustomerRecord = {
+        ...(data as CustomerRecord),
+        updatedAt: new Date().toISOString(),
+        documents: data.documents || []
+      };
+      
+      db.customers.push(newRecord);
+      const saveResult = await saveDb(db);
+      console.log('Yeni kayıt oluşturma sonucu:', saveResult ? 'Başarılı' : 'Başarısız');
+      
+      return newRecord;
+    }
+  } catch (error) {
+    console.error('updateOrCreateRecord hatası:', error);
+    throw error;
+  }
+}
+
+// Doküman bilgisini güncelleme
+export async function updateDocumentRecord(data: {
+  email: string;
+  documentType: string;
+  documentUrl: string;
+  documentName: string;
+  updatedAt: string;
+  [key: string]: any;
+}): Promise<CustomerRecord | null> {
+  if (!data.email) {
+    throw new Error('Email alanı zorunludur');
+  }
+  
+  const db = await loadDb();
+  const customerIndex = db.customers.findIndex(c => 
+    c.email.toLowerCase() === data.email.toLowerCase()
+  );
+  
+  if (customerIndex < 0) {
+    return null; // Müşteri bulunamadı
+  }
+  
+  // Müşteri kaydını al
+  const customer = db.customers[customerIndex];
+  
+  // Dokümanlar dizisini oluştur veya mevcut olanı kullan
+  if (!customer.documents) {
+    customer.documents = [];
+  }
+  
+  // Aynı tipteki mevcut dokümanı bul
+  const docIndex = customer.documents.findIndex(
+    doc => doc.documentType === data.documentType
+  );
+  
+  if (docIndex >= 0) {
+    // Mevcut dokümanı güncelle
+    customer.documents[docIndex] = {
+      documentType: data.documentType,
+      documentUrl: data.documentUrl,
+      documentName: data.documentName,
+      updatedAt: data.updatedAt,
+      ...(data.uploadedBy ? { uploadedBy: data.uploadedBy } : {}),
+      ...(data.uploadedByRole ? { uploadedByRole: data.uploadedByRole } : {})
+    };
+  } else {
+    // Yeni doküman ekle
+    customer.documents.push({
+      documentType: data.documentType,
+      documentUrl: data.documentUrl,
+      documentName: data.documentName,
+      updatedAt: data.updatedAt,
+      ...(data.uploadedBy ? { uploadedBy: data.uploadedBy } : {}),
+      ...(data.uploadedByRole ? { uploadedByRole: data.uploadedByRole } : {})
+    });
+  }
+  
+  // Müşteri kaydını güncelle
+  customer.updatedAt = new Date().toISOString();
+  db.customers[customerIndex] = customer;
+  
+  // Değişiklikleri kaydet
+  await saveDb(db);
+  
+  return customer;
 } 

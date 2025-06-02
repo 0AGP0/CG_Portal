@@ -1,12 +1,13 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Layout from '@/components/Layout';
 import { useAuth } from '@/context/AuthContext';
 import { useStudentDetail } from '@/hooks/useStudents';
+import { toast } from 'react-hot-toast';
 
 // Animasyon varyantları
 const containerVariants = {
@@ -35,12 +36,14 @@ export default function StudentDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { user, isAdvisor } = useAuth();
+  const [isEditingVisa, setIsEditingVisa] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   // URL'den öğrenci email'ini al
   const studentEmail = typeof params.email === 'string' ? decodeURIComponent(params.email) : '';
   
   // Öğrenci detaylarını çek
-  const { student, isLoading, isError } = useStudentDetail(studentEmail);
+  const { student, isLoading, isError, mutate } = useStudentDetail(studentEmail);
 
   // Erişim kontrolü
   if (!user || !isAdvisor()) {
@@ -58,6 +61,46 @@ export default function StudentDetailPage() {
       </Layout>
     );
   }
+
+  const handleVisaSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const formData = new FormData(e.currentTarget);
+      const data = {
+        passport_number: formData.get('passport_number'),
+        passport_type: formData.get('passport_type'),
+        issuing_authority: formData.get('issuing_authority'),
+        pnr_number: formData.get('pnr_number'),
+        visa_application_date: formData.get('visa_application_date'),
+        visa_appointment_date: formData.get('visa_appointment_date'),
+        consulate: formData.get('consulate'),
+        has_been_to_germany: formData.get('has_been_to_germany') === 'true'
+      };
+
+      const response = await fetch(`/api/advisor/students/${params.email}/visa`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error('Vize bilgileri güncellenirken bir hata oluştu');
+      }
+
+      toast.success('Vize bilgileri başarıyla güncellendi');
+      setIsEditingVisa(false);
+      mutate(); // Verileri yeniden yükle
+    } catch (error) {
+      console.error('Vize bilgileri güncelleme hatası:', error);
+      toast.error('Vize bilgileri güncellenirken bir hata oluştu');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <Layout>
@@ -171,9 +214,138 @@ export default function StudentDetailPage() {
               variants={itemVariants}
               className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-6 rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30"
             >
-              <h2 className="text-xl font-semibold mb-4 text-[#002757] dark:text-blue-300 border-b border-gray-200/80 dark:border-gray-700/50 pb-2">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold text-[#002757] dark:text-blue-300 border-b border-gray-200/80 dark:border-gray-700/50 pb-2">
                 Vize & Pasaport Bilgileri
               </h2>
+                <button
+                  onClick={() => setIsEditingVisa(!isEditingVisa)}
+                  className="btn-secondary text-sm"
+                >
+                  {isEditingVisa ? 'Düzenlemeyi İptal Et' : 'Düzenle'}
+                </button>
+              </div>
+
+              {isEditingVisa ? (
+                <form onSubmit={handleVisaSubmit} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
+                        Pasaport No
+                      </label>
+                      <input
+                        type="text"
+                        name="passport_number"
+                        defaultValue={student.passport_number || ''}
+                        className="form-input"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
+                        Pasaport Tipi
+                      </label>
+                      <input
+                        type="text"
+                        name="passport_type"
+                        defaultValue={student.passport_type || ''}
+                        className="form-input"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
+                        Veren Makam
+                      </label>
+                      <input
+                        type="text"
+                        name="issuing_authority"
+                        defaultValue={student.issuing_authority || ''}
+                        className="form-input"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
+                        PNR No
+                      </label>
+                      <input
+                        type="text"
+                        name="pnr_number"
+                        defaultValue={student.pnr_number || ''}
+                        className="form-input"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
+                        Vize Başvuru Tarihi
+                      </label>
+                      <input
+                        type="date"
+                        name="visa_application_date"
+                        defaultValue={student.visa_application_date || ''}
+                        className="form-input"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
+                        Vize Randevu Tarihi
+                      </label>
+                      <input
+                        type="date"
+                        name="visa_appointment_date"
+                        defaultValue={student.visa_appointment_date || ''}
+                        className="form-input"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
+                        Konsolosluk
+                      </label>
+                      <input
+                        type="text"
+                        name="consulate"
+                        defaultValue={student.consulate || ''}
+                        className="form-input"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
+                        Almanya'da Bulunma
+                      </label>
+                      <select
+                        name="has_been_to_germany"
+                        defaultValue={student.has_been_to_germany ? 'true' : 'false'}
+                        className="form-select"
+                      >
+                        <option value="false">Hayır</option>
+                        <option value="true">Evet</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end gap-3 mt-6">
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingVisa(false)}
+                      className="btn-secondary"
+                    >
+                      İptal
+                    </button>
+                    <button
+                      type="submit"
+                      className="btn-primary"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? 'Kaydediliyor...' : 'Kaydet'}
+                    </button>
+                  </div>
+                </form>
+              ) : (
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-gray-600 dark:text-gray-300 font-medium">Pasaport No:</span>
@@ -208,6 +380,7 @@ export default function StudentDetailPage() {
                   <span className="dark:text-gray-100">{student.has_been_to_germany ? 'Evet' : 'Hayır'}</span>
                 </div>
               </div>
+              )}
             </motion.div>
             
             {/* Eğitim Bilgileri */}
@@ -286,7 +459,6 @@ export default function StudentDetailPage() {
                 Süreç Durumu
               </h2>
               <div className="flex items-center justify-center p-4">
-                <div className="text-center">
                   <div className={`text-4xl font-bold mb-2 ${
                     student.stage === 'BİTEN' || student.stage === 'biten' 
                       ? 'text-green-600 dark:text-green-400' 
@@ -296,7 +468,6 @@ export default function StudentDetailPage() {
                   </div>
                   <div className="text-sm text-gray-500 dark:text-gray-400">
                     Son güncelleme: {new Date(student.updatedAt).toLocaleDateString('tr-TR')}
-                  </div>
                 </div>
               </div>
             </motion.div>

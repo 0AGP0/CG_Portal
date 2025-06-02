@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
+import { NotificationCenter } from '@/components/NotificationCenter';
 
 type LayoutProps = {
   children: ReactNode;
@@ -95,6 +96,8 @@ const Header = () => {
           <div className="hidden md:flex items-center gap-6">
             {user ? (
               <>
+                {user.role === 'student' && <NotificationCenter />}
+                
                 <div className="flex items-center gap-3 text-gray-700 dark:text-gray-200">
                   <div className="relative">
                     <div className="absolute inset-0 bg-gradient-to-r from-primary-400 to-accent-400 rounded-full blur-[1px]"></div>
@@ -166,14 +169,6 @@ const Header = () => {
                     bg-white text-primary-600 shadow-sm hover:shadow-md border border-gray-100 hover:border-gray-200"
                 >
                   Giriş
-                </Link>
-                <Link 
-                  href="/register" 
-                  className="px-4 py-2 rounded-lg text-sm font-medium 
-                    bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 
-                    text-white shadow-sm hover:shadow-md"
-                >
-                  Kayıt Ol
                 </Link>
               </>
             )}
@@ -282,16 +277,9 @@ const Header = () => {
                   <>
                     <Link 
                       href="/login" 
-                    className="py-3 px-4 rounded-xl bg-white text-primary-600 text-sm font-medium shadow-sm border border-gray-100"
+                      className="py-3 px-4 rounded-xl bg-white text-primary-600 text-sm font-medium shadow-sm border border-gray-100"
                     >
-                    Giriş
-                    </Link>
-                  
-                    <Link 
-                      href="/register" 
-                    className="py-3 px-4 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 text-white text-sm font-medium shadow-sm"
-                    >
-                      Kayıt Ol
+                      Giriş
                     </Link>
                   </>
                 )}

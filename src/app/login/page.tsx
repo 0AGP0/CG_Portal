@@ -257,15 +257,6 @@ export default function Login() {
                     role === 'student' ? 'Giriş Bağlantısı Al' : role === 'admin' ? 'Admin Girişi' : 'Danışman Girişi'
                   )}
                 </button>
-                
-                <div className="mt-6 text-center">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Hesabınız yok mu?{' '}
-                    <Link href="/register" className="font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300 transition-colors">
-                      Kayıt Olun
-                    </Link>
-                  </p>
-                </div>
               </div>
             </form>
           </div>
