@@ -47,6 +47,74 @@ const itemVariants = {
   }
 };
 
+// Aşama tanımlamaları
+const STAGES = {
+  YENI: 'Yeni',
+  SUREC_BASLATILDI: 'Süreç Başlatıldı',
+  ISLEMDE: 'İşlemde',
+  VIZE_BASVURU: 'Vize Başvuru',
+  VIZE_RANDEVU: 'Vize Randevu',
+  VIZE_SONUC: 'Vize Sonuç',
+  BITEN: 'BİTEN'
+};
+
+// Aşama renkleri ve ikonları
+const STAGE_CONFIG = {
+  [STAGES.YENI]: {
+    color: 'bg-gray-100 text-gray-800 border-gray-200',
+    icon: '🆕',
+    bgColor: 'bg-gray-50/50',
+    borderColor: 'border-gray-200'
+  },
+  [STAGES.SUREC_BASLATILDI]: {
+    color: 'bg-blue-100 text-blue-800 border-blue-200',
+    icon: '🚀',
+    bgColor: 'bg-blue-50/50',
+    borderColor: 'border-blue-200'
+  },
+  [STAGES.ISLEMDE]: {
+    color: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+    icon: '⚡',
+    bgColor: 'bg-yellow-50/50',
+    borderColor: 'border-yellow-200'
+  },
+  [STAGES.VIZE_BASVURU]: {
+    color: 'bg-purple-100 text-purple-800 border-purple-200',
+    icon: '📝',
+    bgColor: 'bg-purple-50/50',
+    borderColor: 'border-purple-200'
+  },
+  [STAGES.VIZE_RANDEVU]: {
+    color: 'bg-orange-100 text-orange-800 border-orange-200',
+    icon: '📅',
+    bgColor: 'bg-orange-50/50',
+    borderColor: 'border-orange-200'
+  },
+  [STAGES.VIZE_SONUC]: {
+    color: 'bg-red-100 text-red-800 border-red-200',
+    icon: '📋',
+    bgColor: 'bg-red-50/50',
+    borderColor: 'border-red-200'
+  },
+  [STAGES.BITEN]: {
+    color: 'bg-green-100 text-green-800 border-green-200',
+    icon: '✅',
+    bgColor: 'bg-green-50/50',
+    borderColor: 'border-green-200'
+  }
+};
+
+// Aşama sıralaması
+const STAGE_ORDER = [
+  STAGES.YENI,
+  STAGES.SUREC_BASLATILDI,
+  STAGES.ISLEMDE,
+  STAGES.VIZE_BASVURU,
+  STAGES.VIZE_RANDEVU,
+  STAGES.VIZE_SONUC,
+  STAGES.BITEN
+];
+
 export default function AdvisorDashboard() {
   const { user, isAdvisor } = useAuth();
   const router = useRouter();
@@ -102,6 +170,15 @@ export default function AdvisorDashboard() {
     
     return matchesSearch;
   }) : [];
+
+  // Öğrencileri aşamalara göre grupla
+  const groupedStudents = STAGE_ORDER.reduce((acc, stage) => {
+    acc[stage] = filteredStudents.filter((student: Student) => {
+      if (stage === STAGES.YENI) return !student.processStarted;
+      return student.stage === stage;
+    });
+    return acc;
+  }, {} as Record<string, Student[]>);
 
   // Süreci başlatma
   const startStudentProcess = async (studentId: string) => {
@@ -265,103 +342,127 @@ export default function AdvisorDashboard() {
           </div>
         </div>
 
-        {/* Öğrenci Listesi */}
-        <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30 overflow-hidden">
-          {filteredStudents.length === 0 ? (
-            <div className="p-8 text-center">
-              <p className="text-lg text-gray-500 dark:text-gray-400">Öğrenci bulunamadı</p>
-              {selectedFilter !== "all" && (
-                <button 
-                  onClick={() => setSelectedFilter("all")}
-                  className="mt-2 text-blue-500 dark:text-blue-400 hover:underline"
-                >
-                  Tüm öğrencileri göster
-                </button>
-              )}
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700/30">
-                <thead className="bg-gray-50/70 dark:bg-gray-700/30">
-                  <tr>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Öğrenci
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Durum
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Üniversite / Program
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Son İşlem
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      İşlemler
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm divide-y divide-gray-200 dark:divide-gray-700/30">
-                  {filteredStudents.map((student: Student) => (
-                    <tr key={student.id || student.email} className="hover:bg-gray-50/80 dark:hover:bg-gray-700/30">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="flex-shrink-0 h-10 w-10 relative">
-                            <div className="h-full w-full rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-800 dark:text-blue-300 font-bold">
+        {/* Öğrenci Listesi - Kanban Board */}
+        <div className="mt-6">
+          <div className="flex space-x-4 overflow-x-auto pb-4 px-1">
+            {STAGE_ORDER.map((stage) => (
+              <motion.div
+                key={stage}
+                variants={itemVariants}
+                initial="hidden"
+                animate="visible"
+                className={`flex-none w-80 ${STAGE_CONFIG[stage].bgColor} rounded-xl shadow-sm border ${STAGE_CONFIG[stage].borderColor} backdrop-blur-sm`}
+              >
+                <div className="p-4 border-b border-gray-100/60 dark:border-gray-700/30">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-xl">{STAGE_CONFIG[stage].icon}</span>
+                      <h3 className="font-medium text-gray-900 dark:text-gray-100">{stage}</h3>
+                    </div>
+                    <span className={`px-2.5 py-1 text-xs rounded-full ${STAGE_CONFIG[stage].color} font-medium`}>
+                      {groupedStudents[stage]?.length || 0}
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="p-3 min-h-[calc(100vh-400px)] max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar">
+                  {groupedStudents[stage]?.map((student: Student) => (
+                    <motion.div
+                      key={student.id || student.email}
+                      variants={itemVariants}
+                      className="mb-3 bg-white dark:bg-gray-800/50 rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30 hover:shadow-md transition-all duration-200 hover:-translate-y-0.5"
+                    >
+                      <div className="p-3">
+                        <div className="flex items-start space-x-3">
+                          <div className="flex-shrink-0">
+                            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-sm">
                               {student.name?.substring(0, 2).toUpperCase() || '??'}
                             </div>
-                            {(student.unreadMessages ?? 0) > 0 && (
-                              <div className="absolute -top-1 -right-1 bg-red-500 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs">
-                                {student.unreadMessages}
+                          </div>
+                          
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between">
+                              <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                                {student.name}
+                              </p>
+                              {(student.unreadMessages ?? 0) > 0 && (
+                                <span className="ml-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full shadow-sm">
+                                  {student.unreadMessages}
+                                </span>
+                              )}
+                            </div>
+                            
+                            <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
+                              {student.email}
+                            </p>
+                            
+                            {student.university && (
+                              <div className="mt-2 flex items-center text-xs text-gray-600 dark:text-gray-300">
+                                <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                </svg>
+                                <span className="truncate">{student.university}</span>
                               </div>
                             )}
+                            
+                            <div className="mt-3 flex space-x-2">
+                              <Link 
+                                href={`/advisor/students/${encodeURIComponent(student.email || '')}`}
+                                className="flex-1 px-3 py-1.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs rounded-lg hover:from-blue-600 hover:to-blue-700 text-center font-medium shadow-sm transition-all duration-200 hover:shadow-md"
+                              >
+                                Detaylar
+                              </Link>
+                              
+                              <Link 
+                                href={`/advisor/messages?student=${encodeURIComponent(student.email || '')}`}
+                                className="flex-1 px-3 py-1.5 bg-gradient-to-r from-green-500 to-green-600 text-white text-xs rounded-lg hover:from-green-600 hover:to-green-700 text-center font-medium shadow-sm transition-all duration-200 hover:shadow-md"
+                              >
+                                Mesaj
+                              </Link>
+                            </div>
                           </div>
-                          <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{student.name}</div>
-                            <div className="text-sm text-gray-500 dark:text-gray-400">{student.email}</div>
-                          </div>
                         </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className={`inline-flex px-2 py-1 text-xs rounded-full ${
-                          student.processStarted 
-                            ? 'bg-green-100/70 dark:bg-green-900/30 text-green-800 dark:text-green-300' 
-                            : 'bg-yellow-100/70 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300'
-                        }`}>
-                          {student.stage || (student.processStarted ? 'Aktif' : 'Yeni')}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900 dark:text-gray-100">{student.university || 'Henüz Seçilmedi'}</div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">{student.program || 'Henüz Seçilmedi'}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                        {new Date(student.updatedAt || '').toLocaleDateString('tr-TR')}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <div className="flex space-x-2 justify-end">
-                          <Link 
-                            href={`/advisor/students/${encodeURIComponent(student.email || '')}`}
-                            className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-xs"
-                          >
-                            Detaylar
-                          </Link>
-                          
-                          <Link 
-                            href={`/advisor/messages?student=${encodeURIComponent(student.email || '')}`}
-                            className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-xs"
-                          >
-                            Mesaj
-                          </Link>
-                        </div>
-                      </td>
-                    </tr>
+                      </div>
+                    </motion.div>
                   ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+                  
+                  {(!groupedStudents[stage] || groupedStudents[stage].length === 0) && (
+                    <div className="p-6 text-center">
+                      <div className="text-gray-400 dark:text-gray-500 text-4xl mb-2">📭</div>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        Bu aşamada öğrenci bulunmuyor
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
+
+        {/* Custom Scrollbar Styles */}
+        <style jsx global>{`
+          .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+          }
+          .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+          }
+          .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #CBD5E0;
+            border-radius: 3px;
+          }
+          .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #A0AEC0;
+          }
+          .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #4A5568;
+          }
+          .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #2D3748;
+          }
+        `}</style>
       </motion.div>
     </Layout>
   );

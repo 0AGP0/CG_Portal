@@ -2,6 +2,57 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getRecordByEmail } from '@/utils/database';
 import { logError } from '@/utils/logger';
 
+// Vize başvuru bilgilerini kontrol eden yardımcı fonksiyon
+function checkVisaApplicationFields(student: any) {
+  const missingFields = [];
+  
+  // Danışan İletişim Bilgileri
+  if (!student.contact_address) missingFields.push('İletişim Adresi');
+  if (!student.x_studio_medeni_durum_1) missingFields.push('Medeni Durum');
+  if (!student.phone) missingFields.push('İletişim Numarası');
+  if (!student.email) missingFields.push('Mail Adresi');
+  
+  // Baba Bilgileri
+  if (!student.x_studio_baba_ad) missingFields.push('Baba Adı');
+  if (!student.x_studio_baba_soyad) missingFields.push('Baba Soyadı');
+  if (!student.x_studio_baba_doum_tarihi) missingFields.push('Baba Doğum Tarihi');
+  if (!student.x_studio_baba_doum_yeri) missingFields.push('Baba Doğum Yeri');
+  if (!student.x_studio_baba_ikamet_ehrilkesi) missingFields.push('Baba İkamet Şehri/İlçesi');
+  
+  // Anne Bilgileri
+  if (!student.x_studio_anne_ad) missingFields.push('Anne Adı');
+  if (!student.x_studio_anne_soyad) missingFields.push('Anne Soyadı');
+  if (!student.x_studio_anne_doum_tarihi) missingFields.push('Anne Doğum Tarihi');
+  if (!student.x_studio_anne_doum_yeri) missingFields.push('Anne Doğum Yeri');
+  if (!student.x_studio_anne_ikamet_sehrilke) missingFields.push('Anne İkamet Şehri/İlçesi');
+  
+  // Evli ise Eş Bilgileri (Medeni durum kontrolü eklenecek)
+  if (student.x_studio_medeni_durum_1 === 'Evli') {
+    if (!student.x_studio_es_ad_soyad) missingFields.push('Eş Adı Soyadı');
+    if (!student.x_studio_es_klk_soyad) missingFields.push('Eş Kızlık Soyadı');
+    if (!student.x_studio_es_doum_tarihi) missingFields.push('Eş Doğum Tarihi');
+    if (!student.x_studio_es_doum_yeri) missingFields.push('Eş Doğum Yeri');
+    if (!student.x_studio_es_ikamet) missingFields.push('Eş İkamet Şehri/İlçesi');
+  }
+  
+  // Çocuk Bilgileri (18 yaş altı)
+  if (student.x_studio_cocuk_var_m) {
+    if (!student.x_studio_cocuk_ad_soyad) missingFields.push('Çocuk Adı Soyadı');
+    if (!student.x_studio_cocuk_doum_tarihi) missingFields.push('Çocuk Doğum Tarihi');
+    if (!student.x_studio_cocuk_doum_yeri) missingFields.push('Çocuk Doğum Yeri');
+    if (!student.x_studio_cocuk_vatandaslik) missingFields.push('Çocuk Vatandaşlık Bilgileri');
+    if (!student.x_studio_cocuk_ikamet) missingFields.push('Çocuk İkamet Şehri/İlçesi');
+  }
+  
+  // Almanya'da Bulunma Bilgileri
+  if (student.x_studio_almanya_bulunma === 'Evet') {
+    if (!student.x_studio_almanya_bulunma_tarihleri) missingFields.push('Almanya\'da Bulunma Tarihleri');
+    if (!student.x_studio_almanya_bulunma_sehir) missingFields.push('Almanya\'da Bulunulan Şehir');
+  }
+  
+  return missingFields;
+}
+
 export async function GET(request: NextRequest) {
   try {
     // Öğrencinin email bilgisini al
@@ -26,7 +77,7 @@ export async function GET(request: NextRequest) {
     
     // Aşama durumunu belirle
     let stageStatus = 'İşlemde';
-    let stagePercentage = 40; // Varsayılan ilerleme yüzdesi
+    let stagePercentage = 40;
     let stageMessage = '';
     
     if (student.stage === 'BİTEN') {
@@ -47,7 +98,6 @@ export async function GET(request: NextRequest) {
     const alerts = [];
     
     if (student.webhook_updated) {
-      // Sistem güncellemesi olduysa, bildirimi ekle
       const updateDate = student.webhook_update_timestamp ? new Date(student.webhook_update_timestamp).toLocaleDateString('tr-TR') : 'yakın zamanda';
       alerts.push({
         id: 1,
@@ -55,7 +105,6 @@ export async function GET(request: NextRequest) {
         message: `Bilgileriniz ${updateDate} tarihinde güncellendi. Durumunuz: ${student.stage}`
       });
     } else {
-      // Varsayılan uyarı
       alerts.push({
         id: 1, 
         type: 'warning', 
@@ -63,34 +112,37 @@ export async function GET(request: NextRequest) {
       });
     }
     
+    // Vize başvuru aşaması kontrolü ve bildirim oluşturma
+    if (student.stage === 'Vize Başvuru') {
+      const missingFields = checkVisaApplicationFields(student);
+      
+      if (missingFields.length > 0) {
+        alerts.push({
+          id: 2,
+          type: 'warning',
+          message: `Vize başvurunuz için aşağıdaki bilgileri tamamlamanız gerekmektedir: ${missingFields.join(', ')}`,
+          details: 'Lütfen kişisel bilgiler panelinden eksik bilgilerinizi güncelleyiniz.'
+        });
+      }
+    }
+    
     // Öğrenci profil bilgilerini formatla ve döndür
     return NextResponse.json(
       { 
         success: true, 
         student: {
-          name: student.name || userEmail.split('@')[0],
+          // Temel bilgiler
+          name: student.name,
           email: student.email,
           studentId: student.lead_id || 'Henüz Oluşturulmadı',
-          university: student.university || 'Henüz Belirlenmedi',
-          program: student.program || 'Henüz Belirlenmedi',
           processStarted: student.processStarted || false,
           counselor: student.advisorName || 'Henüz Atanmadı',
           counselorEmail: student.advisorEmail || null,
           salesPerson: student.salesName || 'Henüz Atanmadı',
           salesEmail: student.salesEmail || null,
-          salesPersonEmail: student.salesEmail || null,
           lastLogin: new Date().toLocaleDateString('tr-TR'),
           
-          // Kişisel bilgiler
-          phone: student.phone,
-          birth_date: student.birth_date || student.x_studio_doum_tarihi,
-          birth_place: student.birth_place || student.x_studio_doum_yeri,
-          age: student.age || student.x_studio_ya,
-          contact_address: student.contact_address,
-          marital_status: student.marital_status || student.x_studio_medeni_durum_1,
-          pnr_number: student.pnr_number || student.x_studio_pnr_numaras,
-          
-          // Durum bilgileri
+          // Sistem bilgileri
           systemDetails: {
             stage: student.stage || 'Yeni',
             stageStatus: stageStatus,
@@ -100,42 +152,94 @@ export async function GET(request: NextRequest) {
             lastUpdateTime: student.webhook_update_timestamp ? new Date(student.webhook_update_timestamp).toLocaleDateString('tr-TR') : null
           },
           
-          // Pasaport bilgileri
-          passport: {
-            number: student.passport_number || student.x_studio_pasaport_numaras || null,
-            type: student.passport_type || student.x_studio_pasaport_tr || null,
-            issueDate: student.passport_issue_date || student.x_studio_verili_tarihi || null,
-            expiryDate: student.passport_expiry_date || student.x_studio_geerlilik_tarihi || null,
-            issuingAuthority: student.issuing_authority || student.x_studio_veren_makam || null
-          },
+          // Odoo'dan gelen tüm alanlar
+          x_studio_mail_adresi: student.x_studio_mail_adresi,
+          x_studio_doum_tarihi: student.x_studio_doum_tarihi,
+          x_studio_doum_yeri: student.x_studio_doum_yeri,
+          x_studio_ya: student.x_studio_ya,
+          x_studio_medeni_durum_1: student.x_studio_medeni_durum_1,
+          x_studio_finansal_kant: student.x_studio_finansal_kant,
           
-          // Vize bilgileri
-          visa: {
-            applicationDate: student.visa_application_date || student.x_studio_vize_bavuru_tarihi_1 || null,
-            appointmentDate: student.visa_appointment_date || student.x_studio_vize_randevu_tarihi || null,
-            consulate: student.consulate || student.x_studio_konsolosluk_1 || null
-          },
+          // Anne bilgileri
+          x_studio_anne_ad: student.x_studio_anne_ad,
+          x_studio_anne_soyad: student.x_studio_anne_soyad,
+          x_studio_anne_doum_tarihi: student.x_studio_anne_doum_tarihi,
+          x_studio_anne_doum_yeri: student.x_studio_anne_doum_yeri,
+          x_studio_anne_ikamet_sehrilke: student.x_studio_anne_ikamet_sehrilke,
+          x_studio_anne_telefon: student.x_studio_anne_telefon,
+          
+          // Baba bilgileri
+          x_studio_baba_ad: student.x_studio_baba_ad,
+          x_studio_baba_soyad: student.x_studio_baba_soyad,
+          x_studio_baba_doum_tarihi: student.x_studio_baba_doum_tarihi,
+          x_studio_baba_doum_yeri: student.x_studio_baba_doum_yeri,
+          x_studio_baba_ikamet_ehrilkesi: student.x_studio_baba_ikamet_ehrilkesi,
+          x_studio_baba_telefon: student.x_studio_baba_telefon,
+          
+          // Pasaport bilgileri
+          x_studio_pasaport_numaras: student.x_studio_pasaport_numaras,
+          x_studio_pasaport_tr: student.x_studio_pasaport_tr,
+          x_studio_verili_tarihi: student.x_studio_verili_tarihi,
+          x_studio_geerlilik_tarihi: student.x_studio_geerlilik_tarihi,
+          x_studio_veren_makam: student.x_studio_veren_makam,
+          x_studio_pnr_numaras: student.x_studio_pnr_numaras,
           
           // Lise bilgileri
-          high_school_name: student.high_school_name || student.x_studio_lise_ad || null,
-          high_school_type: student.high_school_type || student.x_studio_lise_tr || null,
-          high_school_city: student.high_school_city || student.x_studio_lise_ehir || null,
-          high_school_start_date: student.high_school_start_date || student.x_studio_lise_balang_tarihi_1 || null,
-          high_school_graduation_date: student.high_school_graduation_date || student.x_studio_lise_biti_tarihi || null,
+          x_studio_lise_ad: student.x_studio_lise_ad,
+          x_studio_lise_tr: student.x_studio_lise_tr,
+          x_studio_lise_ehir: student.x_studio_lise_ehir,
+          x_studio_lise_balang_tarihi_1: student.x_studio_lise_balang_tarihi_1,
+          x_studio_lise_biti_tarihi: student.x_studio_lise_biti_tarihi,
           
           // Üniversite bilgileri
-          university_name: student.university_name || student.x_studio_niversite_ad || student.university || null,
-          university_department: student.university_department || student.x_studio_niversite_blm_ad || student.program || null,
-          university_start_date: student.university_start_date || student.x_studio_niversite_balang_tarihi || null,
-          university_end_date: student.university_end_date || student.x_studio_niversite_biti_tarihi || null,
-          graduation_status: student.graduation_status || student.x_studio_mezuniyet_durumu || null,
-          graduation_year: student.graduation_year || student.x_studio_mezuniyet_yl || null,
+          x_studio_niversite_ad: student.x_studio_niversite_ad,
+          x_studio_niversite_blm_ad: student.x_studio_niversite_blm_ad,
+          x_studio_niversite_balang_tarihi: student.x_studio_niversite_balang_tarihi,
+          x_studio_niversite_biti_tarihi: student.x_studio_niversite_biti_tarihi,
+          x_studio_mezuniyet_durumu: student.x_studio_mezuniyet_durumu,
+          x_studio_mezuniyet_yl: student.x_studio_mezuniyet_yl,
           
           // Dil bilgileri
-          language_level: student.language_level || student.x_studio_almanca_seviyesi_1 || null,
-          language_certificate: student.language_certificate || student.x_studio_almanca_sertifikas || null,
-          language_course_registration: student.language_course_registration || student.x_studio_dil_kursu_kayt || null,
-          language_learning_status: student.language_learning_status || student.x_studio_dil_renim_durumu || null,
+          x_studio_almanca_seviyesi_1: student.x_studio_almanca_seviyesi_1,
+          x_studio_almanca_sertifikas: student.x_studio_almanca_sertifikas,
+          x_studio_dil_kursu_kayt: student.x_studio_dil_kursu_kayt,
+          x_studio_dil_renim_durumu: student.x_studio_dil_renim_durumu,
+          
+          // Sınav ve vize bilgileri
+          x_studio_sym_snav_giri: student.x_studio_sym_snav_giri,
+          x_studio_sym_yerlestirme_sonuc_tarihi: student.x_studio_sym_yerlestirme_sonuc_tarihi,
+          x_studio_vize_randevu_tarihi: student.x_studio_vize_randevu_tarihi,
+          x_studio_vize_bavuru_tarihi_1: student.x_studio_vize_bavuru_tarihi_1,
+          x_studio_konsolosluk_1: student.x_studio_konsolosluk_1,
+          x_studio_vize_randevu_belgesi: student.x_studio_vize_randevu_belgesi,
+          
+          // Diğer bilgiler
+          x_studio_almanya_bulunma: student.x_studio_almanya_bulunma,
+          x_studio_de_blm_tercihi: student.x_studio_de_blm_tercihi,
+          x_studio_niversite_tercihleri: student.x_studio_niversite_tercihleri,
+          x_studio_maddi_kant_durumu: student.x_studio_maddi_kant_durumu,
+          x_studio_bilgiler_1: student.x_studio_bilgiler_1,
+          
+          // İletişim bilgileri
+          phone: student.phone,
+          contact_address: student.contact_address,
+          
+          // Vize başvuru bilgileri
+          x_studio_es_ad_soyad: student.x_studio_es_ad_soyad,
+          x_studio_es_klk_soyad: student.x_studio_es_klk_soyad,
+          x_studio_es_doum_tarihi: student.x_studio_es_doum_tarihi,
+          x_studio_es_doum_yeri: student.x_studio_es_doum_yeri,
+          x_studio_es_ikamet: student.x_studio_es_ikamet,
+          
+          x_studio_cocuk_var_m: student.x_studio_cocuk_var_m,
+          x_studio_cocuk_ad_soyad: student.x_studio_cocuk_ad_soyad,
+          x_studio_cocuk_doum_tarihi: student.x_studio_cocuk_doum_tarihi,
+          x_studio_cocuk_doum_yeri: student.x_studio_cocuk_doum_yeri,
+          x_studio_cocuk_vatandaslik: student.x_studio_cocuk_vatandaslik,
+          x_studio_cocuk_ikamet: student.x_studio_cocuk_ikamet,
+          
+          x_studio_almanya_bulunma_tarihleri: student.x_studio_almanya_bulunma_tarihleri,
+          x_studio_almanya_bulunma_sehir: student.x_studio_almanya_bulunma_sehir,
           
           // Uyarılar
           alerts: alerts

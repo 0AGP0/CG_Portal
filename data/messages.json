@@ -160,6 +160,17 @@
       "category": "general",
       "createdAt": "2025-05-20T13:03:29.779Z",
       "isRead": false
+    },
+    {
+      "id": "msg-1748949736646",
+      "senderEmail": "burcu.shut@gmail.com",
+      "receiverEmail": "emre.danisman@example.com",
+      "senderRole": "student",
+      "content": "merhaba",
+      "subject": "merhaba",
+      "category": "general",
+      "createdAt": "2025-06-03T11:22:16.646Z",
+      "isRead": false
     }
   ]
 }

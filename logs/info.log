@@ -224,3 +224,20 @@
   "action": "Send Webhook Notification(#1962)",
   "stage": false
 }
+[2025-06-03T11:22:16.612Z] [INFO] Mesaj gönderme isteği alındı
+[2025-06-03T11:22:16.618Z] [INFO] Mesaj istenen parametreler:
+{
+  "sender": "burcu.shut@gmail.com",
+  "receiver": "emre.danisman@example.com",
+  "role": "student",
+  "subject": "merhaba",
+  "hasContent": true
+}
+[2025-06-03T11:22:16.623Z] [INFO] Öğrenci mesajı, alıcı kontrolü atlanıyor
+[2025-06-03T11:22:16.626Z] [INFO] Çalışma dizini (CWD):
+"C:\\Projects\\Portal\\CG_Portal"
+[2025-06-03T11:22:16.632Z] [INFO] Veri yolu (data):
+"C:\\Projects\\Portal\\CG_Portal\\data"
+[2025-06-03T11:22:16.637Z] [INFO] Yeni mesaj oluşturuluyor
+[2025-06-03T11:22:16.655Z] [INFO] Mesaj başarıyla oluşturuldu:
+"msg-1748949736646"
