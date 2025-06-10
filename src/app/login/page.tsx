@@ -1,21 +1,32 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Layout from '@/components/Layout';
 import { useAuth } from '@/context/AuthContext';
 import { motion } from 'framer-motion';
+import { logger } from '@/utils/logger';
 
 export default function Login() {
+  const router = useRouter();
+  const { login, user, isAuthenticated } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<'student' | 'advisor' | 'admin'>('student');
   const [isLoading, setIsLoading] = useState(false);
   const [toast, setToast] = useState<{ show: boolean; message: string; type: 'success' | 'error' } | null>(null);
   
-  const { login } = useAuth();
-  const router = useRouter();
+  // Kullanıcı zaten giriş yapmışsa yönlendir
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      logger.info('Kullanıcı zaten giriş yapmış, yönlendiriliyor:', user);
+      const redirectPath = user.role === 'admin' ? '/admin' : 
+                          user.role === 'advisor' ? '/advisor/dashboard' : 
+                          '/dashboard';
+      router.replace(redirectPath);
+    }
+  }, [isAuthenticated, user, router]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,7 +37,6 @@ export default function Login() {
         message: 'Lütfen e-posta adresinizi girin.',
         type: 'error'
       });
-      setTimeout(() => setToast(null), 3000);
       return;
     }
     
@@ -36,44 +46,42 @@ export default function Login() {
         message: `${role === 'advisor' ? 'Danışman' : 'Admin'} girişi için şifre gereklidir.`,
         type: 'error'
       });
-      setTimeout(() => setToast(null), 3000);
       return;
     }
     
     setIsLoading(true);
     
     try {
-      // Giriş işlemi
+      logger.info('Giriş başlatılıyor:', { email, role });
+      
       const success = await login(email, password, role);
+      logger.info('Giriş sonucu:', success);
       
       if (success) {
-        // Başarılı giriş - kullanıcının rolüne göre yönlendirme yap
-        if (role === 'advisor') {
-          // Danışman dashboard'a yönlendir
-          router.push('/advisor/dashboard');
-        } else if (role === 'admin') {
-          // Admin dashboard'a yönlendir
-          router.push('/admin');
-        } else {
-          // Öğrenci dashboard'a yönlendir
-          router.push('/dashboard');
-        }
-      } else {
         setToast({
           show: true,
-          message: 'Giriş başarısız. Lütfen bilgilerinizi kontrol edin.',
-          type: 'error'
+          message: 'Giriş başarılı! Yönlendiriliyorsunuz...',
+          type: 'success'
         });
+        
+        // Kısa bir gecikme ile yönlendirme yap
+        setTimeout(() => {
+          const redirectPath = role === 'admin' ? '/admin' : 
+                             role === 'advisor' ? '/advisor/dashboard' : 
+                             '/dashboard';
+          router.replace(redirectPath);
+        }, 500);
       }
     } catch (error) {
+      logger.error('Giriş hatası:', error);
       setToast({
         show: true,
-        message: 'Bir hata oluştu. Lütfen daha sonra tekrar deneyin.',
+        message: error instanceof Error ? error.message : 'Giriş yapılırken bir hata oluştu.',
         type: 'error'
       });
     } finally {
       setIsLoading(false);
-      setTimeout(() => setToast(null), 3000);
+      setTimeout(() => setToast(null), 5000);
     }
   };
 

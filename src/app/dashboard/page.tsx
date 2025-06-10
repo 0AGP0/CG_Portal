@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import Layout from '@/components/Layout';
 import { useAuth } from '@/context/AuthContext';
 import { useUnreadMessagesCount } from '@/hooks/useData';
+import { useNotifications } from '@/context/NotificationContext';
 
 // Animasyon varyantları
 const containerVariants = {
@@ -33,6 +34,7 @@ const itemVariants = {
 export default function Dashboard() {
   const { user, startProcess, resetProcess } = useAuth();
   const { unreadCount } = useUnreadMessagesCount();
+  const { dashboardNotifications } = useNotifications();
   const [isLoading, setIsLoading] = useState(true);
   const [studentData, setStudentData] = useState<any>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -203,7 +205,7 @@ export default function Dashboard() {
         </div>
 
         {/* Uyarılar ve Bildirimler */}
-        {userData?.alerts?.length > 0 && (
+        {dashboardNotifications.length > 0 && (
           <motion.div 
             variants={containerVariants}
             initial="hidden"
@@ -217,41 +219,61 @@ export default function Dashboard() {
               Bildirimler
             </h2>
             
-            {userData?.alerts?.map((alert: any) => (
+            {dashboardNotifications.map((notification) => (
               <motion.div
-                key={alert.id}
+                key={notification.id}
                 variants={itemVariants}
                 className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm border border-l-4 backdrop-blur-sm ${
-                  alert.type === 'success' 
+                  notification.type === 'document_approved' 
                     ? 'border-success-200 dark:border-success-900/30' 
-                    : alert.type === 'warning' 
+                    : notification.type === 'document_required' 
                       ? 'border-warning-200 dark:border-warning-900/30' 
-                      : 'border-danger-200 dark:border-danger-900/30'
+                      : notification.type === 'document_rejected'
+                        ? 'border-danger-200 dark:border-danger-900/30'
+                        : 'border-primary-200 dark:border-primary-900/30'
                 }`}
               >
                 <span className={`flex-shrink-0 rounded-full p-1.5 ${
-                  alert.type === 'success' 
+                  notification.type === 'document_approved' 
                     ? 'bg-success-100 dark:bg-success-900/30 text-success-700 dark:text-success-300' 
-                    : alert.type === 'warning' 
+                    : notification.type === 'document_required' 
                       ? 'bg-warning-100 dark:bg-warning-900/30 text-warning-700 dark:text-warning-300' 
-                      : 'bg-danger-100 dark:bg-danger-900/30 text-danger-700 dark:text-danger-300'
+                      : notification.type === 'document_rejected'
+                        ? 'bg-danger-100 dark:bg-danger-900/30 text-danger-700 dark:text-danger-300'
+                        : 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300'
                 }`}>
-                  {alert.type === 'success' ? (
+                  {notification.type === 'document_approved' ? (
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
-                  ) : alert.type === 'warning' ? (
+                  ) : notification.type === 'document_required' ? (
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                     </svg>
-                  ) : (
+                  ) : notification.type === 'document_rejected' ? (
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    </svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                     </svg>
                   )}
                 </span>
                 <div>
-                  <p className="text-gray-800 dark:text-gray-200 font-medium">{alert.message}</p>
+                  <p className="text-gray-800 dark:text-gray-200 font-medium">{notification.title}</p>
+                  <p className="text-gray-600 dark:text-gray-400 mt-1">{notification.message}</p>
+                  {notification.type === 'document_required' && (
+                    <Link
+                      href="/dashboard/documents"
+                      className="mt-2 inline-flex items-center text-xs font-medium text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300"
+                    >
+                      <span>Belgeleri Görüntüle</span>
+                      <svg className="ml-1.5 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </Link>
+                  )}
                 </div>
               </motion.div>
             ))}
@@ -259,39 +281,7 @@ export default function Dashboard() {
         )}
 
         {/* Özet Bilgiler */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-xl shadow-sm border border-gray-100/60 dark:border-gray-700/30 overflow-hidden"
-          >
-            <div className="p-5 border-b border-gray-100 dark:border-gray-700/30 flex justify-between items-center">
-              <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Kişisel Bilgiler</h2>
-              <Link href="/dashboard/education" className="text-xs font-medium text-primary-600 dark:text-primary-400 hover:underline">
-                Detay Görüntüle
-              </Link>
-            </div>
-            <div className="p-5 space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Üniversite</span>
-                <span className="font-medium text-gray-800 dark:text-gray-200">{userData?.university}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Program</span>
-                <span className="font-medium text-gray-800 dark:text-gray-200">{userData?.program}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Danışman</span>
-                <span className="font-medium text-gray-800 dark:text-gray-200">{userData?.counselor}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Satış Temsilcisi</span>
-                <span className="font-medium text-gray-800 dark:text-gray-200">{userData?.salesPerson}</span>
-              </div>
-            </div>
-          </motion.div>
-          
+        <div className="grid grid-cols-1 gap-6">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -305,6 +295,9 @@ export default function Dashboard() {
               </Link>
             </div>
             <div className="p-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Sol taraf - Süreç durumu */}
+                <div>
               <div className="relative pt-2">
                 <div className="overflow-hidden h-2 text-xs flex rounded-full bg-gray-200 dark:bg-gray-700">
                   <div 
@@ -340,75 +333,44 @@ export default function Dashboard() {
                 </div>
               )}
               
-              <div className="mt-6 space-y-3">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 flex items-center justify-center mr-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  <div className="mt-6">
+                    <Link href="/dashboard/process" className="inline-flex items-center text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">
+                      <span>Süreç Detaylarını Görüntüle</span>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                     </svg>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-800 dark:text-gray-200">Başvuru Formu Dolduruldu</p>
+                    </Link>
                   </div>
                 </div>
                 
-                <div className="flex items-center">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 flex items-center justify-center mr-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
+                {/* Sağ taraf - Kişisel bilgiler */}
+                <div className="border-t md:border-t-0 md:border-l border-gray-100 dark:border-gray-700/30 pt-6 md:pt-0 md:pl-6">
+                  <h3 className="text-base font-semibold text-gray-800 dark:text-gray-100 mb-4">Kişisel Bilgiler</h3>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Üniversite</span>
+                      <span className="font-medium text-gray-800 dark:text-gray-200">{userData?.university}</span>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-800 dark:text-gray-200">Danışman Atandı</p>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Program</span>
+                      <span className="font-medium text-gray-800 dark:text-gray-200">{userData?.program}</span>
                   </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Danışman</span>
+                      <span className="font-medium text-gray-800 dark:text-gray-200">{userData?.counselor}</span>
                 </div>
-                
-                {/* Dinamik adım - gelen durum bilgisine göre */}
-                <div className={`flex items-center ${studentData?.systemDetails?.stage === 'BİTEN' ? '' : 'opacity-70'}`}>
-                  <div className={`flex-shrink-0 w-8 h-8 rounded-full 
-                    ${studentData?.systemDetails?.stage === 'BİTEN' 
-                      ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300' 
-                      : 'bg-primary-100/50 dark:bg-primary-900/10 text-primary-400 dark:text-primary-500'} 
-                    flex items-center justify-center mr-3`}>
-                    {studentData?.systemDetails?.stage === 'BİTEN' ? (
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Satış Temsilcisi</span>
+                      <span className="font-medium text-gray-800 dark:text-gray-200">{userData?.salesPerson}</span>
+                  </div>
+                    <div className="pt-4">
+                      <Link href="/dashboard/education" className="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline inline-flex items-center">
+                        <span>Detaylı Bilgileri Görüntüle</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                       </svg>
-                    ) : (
-                      <div className="h-2 w-2 rounded-full bg-primary-500 dark:bg-primary-400 animate-pulse"></div>
-                    )}
+                      </Link>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
-                      {studentData?.systemDetails?.stage === 'BİTEN' 
-                        ? 'Süreç Tamamlandı' 
-                        : 'Başvuru Dosyası Hazırlanıyor'}
-                    </p>
-                  </div>
-                </div>
-                
-                {/* Vize adımı */}
-                <div className={`flex items-center ${studentData?.systemDetails?.stage === 'BİTEN' ? '' : 'opacity-40'}`}>
-                  <div className={`flex-shrink-0 w-8 h-8 rounded-full 
-                    ${studentData?.systemDetails?.stage === 'BİTEN' 
-                      ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300' 
-                      : 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500'} 
-                    flex items-center justify-center mr-3`}>
-                    {studentData?.systemDetails?.stage === 'BİTEN' ? (
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    ) : (
-                      <span className="text-xs">4</span>
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-800 dark:text-gray-200">Vize Süreci</p>
-                    {studentData?.visa?.appointmentDate && (
-                      <p className="text-xs text-primary-600 dark:text-primary-400">
-                        Randevu: {studentData.visa.appointmentDate}
-                      </p>
-                    )}
                   </div>
                 </div>
               </div>
@@ -488,92 +450,6 @@ export default function Dashboard() {
               </div>
             </Link>
           </motion.div>
-          </div>
-        </motion.div>
-
-        {/* Kişisel Bilgiler Kartı */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-xl shadow-sm border border-gray-100/60 dark:border-gray-700/30 overflow-hidden mt-6"
-        >
-          <div className="p-5 border-b border-gray-100 dark:border-gray-700/30 flex justify-between items-center">
-            <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Kişisel Bilgiler</h2>
-            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-              studentData?.systemDetails?.stage === 'BİTEN' 
-                ? 'bg-success-100 text-success-800 dark:bg-success-900/30 dark:text-success-300' 
-                : 'bg-warning-100 text-warning-800 dark:bg-warning-900/30 dark:text-warning-300'
-            }`}>
-              {studentData?.systemDetails?.stage || 'Yeni'}
-            </span>
-          </div>
-          <div className="p-5 space-y-4">
-            {/* Pasaport Bilgileri */}
-            {studentData?.passport?.number && (
-              <div>
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Pasaport Bilgileri</h3>
-                <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-600 dark:text-gray-400">Pasaport No</span>
-                    <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{studentData?.passport?.number}</span>
-                  </div>
-                  {studentData?.passport?.type && (
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-600 dark:text-gray-400">Pasaport Tipi</span>
-                      <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{studentData?.passport?.type}</span>
-                    </div>
-                  )}
-                  {studentData?.passport?.issueDate && (
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-600 dark:text-gray-400">Veriliş Tarihi</span>
-                      <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{studentData?.passport?.issueDate}</span>
-                    </div>
-                  )}
-                  {studentData?.passport?.expiryDate && (
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-600 dark:text-gray-400">Geçerlilik Tarihi</span>
-                      <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{studentData?.passport?.expiryDate}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-            
-            {/* Vize Bilgileri */}
-            {studentData?.visa?.appointmentDate && (
-              <div>
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Vize Bilgileri</h3>
-                <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 space-y-2">
-                  {studentData?.visa?.applicationDate && (
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-600 dark:text-gray-400">Başvuru Tarihi</span>
-                      <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{studentData?.visa?.applicationDate}</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-600 dark:text-gray-400">Randevu Tarihi</span>
-                    <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{studentData?.visa?.appointmentDate}</span>
-                  </div>
-                  {studentData?.visa?.consulate && (
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-600 dark:text-gray-400">Konsolosluk</span>
-                      <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{studentData?.visa?.consulate}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-            
-            {/* Son Güncelleme Bilgisi */}
-            <div className="border-t border-gray-100 dark:border-gray-700/30 pt-3 mt-3 text-xs text-gray-500 dark:text-gray-400">
-              <p>Son güncelleme: {studentData?.systemDetails?.lastUpdated || 'Bilinmiyor'}</p>
-              {studentData?.systemDetails?.isUpdated && (
-                <p className="mt-1">
-                  Otomatik güncelleme: {studentData.systemDetails.lastUpdateTime || 'yakın zamanda'}
-                </p>
-              )}
-            </div>
           </div>
         </motion.div>
       </div>

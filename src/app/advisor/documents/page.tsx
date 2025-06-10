@@ -1,43 +1,50 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DocumentProvider } from '@/context/DocumentContext';
 import { AdvisorDocumentView } from '@/components/AdvisorDocumentView';
 import Layout from '@/components/Layout';
+import { useStudents } from '@/hooks/useData';
+import { useAuth } from '@/context/AuthContext';
 
-// Test için örnek öğrenci verileri
-const MOCK_STUDENTS = [
-  {
-    id: '12345',
-    name: 'Ahmet Yılmaz',
-    type: 'UNIVERSITY_STUDENT',
-    email: 'ahmet.yilmaz@example.com',
-    stage: 'PREPARATION',
-    pendingDocuments: 3,
-    uploadedDocuments: 2
-  },
-  {
-    id: '12346',
-    name: 'Ayşe Demir',
-    type: 'HIGH_SCHOOL_GRADUATE',
-    email: 'ayse.demir@example.com',
-    stage: 'VISA_APPLICATION',
-    pendingDocuments: 1,
-    uploadedDocuments: 4
-  },
-  {
-    id: '12347',
-    name: 'Mehmet Kaya',
-    type: 'UNIVERSITY_GRADUATE',
-    email: 'mehmet.kaya@example.com',
-    stage: 'PREPARATION',
-    pendingDocuments: 0,
-    uploadedDocuments: 5
-  }
-];
+type StudentType = 'UNIVERSITY_STUDENT' | 'HIGH_SCHOOL_GRADUATE' | 'UNIVERSITY_GRADUATE';
+
+interface Student {
+  email: string;
+  name: string;
+  type: StudentType;
+  stage: string;
+  documents?: Array<{
+    isUploaded: boolean;
+    [key: string]: any;
+  }>;
+  [key: string]: any;
+}
 
 export default function AdvisorDocumentsPage() {
-  const [selectedStudent, setSelectedStudent] = useState<typeof MOCK_STUDENTS[0] | null>(null);
+  const { user } = useAuth();
+  const { students, isLoading } = useStudents();
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // URL'den öğrenci parametresini al
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const studentEmail = params.get('student');
+    
+    if (studentEmail && students.length > 0) {
+      const student = students.find((s: Student) => s.email === studentEmail);
+      if (student) {
+        setSelectedStudent(student);
+      }
+    }
+  }, [students]);
+
+  // Öğrenci arama
+  const filteredStudents = students.filter((student: Student) => 
+    student.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    student.email?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <Layout>
@@ -53,14 +60,32 @@ export default function AdvisorDocumentsPage() {
               <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30">
                 <div className="p-4 border-b border-gray-100 dark:border-gray-700">
                   <h2 className="text-lg font-semibold text-[#002757] dark:text-blue-300">Öğrencilerim</h2>
+                  <div className="mt-2">
+                    <input
+                      type="text"
+                      placeholder="Öğrenci ara..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full px-3 py-2 bg-white/50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+                    />
+                  </div>
                 </div>
                 <div className="divide-y divide-gray-100 dark:divide-gray-700">
-                  {MOCK_STUDENTS.map((student) => (
+                  {isLoading ? (
+                    <div className="p-4 text-center text-gray-500 dark:text-gray-400">
+                      <p>Öğrenciler yükleniyor...</p>
+                    </div>
+                  ) : filteredStudents.length === 0 ? (
+                    <div className="p-4 text-center text-gray-500 dark:text-gray-400">
+                      <p>Sonuç bulunamadı</p>
+                    </div>
+                  ) : (
+                    filteredStudents.map((student: Student) => (
                     <button
-                      key={student.id}
+                        key={student.email}
                       onClick={() => setSelectedStudent(student)}
                       className={`w-full p-4 text-left hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors ${
-                        selectedStudent?.id === student.id ? 'bg-blue-50/50 dark:bg-blue-900/20' : ''
+                          selectedStudent?.email === student.email ? 'bg-blue-50/50 dark:bg-blue-900/20' : ''
                       }`}
                     >
                       <div className="flex flex-col space-y-1">
@@ -78,16 +103,17 @@ export default function AdvisorDocumentsPage() {
                         <div className="flex items-center space-x-4 mt-2 text-sm">
                           <span className="flex items-center text-yellow-600 dark:text-yellow-400">
                             <span className="w-2 h-2 bg-yellow-400 rounded-full mr-2"></span>
-                            {student.pendingDocuments}
+                              {student.documents?.filter((doc: any) => !doc.isUploaded).length || 0}
                           </span>
                           <span className="flex items-center text-blue-600 dark:text-blue-400">
                             <span className="w-2 h-2 bg-blue-400 rounded-full mr-2"></span>
-                            {student.uploadedDocuments}
+                              {student.documents?.filter((doc: any) => doc.isUploaded).length || 0}
                           </span>
                         </div>
                       </div>
                     </button>
-                  ))}
+                    ))
+                  )}
                 </div>
               </div>
             </div>
@@ -96,9 +122,9 @@ export default function AdvisorDocumentsPage() {
             <div className="lg:col-span-3">
               {selectedStudent ? (
                 <AdvisorDocumentView
-                  studentId={selectedStudent.id}
+                  studentId={selectedStudent.email}
                   studentName={selectedStudent.name}
-                  studentType={selectedStudent.type as any}
+                  studentType={(selectedStudent.type || 'UNIVERSITY_STUDENT') as StudentType}
                 />
               ) : (
                 <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-8 rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30 text-center">

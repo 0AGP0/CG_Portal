@@ -1,132 +1,136 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getAdvisorByEmail, getRecordByEmail } from '@/utils/database';
+import { NextResponse } from 'next/server';
+import { getStudentByEmail } from '@/lib/db';
+import { logger } from '@/utils/logger';
 
-interface RouteParams {
-  params: {
-    email: string | Promise<string>;
-  };
-}
-
-export async function GET(request: NextRequest, context: RouteParams) {
+export async function GET(
+  request: Request,
+  context: { params: { email: string } }
+) {
   try {
-    // params'ı await ile beklemeliyiz
-    const params = await context.params;
-    // Parametreyi güvenli bir şekilde al
-    const email = typeof params.email === 'string' ? params.email : await params.email;
-    const studentEmail = email ? decodeURIComponent(email) : '';
-    
+    // Öğrenci e-postasını al
+    const studentEmail = decodeURIComponent(context.params.email);
     if (!studentEmail) {
-      return NextResponse.json({ error: 'Geçerli bir öğrenci e-postası gerekli' }, { status: 400 });
+      logger.warn('Eksik öğrenci e-postası');
+      return NextResponse.json(
+        { error: 'Öğrenci e-postası gerekli' },
+        { status: 400 }
+      );
     }
-    
-    // Oturum doğrulama işlemi normalde burada yapılır
-    // Şu an için basit bir gelen header doğrulaması yapacağız
-    const advisorEmail = request.headers.get('x-user-email') || '';
-    
-    if (!advisorEmail) {
-      return NextResponse.json({ error: 'Oturum bilgisi gerekli' }, { status: 401 });
-    }
-    
-    // Danışmanı e-posta ile bul
-    const advisor = await getAdvisorByEmail(advisorEmail);
-    
-    if (!advisor) {
-      return NextResponse.json({ error: 'Danışman bulunamadı' }, { status: 404 });
-    }
-    
-    // Öğrencinin bu danışmana ait olup olmadığını kontrol et
-    if (!advisor.studentIds.includes(studentEmail)) {
-      return NextResponse.json({ error: 'Bu öğrenci sizin danışanınız değil' }, { status: 403 });
-    }
-    
-    // Öğrenci bilgilerini getir
-    const student = await getRecordByEmail(studentEmail);
+
+    logger.info('Öğrenci detayları getiriliyor:', { studentEmail });
+
+    // Öğrenci verilerini getir
+    const student = await getStudentByEmail(studentEmail);
     
     if (!student) {
-      return NextResponse.json({ error: 'Öğrenci bulunamadı' }, { status: 404 });
+      logger.warn('Öğrenci bulunamadı:', { studentEmail });
+      return NextResponse.json(
+        { error: 'Öğrenci bulunamadı' },
+        { status: 404 }
+      );
     }
-    
-    // Öğrenci bilgilerini düzenleyerek dön
-    return NextResponse.json({
-      id: student.lead_id,
-      email: student.email,
-      name: student.name,
-      stage: student.stage,
-      
-      // Adres ve iletişim bilgileri
-      contact_address: student.contact_address,
-      phone: student.phone,
-      age: student.age,
-      
-      // Kişisel bilgiler
-      birth_date: student.birth_date,
-      birth_place: student.birth_place,
-      marital_status: student.marital_status,
-      
-      // Eğitim bilgileri
-      high_school_name: student.high_school_name,
-      high_school_type: student.high_school_type,
-      high_school_city: student.high_school_city,
-      high_school_start_date: student.high_school_start_date,
-      high_school_graduation_date: student.high_school_graduation_date,
-      university_name: student.university_name || student.university,
-      university_department: student.university_department || student.program,
-      university_start_date: student.university_start_date,
-      university_end_date: student.university_end_date,
-      graduation_status: student.graduation_status,
-      graduation_year: student.graduation_year,
-      university_preferences: student.university_preferences,
-      german_department_preference: student.german_department_preference,
-      
-      // Dil bilgileri
-      language_level: student.language_level,
-      language_certificate: student.language_certificate,
-      language_course_registration: student.language_course_registration,
-      language_learning_status: student.language_learning_status,
-      
-      // Vize/Pasaport bilgileri
-      passport_number: student.passport_number,
-      passport_type: student.passport_type,
-      passport_issue_date: student.passport_issue_date,
-      passport_expiry_date: student.passport_expiry_date,
-      issuing_authority: student.issuing_authority,
-      pnr_number: student.pnr_number,
-      visa_application_date: student.visa_application_date,
-      visa_appointment_date: student.visa_appointment_date,
-      visa_document: student.visa_document,
-      consulate: student.consulate,
-      has_been_to_germany: student.has_been_to_germany,
-      
-      // Aile bilgileri
-      mother_name: student.mother_name,
-      mother_surname: student.mother_surname,
-      mother_birth_date: student.mother_birth_date,
-      mother_birth_place: student.mother_birth_place,
-      mother_residence: student.mother_residence,
-      mother_phone: student.mother_phone,
-      
-      father_name: student.father_name,
-      father_surname: student.father_surname,
-      father_birth_date: student.father_birth_date,
-      father_birth_place: student.father_birth_place,
-      father_residence: student.father_residence,
-      father_phone: student.father_phone,
-      
-      // Finansal bilgiler
-      financial_proof: student.financial_proof,
-      financial_proof_status: student.financial_proof_status,
-      
-      // Sınav bilgileri
-      exam_entry: student.exam_entry,
-      exam_result_date: student.exam_result_date,
-      
-      // Dökümanlar
-      documents: student.documents || [],
-      
-      updatedAt: student.updatedAt
-    });
+
+    // Gelen veriyi logla
+    logger.info('Ham öğrenci verisi:', student);
+
+    // Öğrenci verisini formatla
+    const formattedStudent = {
+      personal: {
+        email: student.email,
+        name: student.name,
+        phone: student.phone,
+        birthDate: student.birth_date,
+        birthPlace: student.birth_place,
+        maritalStatus: student.marital_status,
+        contactAddress: student.contact_address
+      },
+      mother: {
+        name: student.mother_name,
+        surname: student.mother_surname,
+        birthDate: student.mother_birth_date,
+        birthPlace: student.mother_birth_place,
+        residence: student.mother_residence,
+        phone: student.mother_phone
+      },
+      father: {
+        name: student.father_name,
+        surname: student.father_surname,
+        birthDate: student.father_birth_date,
+        birthPlace: student.father_birth_place,
+        residence: student.father_residence,
+        phone: student.father_phone
+      },
+      passport: {
+        number: student.passport_number,
+        type: student.passport_type,
+        issueDate: student.passport_issue_date,
+        expiryDate: student.passport_expiry_date,
+        issuingAuthority: student.issuing_authority
+      },
+      education: {
+        highSchool: {
+          name: student.high_school_name,
+          type: student.high_school_type,
+          city: student.high_school_city,
+          startDate: student.high_school_start_date,
+          graduationDate: student.high_school_graduation_date
+        },
+        university: {
+          name: student.university_name,
+          department: student.university_department,
+          startDate: student.university_start_date,
+          endDate: student.university_end_date,
+          graduationStatus: student.graduation_status,
+          graduationYear: student.graduation_year,
+          preferences: student.university_preferences,
+          germanDepartmentPreference: student.german_department_preference
+        }
+      },
+      language: {
+        level: student.language_level,
+        certificate: student.language_certificate,
+        courseRegistration: student.language_course_registration,
+        learningStatus: student.language_learning_status
+      },
+      visa: {
+        consulate: student.visa_consulate,
+        applicationDate: student.visa_application_date,
+        appointmentDate: student.visa_appointment_date,
+        document: student.visa_document
+      },
+      process: {
+        stage: student.stage,
+        status: student.process_started,
+        startDate: student.process_start_date,
+        advisor: {
+          id: student.advisor_id,
+          name: student.advisor_name,
+          email: student.advisor_email
+        },
+        financialProof: {
+          status: student.financial_proof_status,
+          document: student.financial_proof
+        },
+        exam: {
+          entry: student.exam_entry,
+          resultDate: student.exam_result_date
+        },
+        documents: student.documents || [],
+        createdAt: student.created_at,
+        updatedAt: student.updated_at
+      }
+    };
+
+    // Formatlanmış veriyi logla
+    logger.info('Formatlanmış öğrenci verisi:', formattedStudent);
+
+    return NextResponse.json(formattedStudent);
+
   } catch (error) {
-    console.error('Öğrenci detayı getirme hatası:', error);
-    return NextResponse.json({ error: 'Veri alma hatası' }, { status: 500 });
+    logger.error('Öğrenci detayları getirme hatası:', error);
+    return NextResponse.json(
+      { error: 'Öğrenci detayları alınamadı' },
+      { status: 500 }
+    );
   }
 } 

@@ -46,7 +46,8 @@ export default function AdvisorMessagesPage() {
     selectedTicketId, 
     selectTicket, 
     sendMessage,
-    createNewTicket: contextCreateNewTicket
+    isLoading: isMessagesLoading,
+    error: messagesError
   } = useMessages();
   
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
@@ -54,6 +55,7 @@ export default function AdvisorMessagesPage() {
   const [students, setStudents] = useState<Student[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Danışmanın öğrencilerini getir
   useEffect(() => {
@@ -66,29 +68,36 @@ export default function AdvisorMessagesPage() {
   const fetchStudents = async () => {
     try {
       setIsLoading(true);
+      setError(null);
+      
       const response = await fetch('/api/advisor/students', {
         headers: {
           'x-user-email': user?.email || ''
         }
       });
       
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && Array.isArray(data.students)) {
-          const mappedStudents = data.students.map((student: any) => ({
-            id: student.email,
-            email: student.email,
-            name: student.name || student.email.split('@')[0],
-            lastActive: student.updatedAt
-          }));
-          
-          setStudents(mappedStudents);
-        }
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Öğrenci listesi alınamadı');
+      }
+      
+      const data = await response.json();
+      
+      if (data.success && Array.isArray(data.students)) {
+        const mappedStudents = data.students.map((student: any) => ({
+          id: student.email,
+          email: student.email,
+          name: student.name || student.email.split('@')[0],
+          lastActive: student.updatedAt
+        }));
+        
+        setStudents(mappedStudents);
       } else {
-        console.error('Öğrenci verilerini getirme hatası:', response.status);
+        throw new Error('Öğrenci verileri beklenmeyen formatta');
       }
     } catch (error) {
       console.error('Öğrenci verilerini getirme hatası:', error);
+      setError(error instanceof Error ? error.message : 'Öğrenci listesi alınamadı');
     } finally {
       setIsLoading(false);
     }
@@ -114,57 +123,65 @@ export default function AdvisorMessagesPage() {
   // Öğrenci seçimi
   const selectStudent = (id: string) => {
     setSelectedStudentId(id);
-    selectTicket(0); // Öğrenci değiştiğinde mesaj seçimini sıfırla (0 geçersiz bir ID olduğundan seçim sıfırlanır)
+    selectTicket(0); // Öğrenci değiştiğinde mesaj seçimini sıfırla
   };
 
   // Yeni mesaj oluşturma
-  const handleCreateNewTicket = () => {
+  const handleCreateNewTicket = async () => {
     if (!selectedStudentId || !selectedStudent) return;
     
-    // Context'teki createNewTicket fonksiyonunu kullanacağız,
-    // ancak danışman için uyarlamak gerekiyor
-    const subject = "Yeni Konu";
-    const content = `Merhaba ${selectedStudent.name}`;
-    
-    // Not: Bu kısımda API çağrısı doğrudan yapılması gerekebilir
-    const createAdvisorNewTicket = async () => {
-      try {
-        const response = await fetch('/api/messages/send', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-user-email': user?.email || ''
-          },
-          body: JSON.stringify({
-            receiverEmail: selectedStudentId,
-            content,
-            senderRole: 'advisor',
-            subject,
-            category: 'general'
-          })
-        });
-        
-        if (response.ok) {
-          // Yeni mesaj başarıyla oluşturuldu, sayfayı yenile
-          window.location.reload();
-        }
-      } catch (error) {
-        console.error('Yeni mesaj oluşturma hatası:', error);
+    try {
+      setError(null);
+      
+      const response = await fetch('/api/messages/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-email': user?.email || ''
+        },
+        body: JSON.stringify({
+          receiverEmail: selectedStudentId,
+          content: `Merhaba ${selectedStudent.name}`,
+          senderRole: 'advisor',
+          subject: 'Yeni Konu',
+          category: 'general'
+        })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Yeni mesaj oluşturulamadı');
       }
-    };
-    
-    createAdvisorNewTicket();
+      
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.error || 'Yeni mesaj oluşturulamadı');
+      }
+      
+      // Başarılı olduğunda sayfayı yenile
+      window.location.reload();
+      
+    } catch (error) {
+      console.error('Yeni mesaj oluşturma hatası:', error);
+      setError(error instanceof Error ? error.message : 'Yeni mesaj oluşturulurken bir hata oluştu');
+    }
   };
 
   // Mesaj gönderme
-  const handleSendMessage = (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!newMessage.trim() || !selectedTicketId) return;
+    if (!newMessage.trim() || !selectedTicketId || !selectedTicket) return;
     
-    // Context'teki sendMessage fonksiyonunu çağır
-    sendMessage(newMessage);
-    setNewMessage('');
+    try {
+      setError(null);
+      await sendMessage(selectedTicket, newMessage);
+      setNewMessage('');
+    } catch (error) {
+      console.error('Mesaj gönderme hatası:', error);
+      setError(error instanceof Error ? error.message : 'Mesaj gönderilirken bir hata oluştu');
+    }
   };
 
   // Erişim kontrolü
@@ -178,6 +195,37 @@ export default function AdvisorMessagesPage() {
             <Link href="/login" className="btn-primary">
               Giriş Sayfasına Dön
             </Link>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  // Yükleniyor durumu
+  if (isLoading || isMessagesLoading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+      </Layout>
+    );
+  }
+
+  // Hata durumu
+  if (error || messagesError) {
+    return (
+      <Layout>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center p-8 bg-red-50 rounded-lg border border-red-200">
+            <h1 className="text-2xl font-bold text-red-600 mb-4">Hata Oluştu</h1>
+            <p className="mb-4">{error || messagesError}</p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="btn-primary"
+            >
+              Sayfayı Yenile
+            </button>
           </div>
         </div>
       </Layout>

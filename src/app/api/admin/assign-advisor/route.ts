@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { startProcessAndAssignAdvisor } from '@/utils/database';
+import { promises as fs } from 'fs';
+import path from 'path';
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,21 +15,42 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Öğrenciye danışman ata
-    // Not: startProcessAndAssignAdvisor fonksiyonu öğrenci e-postası, danışman ID'si ve satış ekibi üyesi ID'si gerektirir
-    // Burada satış ekibi üyesi ID'si yerine 'admin' kullanıyoruz
-    const updatedStudent = await startProcessAndAssignAdvisor(
-      body.studentId, // studentId değerini email olarak kullanıyoruz
-      body.advisorId,
-      'admin-user'
-    );
+    // customers.json dosyasını oku
+    const filePath = path.join(process.cwd(), 'data', 'customers.json');
+    const fileContent = await fs.readFile(filePath, 'utf8');
+    const data = JSON.parse(fileContent);
     
-    if (!updatedStudent) {
+    // Öğrenciyi bul
+    const studentIndex = data.customers.findIndex((s: any) => s.email === body.studentId);
+    if (studentIndex === -1) {
       return NextResponse.json(
-        { error: 'Danışman atama işlemi başarısız oldu' },
-        { status: 500 }
+        { error: 'Öğrenci bulunamadı' },
+        { status: 404 }
       );
     }
+    
+    // Danışman bilgilerini al (gerçek uygulamada danışman veritabanından alınır)
+    const advisor = {
+      id: body.advisorId,
+      name: "Emre Danışman", // Gerçek uygulamada danışman veritabanından alınır
+      email: "emre.danisman@example.com" // Gerçek uygulamada danışman veritabanından alınır
+    };
+    
+    // Öğrenci bilgilerini güncelle
+    const updatedStudent = {
+      ...data.customers[studentIndex],
+      advisorId: advisor.id,
+      advisorName: advisor.name,
+      advisorEmail: advisor.email,
+      stage: 'Süreç Başlatıldı',
+      processStarted: true,
+      processStartDate: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    
+    // Güncellenmiş öğrenciyi kaydet
+    data.customers[studentIndex] = updatedStudent;
+    await fs.writeFile(filePath, JSON.stringify(data, null, 2));
     
     // Başarılı yanıt döndür
     return NextResponse.json({
@@ -40,8 +62,8 @@ export async function POST(request: NextRequest) {
         name: updatedStudent.name,
         advisor: updatedStudent.advisorName,
         advisorId: updatedStudent.advisorId,
-        status: updatedStudent.stage || 'Beklemede',
-        processStarted: updatedStudent.processStarted || false,
+        status: updatedStudent.stage,
+        processStarted: updatedStudent.processStarted,
         updatedAt: updatedStudent.updatedAt
       }
     });

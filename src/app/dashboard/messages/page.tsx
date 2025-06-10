@@ -38,13 +38,15 @@ export default function MessagesPage() {
     selectedTicketId, 
     selectTicket, 
     sendMessage, 
-    createNewTicket 
+    createNewTicket,
+    isLoading,
+    error
   } = useMessages();
   const [newMessage, setNewMessage] = useState('');
   const [showNewTicketForm, setShowNewTicketForm] = useState(false);
   const [newTicketSubject, setNewTicketSubject] = useState('');
   const [newTicketContent, setNewTicketContent] = useState('');
-  const [receiverType, setReceiverType] = useState<'advisor' | 'sales'>('advisor');
+  const [receiverType] = useState<'advisor'>('advisor');
 
   // Seçili mesajı getir
   const selectedTicket = tickets.find(ticket => ticket.id === selectedTicketId);
@@ -53,9 +55,9 @@ export default function MessagesPage() {
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!newMessage.trim() || !selectedTicketId) return;
+    if (!newMessage.trim() || !selectedTicketId || !selectedTicket) return;
     
-    sendMessage(newMessage);
+    sendMessage(selectedTicket, newMessage);
     setNewMessage('');
   };
 
@@ -65,7 +67,7 @@ export default function MessagesPage() {
     
     if (!newTicketSubject.trim() || !newTicketContent.trim()) return;
     
-    createNewTicket(newTicketSubject, newTicketContent, receiverType);
+    createNewTicket(newTicketSubject, newTicketContent);
     setNewTicketSubject('');
     setNewTicketContent('');
     setShowNewTicketForm(false);
@@ -101,7 +103,7 @@ export default function MessagesPage() {
               Mesajlarım
             </h1>
             <p className="text-default mt-1">
-              Danışmanınızla ve satış ekibiyle olan tüm mesajlaşmalarınızı buradan takip edebilirsiniz.
+              Danışmanınızla olan tüm mesajlaşmalarınızı buradan takip edebilirsiniz.
             </p>
           </div>
           
@@ -115,6 +117,35 @@ export default function MessagesPage() {
             </button>
           )}
         </div>
+
+        {/* Hata Mesajı */}
+        {error && (
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg"
+          >
+            <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              <p>{error}</p>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Yükleme Durumu */}
+        {isLoading && (
+          <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
+              <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <p>Mesajlar yükleniyor...</p>
+            </div>
+          </div>
+        )}
 
         {/* Yeni Konu Oluşturma Formu */}
         {showNewTicketForm && (
@@ -134,22 +165,11 @@ export default function MessagesPage() {
                         type="radio"
                         name="receiverType"
                         value="advisor"
-                        checked={receiverType === 'advisor'}
-                        onChange={() => setReceiverType('advisor')}
+                        checked={true}
+                        readOnly
                         className="mr-2"
                       />
                       Danışman
-                    </label>
-                    <label className="flex items-center">
-                      <input
-                        type="radio"
-                        name="receiverType"
-                        value="sales"
-                        checked={receiverType === 'sales'}
-                        onChange={() => setReceiverType('sales')}
-                        className="mr-2"
-                      />
-                      Satış Ekibi
                     </label>
                   </div>
                 </div>
@@ -210,34 +230,46 @@ export default function MessagesPage() {
             </div>
             
             <div className="divide-y divide-gray-200/60 dark:divide-gray-700/30">
-              {tickets.map((ticket) => (
-                <motion.div
-                  key={ticket.id}
-                  variants={itemVariants}
-                  onClick={() => selectTicket(ticket.id)}
-                  className={`p-4 cursor-pointer transition-colors ${
-                    selectedTicketId === ticket.id 
-                      ? 'bg-blue-50/70 dark:bg-blue-900/20 border-l-4 border-blue-500' 
-                      : ticket.isRead ? 'hover:bg-gray-50/70 dark:hover:bg-gray-700/30' : 'hover:bg-gray-50/70 dark:hover:bg-gray-700/30 bg-yellow-50/70 dark:bg-yellow-900/20'
-                  }`}
-                >
-                  <div className="flex justify-between items-start mb-1">
-                    <h3 className={`font-medium ${!ticket.isRead ? 'font-bold' : ''}`}>
-                      {ticket.subject}
-                    </h3>
-                    {!ticket.isRead && (
-                      <span className="bg-blue-500 rounded-full w-2 h-2"></span>
-                    )}
-                  </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-300 truncate">{ticket.preview}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{ticket.date}</p>
-                </motion.div>
-              ))}
-              
-              {tickets.length === 0 && (
+              {isLoading ? (
+                <div className="p-4 text-center text-gray-500 dark:text-gray-400">
+                  <p>Mesajlar yükleniyor...</p>
+                </div>
+              ) : tickets.length === 0 ? (
                 <div className="p-6 text-center text-gray-500 dark:text-gray-400">
                   <p>Henüz mesajınız bulunmuyor.</p>
+                  {user.role === 'student' && (
+                    <button 
+                      onClick={() => setShowNewTicketForm(true)}
+                      className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                    >
+                      Yeni Konu Başlat
+                    </button>
+                  )}
                 </div>
+              ) : (
+                tickets.map((ticket) => (
+                  <motion.div
+                    key={ticket.id}
+                    variants={itemVariants}
+                    onClick={() => selectTicket(ticket.id)}
+                    className={`p-4 cursor-pointer transition-colors ${
+                      selectedTicketId === ticket.id 
+                        ? 'bg-blue-50/70 dark:bg-blue-900/20 border-l-4 border-blue-500' 
+                        : ticket.isRead ? 'hover:bg-gray-50/70 dark:hover:bg-gray-700/30' : 'hover:bg-gray-50/70 dark:hover:bg-gray-700/30 bg-yellow-50/70 dark:bg-yellow-900/20'
+                    }`}
+                  >
+                    <div className="flex justify-between items-start mb-1">
+                      <h3 className={`font-medium ${!ticket.isRead ? 'font-bold' : ''}`}>
+                        {ticket.subject}
+                      </h3>
+                      {!ticket.isRead && (
+                        <span className="bg-blue-500 rounded-full w-2 h-2"></span>
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-600 dark:text-gray-300 truncate">{ticket.preview}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{ticket.date}</p>
+                  </motion.div>
+                ))
               )}
             </div>
           </motion.div>

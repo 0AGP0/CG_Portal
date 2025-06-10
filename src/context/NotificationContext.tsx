@@ -17,6 +17,7 @@ export interface Notification {
 
 interface NotificationContextType {
   notifications: Notification[];
+  dashboardNotifications: Notification[];
   unreadCount: number;
   addNotification: (notification: Omit<Notification, 'id' | 'timestamp' | 'isRead'>) => void;
   markAsRead: (id: string) => void;
@@ -26,6 +27,7 @@ interface NotificationContextType {
 
 const NotificationContext = createContext<NotificationContextType>({
   notifications: [],
+  dashboardNotifications: [],
   unreadCount: 0,
   addNotification: () => {},
   markAsRead: () => {},
@@ -37,6 +39,7 @@ export const useNotifications = () => useContext(NotificationContext);
 
 export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [dashboardNotifications, setDashboardNotifications] = useState<Notification[]>([]);
   const { user } = useAuth();
   const { documents, currentStage, getDocumentsByStage } = useDocuments();
 
@@ -52,7 +55,19 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
       isRead: false
     };
 
+    // Header bildirimlerine ekle
     setNotifications(prev => [newNotification, ...prev]);
+    
+    // Genel bakış bildirimlerine ekle (eğer aynı tipte bildirim yoksa)
+    setDashboardNotifications(prev => {
+      const existingNotification = prev.find(
+        n => n.type === notification.type && n.stage === notification.stage
+      );
+      if (!existingNotification) {
+        return [newNotification, ...prev];
+      }
+      return prev;
+    });
   };
 
   // Bildirimi okundu olarak işaretle
@@ -71,7 +86,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     );
   };
 
-  // Bildirimi sil
+  // Bildirimi sil (sadece header bildirimlerinden)
   const clearNotification = (id: string) => {
     setNotifications(prev => prev.filter(notification => notification.id !== id));
   };
@@ -85,7 +100,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
 
     // Bekleyen belgeler için bildirim oluştur
     if (pendingDocuments.length > 0) {
-      const existingNotification = notifications.find(
+      const existingNotification = dashboardNotifications.find(
         n => n.type === 'document_required' && n.stage === currentStage
       );
 
@@ -104,6 +119,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     <NotificationContext.Provider
       value={{
         notifications,
+        dashboardNotifications,
         unreadCount,
         addNotification,
         markAsRead,

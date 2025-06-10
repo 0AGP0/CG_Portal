@@ -241,3 +241,20 @@
 [2025-06-03T11:22:16.637Z] [INFO] Yeni mesaj oluşturuluyor
 [2025-06-03T11:22:16.655Z] [INFO] Mesaj başarıyla oluşturuldu:
 "msg-1748949736646"
+[2025-06-09T22:07:17.677Z] [INFO] Mesaj gönderme isteği alındı
+[2025-06-09T22:07:17.679Z] [INFO] Mesaj istenen parametreler:
+{
+  "sender": "akifgiraypusat@gmail.com",
+  "receiver": "emre.danisman@example.com",
+  "role": "student",
+  "subject": "faef",
+  "hasContent": true
+}
+[2025-06-09T22:07:17.680Z] [INFO] Öğrenci mesajı, alıcı kontrolü atlanıyor
+[2025-06-09T22:07:17.680Z] [INFO] Çalışma dizini (CWD):
+"D:\\Portal Yeni\\CG_Portal"
+[2025-06-09T22:07:17.681Z] [INFO] Veri yolu (data):
+"D:\\Portal Yeni\\CG_Portal\\data"
+[2025-06-09T22:07:17.681Z] [INFO] Yeni mesaj oluşturuluyor
+[2025-06-09T22:07:17.684Z] [INFO] Mesaj başarıyla oluşturuldu:
+"msg-1749506837683"

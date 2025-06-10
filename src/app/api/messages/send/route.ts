@@ -1,7 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createMessage, getRecordByEmail, getAdvisorByEmail } from '@/utils/database';
-import { logError, logInfo } from '@/utils/logger';
+import fs from 'fs';
 import path from 'path';
+import { logError, logInfo } from '@/utils/logger';
+
+interface MessageData {
+  messages: Array<{
+    id: string;
+    senderEmail: string;
+    receiverEmail: string;
+    senderRole: 'student' | 'advisor' | 'sales';
+    content: string;
+    subject: string;
+    category: string;
+    replyToId?: string;
+    createdAt: string;
+    isRead: boolean;
+  }>;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,7 +38,7 @@ export async function POST(request: NextRequest) {
     if (!senderEmail) {
       logError('Kullanıcı kimliği eksik');
       return NextResponse.json(
-        { error: 'Kullanıcı kimliği gereklidir' }, 
+        { success: false, error: 'Kullanıcı kimliği gereklidir' }, 
         { status: 401 }
       );
     }
@@ -32,7 +47,7 @@ export async function POST(request: NextRequest) {
     if (!body.receiverEmail) {
       logError('Alıcı e-posta adresi eksik');
       return NextResponse.json(
-        { error: 'Alıcı e-posta adresi gereklidir' }, 
+        { success: false, error: 'Alıcı e-posta adresi gereklidir' }, 
         { status: 400 }
       );
     }
@@ -40,7 +55,7 @@ export async function POST(request: NextRequest) {
     if (!body.content) {
       logError('Mesaj içeriği eksik');
       return NextResponse.json(
-        { error: 'Mesaj içeriği gereklidir' }, 
+        { success: false, error: 'Mesaj içeriği gereklidir' }, 
         { status: 400 }
       );
     }
@@ -48,52 +63,55 @@ export async function POST(request: NextRequest) {
     if (!body.senderRole || !['student', 'advisor', 'sales'].includes(body.senderRole)) {
       logError('Geçersiz gönderen rolü:', body.senderRole);
       return NextResponse.json(
-        { error: 'Gönderen rolü geçerli değil' }, 
+        { success: false, error: 'Gönderen rolü geçerli değil' }, 
         { status: 400 }
       );
     }
+
+    // messages.json dosyasını oku veya oluştur
+    const filePath = path.join(process.cwd(), 'data', 'messages.json');
+    let data: MessageData = { messages: [] };
     
-    // Alıcının varlığını kontrol et
-    const receiverEmail = body.receiverEmail.toLowerCase();
-    
-    if (body.senderRole === 'student') {
-      // Öğrenci, danışmana veya satış ekibine mesaj gönderiyor
-      // Alıcının danışman veya satış ekibi üyesi olup olmadığını kontrol etmeyi geçebiliriz
-      // çünkü örnek e-posta adreslerini kullanıyoruz
-      logInfo('Öğrenci mesajı, alıcı kontrolü atlanıyor');
-    } else if (body.senderRole === 'advisor' || body.senderRole === 'sales') {
-      // Danışman veya satış ekibi, öğrenciye mesaj gönderiyor
-      logInfo('Danışman/Satış ekibi mesajı, öğrenci kontrolü yapılıyor');
-      
-      const student = await getRecordByEmail(receiverEmail);
-      
-      if (!student) {
-        logError('Alıcı öğrenci bulunamadı:', receiverEmail);
+    if (fs.existsSync(filePath)) {
+      try {
+        const fileContent = fs.readFileSync(filePath, 'utf-8');
+        data = JSON.parse(fileContent);
+      } catch (error) {
+        logError('Mesaj veritabanı okuma hatası:', error);
         return NextResponse.json(
-          { error: 'Alıcı öğrenci bulunamadı' }, 
-          { status: 404 }
+          { success: false, error: 'Mesaj veritabanı okunamadı' },
+          { status: 500 }
         );
       }
-      
-      logInfo('Öğrenci doğrulandı:', student.email);
     }
-    
-    // Çalışma dizinini logla
-    logInfo('Çalışma dizini (CWD):', process.cwd());
-    logInfo('Veri yolu (data):', path.join(process.cwd(), 'data'));
-    
+
     // Yeni mesaj oluştur
-    logInfo('Yeni mesaj oluşturuluyor');
-    const newMessage = await createMessage({
-      senderEmail,
-      receiverEmail,
-      senderRole: body.senderRole,
+    const newMessage = {
+      id: `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      senderEmail: senderEmail.toLowerCase(),
+      receiverEmail: body.receiverEmail.toLowerCase(),
+      senderRole: body.senderRole as 'student' | 'advisor' | 'sales',
       content: body.content,
       subject: body.subject || 'Yeni Mesaj',
       category: body.category || 'general',
-      replyToId: body.replyToId
-    });
+      replyToId: body.replyToId,
+      createdAt: new Date().toISOString(),
+      isRead: false
+    };
+
+    // Mesajı kaydet
+    data.messages.push(newMessage);
     
+    try {
+      fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+    } catch (error) {
+      logError('Mesaj kaydetme hatası:', error);
+      return NextResponse.json(
+        { success: false, error: 'Mesaj kaydedilemedi' },
+        { status: 500 }
+      );
+    }
+
     logInfo('Mesaj başarıyla oluşturuldu:', newMessage.id);
     
     // Başarılı yanıt
@@ -105,12 +123,8 @@ export async function POST(request: NextRequest) {
     
   } catch (error) {
     logError('Mesaj gönderme hatası:', error);
-    if (error instanceof Error) {
-      logError('Hata detayları:', { message: error.message, stack: error.stack });
-    }
-    
     return NextResponse.json(
-      { error: 'Mesaj gönderilirken bir hata oluştu' }, 
+      { success: false, error: 'Mesaj gönderilirken bir hata oluştu' },
       { status: 500 }
     );
   }

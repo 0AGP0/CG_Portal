@@ -54,7 +54,7 @@ export function AdvisorDocumentView({ studentId, studentName, studentType }: Adv
               Belge Durumu
             </h2>
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              {studentName} - {studentType.replace(/_/g, ' ')}
+              {studentName} - {(studentType || 'UNIVERSITY_STUDENT').replace(/_/g, ' ')}
             </p>
           </div>
           {pendingReview > 0 && (

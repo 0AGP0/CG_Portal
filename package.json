@@ -10,29 +10,39 @@
     "test": "jest"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.4",
     "@prisma/client": "^6.8.2",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.9",
     "axios": "^1.9.0",
     "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.2",
     "chart.js": "^4.4.1",
     "clsx": "^2.1.1",
+    "critters": "^0.0.23",
     "crypto": "^1.0.1",
     "dayjs": "^1.11.10",
+    "express-rate-limit": "^7.5.0",
     "framer-motion": "^12.9.7",
+    "jose": "^6.0.11",
+    "jsonwebtoken": "^9.0.2",
     "next": "15.3.1",
     "next-auth": "^4.24.11",
+    "pg": "^8.11.3",
     "react": "^19.0.0",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.5.2",
     "swr": "^2.2.5",
-    "tailwind-merge": "^3.3.0"
+    "tailwind-merge": "^3.3.0",
+    "@types/pg": "^8.11.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@types/bcrypt": "^5.0.2",
     "@types/chart.js": "^2.9.41",
-    "@types/node": "^20",
-    "@types/react": "^19",
+    "@types/node": "^22.15.30",
+    "@types/react": "^19.1.7",
     "@types/react-dom": "^19",
     "autoprefixer": "^10.4.21",
     "eslint": "^9",
@@ -41,6 +51,6 @@
     "postcss": "^8.5.3",
     "supertest": "^6.3.4",
     "tailwindcss": "^3.4.17",
-    "typescript": "^5"
+    "typescript": "^5.8.3"
   }
 }

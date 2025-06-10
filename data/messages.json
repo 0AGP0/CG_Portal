@@ -171,6 +171,28 @@
       "category": "general",
       "createdAt": "2025-06-03T11:22:16.646Z",
       "isRead": false
+    },
+    {
+      "id": "msg-1749506837683",
+      "senderEmail": "akifgiraypusat@gmail.com",
+      "receiverEmail": "emre.danisman@example.com",
+      "senderRole": "student",
+      "content": "aefaeffeefa",
+      "subject": "faef",
+      "category": "general",
+      "createdAt": "2025-06-09T22:07:17.683Z",
+      "isRead": false
+    },
+    {
+      "id": "msg-1749512922270-m9544xt2h",
+      "senderEmail": "burcu.shut@gmail.com",
+      "receiverEmail": "emre.danisman@example.com",
+      "senderRole": "student",
+      "content": "mmm",
+      "subject": "sss",
+      "category": "general",
+      "createdAt": "2025-06-09T23:48:42.270Z",
+      "isRead": false
     }
   ]
 }

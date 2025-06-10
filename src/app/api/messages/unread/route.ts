@@ -1,32 +1,42 @@
 import { NextRequest, NextResponse } from 'next/server';
+import fs from 'fs';
+import path from 'path';
 import { getUnreadMessagesCount } from '@/utils/database';
-import { logError } from '@/utils/logger';
 
 export async function GET(request: NextRequest) {
   try {
-    // Kullanıcı e-posta adresini al
-    const email = request.headers.get('x-user-email');
+    // URL'den email parametresini al
+    const email = request.nextUrl.searchParams.get('email');
     
     if (!email) {
       return NextResponse.json(
-        { error: 'Kullanıcı kimliği gereklidir' }, 
-        { status: 401 }
+        { success: false, error: 'Email parametresi gerekli' },
+        { status: 400 }
       );
     }
-    
-    // Okunmamış mesaj sayısını getir
-    const unreadCount = await getUnreadMessagesCount(email);
-    
-    // Başarılı yanıt
+
+    // Mesaj veritabanını oku
+    const filePath = path.join(process.cwd(), 'data', 'messages.json');
+    if (!fs.existsSync(filePath)) {
+      return NextResponse.json({ success: true, count: 0 });
+    }
+
+    const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    const messages = data.messages || [];
+
+    // Okunmamış mesajları say
+    const unreadCount = messages.filter((message: any) => 
+      message.receiverEmail.toLowerCase() === email.toLowerCase() && !message.isRead
+    ).length;
+
     return NextResponse.json({
       success: true,
-      unreadCount
+      count: unreadCount
     });
-    
   } catch (error) {
-    logError('Okunmamış mesaj sayısı hatası', error);
+    console.error('Okunmamış mesaj sayısı getirme hatası:', error);
     return NextResponse.json(
-      { error: 'Okunmamış mesajlar sayılırken bir hata oluştu' }, 
+      { success: false, error: 'Okunmamış mesaj sayısı alınamadı' },
       { status: 500 }
     );
   }

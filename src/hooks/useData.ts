@@ -3,13 +3,16 @@ import { useAuth } from '@/context/AuthContext';
 import { useMessages as useMessagesContext } from '@/context/MessagesContext';
 
 // SWR fetcher fonksiyonu
-const fetcher = async (url: string) => {
-  const res = await fetch(url, {
-    headers: {
-      'x-user-email': localStorage.getItem('userEmail') || '',
-      'Content-Type': 'application/json'
-    }
-  });
+const fetcher = async (url: string, userEmail?: string) => {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json'
+  };
+  
+  if (userEmail) {
+    headers['x-user-email'] = userEmail;
+  }
+  
+  const res = await fetch(url, { headers });
   
   if (!res.ok) {
     const error = new Error('Veri çekme başarısız oldu');
@@ -114,33 +117,39 @@ export function useUnreadMessagesCount(refreshInterval: number = 30000) {
 }
 
 /**
- * Danışmanın veya satış ekibinin öğrencilerini çekmek için SWR hook'u
+ * Danışmanın öğrencilerini çekmek için SWR hook'u
  * 
- * @param refreshInterval - Yenileme aralığı (ms cinsinden, varsayılan: 10 saniye)
+ * @param refreshInterval - Yenileme aralığı (ms cinsinden, varsayılan: 30 saniye)
  * @returns SWR response nesnesi
  */
-export function useStudents(refreshInterval: number = 10000) {
-  const { user, isAdvisor, isSales } = useAuth();
+export function useStudents(refreshInterval: number = 30000) {
+  const { user, isAdvisor } = useAuth();
   
-  // Danışman veya satış ekibi değilse veya giriş yapılmamışsa boş dizi dön
-  const shouldFetch = user && (isAdvisor() || isSales());
+  // Danışman değilse veya giriş yapılmamışsa boş dizi dön
+  const shouldFetch = Boolean(user?.email && isAdvisor());
   
-  // Kullanıcı rolüne göre endpoint seçimi
-  const endpoint = isAdvisor() ? `/api/advisor/students` : `/api/sales/students`;
+  // Danışman endpoint'i
+  const endpoint = '/api/advisor/students';
   
   const { data, error, isLoading, isValidating, mutate } = useSWR(
-    shouldFetch ? endpoint : null,
-    fetcher,
+    shouldFetch ? [endpoint, user?.email] : null,
+    ([url, email]) => fetcher(url, email),
     {
-      refreshInterval, 
-      revalidateOnFocus: true,
+      refreshInterval,
+      revalidateOnFocus: false,
       revalidateIfStale: true,
-      dedupingInterval: 2000,
+      dedupingInterval: 5000,
+      onError: (err) => {
+        console.error('Öğrenci listesi getirme hatası:', err);
+      }
     }
   );
   
+  // API yanıtını kontrol et ve öğrenci listesini döndür
+  const students = data?.success ? data.students : [];
+  
   return {
-    students: data?.students || [],
+    students,
     isLoading,
     isError: error,
     isValidating,
@@ -156,13 +165,13 @@ export function useStudents(refreshInterval: number = 10000) {
  * @returns SWR response nesnesi
  */
 export function useStudentDetail(studentEmail: string, refreshInterval: number = 10000) {
-  const { user, isAdvisor, isSales } = useAuth();
+  const { user, isAdvisor } = useAuth();
   
-  // Danışman veya satış ekibi değilse veya giriş yapılmamışsa null dön
-  const shouldFetch = user && (isAdvisor() || isSales()) && studentEmail;
+  // Danışman değilse veya giriş yapılmamışsa null dön
+  const shouldFetch = user && isAdvisor() && studentEmail;
   
-  // Kullanıcı rolüne göre endpoint seçimi
-  const baseEndpoint = isAdvisor() ? `/api/advisor/students/` : `/api/sales/students/`;
+  // Danışman endpoint'i
+  const baseEndpoint = `/api/advisor/students/`;
   
   const { data, error, isLoading, isValidating, mutate } = useSWR(
     shouldFetch ? `${baseEndpoint}${encodeURIComponent(studentEmail)}` : null,

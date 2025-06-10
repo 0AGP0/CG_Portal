@@ -1,52 +1,85 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAdvisorByEmail } from '@/utils/database';
-import { logError } from '@/utils/logger';
+import fs from 'fs';
+import path from 'path';
+import { logger } from '@/utils/logger';
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    logger.info('Danışman girişi isteği alındı');
     
-    // E-posta ve şifre kontrolü
+    const body = await request.json();
+    logger.info('Gelen veri:', body);
+    
+    // E-posta kontrolü
     if (!body.email) {
+      logger.error('E-posta eksik');
       return NextResponse.json(
         { error: 'E-posta adresi gereklidir' }, 
         { status: 400 }
       );
     }
     
-    if (!body.password) {
+    // advisors.json dosyasını oku
+    const filePath = path.join(process.cwd(), 'data', 'advisors.json');
+    logger.info('Danışman veritabanı dosyası:', filePath);
+    
+    if (!fs.existsSync(filePath)) {
+      logger.error('Danışman veritabanı bulunamadı:', filePath);
       return NextResponse.json(
-        { error: 'Şifre gereklidir' }, 
-        { status: 400 }
+        { error: 'Danışman veritabanı bulunamadı' },
+        { status: 500 }
       );
     }
     
-    // Danışmanı e-posta adresine göre bul
-    const advisor = await getAdvisorByEmail(body.email);
+    // Dosyayı oku
+    let data;
+    try {
+      const fileContent = fs.readFileSync(filePath, 'utf-8');
+      data = JSON.parse(fileContent);
+      logger.info('Veritabanı dosyası başarıyla okundu');
+    } catch (error) {
+      logger.error('Veritabanı okuma hatası:', error);
+      return NextResponse.json(
+        { error: 'Veritabanı okunamadı' },
+        { status: 500 }
+      );
+    }
+    
+    // Danışmanı bul
+    const advisor = data.advisors?.find((a: any) => 
+      a.email.toLowerCase() === body.email.toLowerCase()
+    );
+    
+    logger.info('Danışman arama sonucu:', advisor ? {
+      id: advisor.id,
+      email: advisor.email,
+      name: advisor.name
+    } : 'Danışman bulunamadı');
     
     if (!advisor) {
+      logger.error('Danışman bulunamadı:', body.email);
       return NextResponse.json(
-        { error: 'Danışman bulunamadı' }, 
-        { status: 404 }
+        { error: 'Bu e-posta adresi ile kayıtlı danışman bulunamadı' }, 
+        { status: 401 }
       );
     }
     
-    // Gerçek uygulamada burada şifre kontrolü, kimlik doğrulama 
-    // ve yetkilendirme işlemleri yapılır
-    
-    // Basitleştirilmiş şifre kontrolü (gerçek uygulamada daha güvenli olmalı)
-    // Test şifresi: "password123" - gerçek uygulamada asla açık metin şifre kullanmayın
-    // Demo amaçlı olarak şimdilik herhangi bir şifreyi kabul ediyoruz
-    
     // Başarılı giriş
+    logger.info('Danışman girişi başarılı:', {
+      id: advisor.id,
+      email: advisor.email,
+      name: advisor.name
+    });
+    
     return NextResponse.json(
       { 
         success: true, 
         message: 'Giriş başarılı',
-        advisor: {
+        user: {
           id: advisor.id,
           name: advisor.name,
           email: advisor.email,
+          role: 'advisor',
           studentIds: advisor.studentIds || []
         }
       }, 
@@ -54,7 +87,7 @@ export async function POST(request: NextRequest) {
     );
     
   } catch (error) {
-    logError('Danışman girişi hatası', error);
+    logger.error('Danışman girişi hatası:', error);
     return NextResponse.json(
       { error: 'Giriş sırasında bir hata oluştu' }, 
       { status: 500 }

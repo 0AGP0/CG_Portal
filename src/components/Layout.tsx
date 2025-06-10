@@ -373,7 +373,6 @@ const Sidebar = () => {
   // Danışman için menü öğeleri
   const advisorMenuItems = [
     { path: '/advisor/dashboard', label: 'Genel Bakış', icon: <HomeIcon /> },
-    { path: '/advisor/students', label: 'Öğrencilerim', icon: <StudentsIcon /> },
     { path: '/advisor/messages', label: 'Mesajlar', icon: <MessageIcon /> },
     { path: '/advisor/applications', label: 'Başvurular', icon: <ApplicationIcon /> },
     { path: '/advisor/documents', label: 'Dokümanlar', icon: <DocumentIcon /> },

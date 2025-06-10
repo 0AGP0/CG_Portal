@@ -6,7 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Layout from '@/components/Layout';
 import { useAuth } from '@/context/AuthContext';
-import { useStudentDetail } from '@/hooks/useStudents';
+import { useStudentDetail } from '@/hooks/useData';
 
 // Animasyon varyantları
 const containerVariants = {

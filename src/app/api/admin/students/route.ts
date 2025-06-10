@@ -1,58 +1,65 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { updateOrCreateRecord, CustomerRecord } from '@/utils/database';
+import { promises as fs } from 'fs';
+import path from 'path';
 
 // GET isteği - Tüm öğrencileri getir
 export async function GET(request: NextRequest) {
   try {
-    // Veritabanından tüm öğrencileri al
-    // loadDb fonksiyonu export edilmemiş, o yüzden doğrudan veritabanını çağıramıyoruz
-    // Örnek veri döndürelim - gerçek uygulamada bir API kullanılacak
+    // customers.json dosyasını oku
+    const filePath = path.join(process.cwd(), 'data', 'customers.json');
+    const fileContent = await fs.readFile(filePath, 'utf8');
+    const data = JSON.parse(fileContent);
     
-    const mockStudents = [
-      {
-        id: "student1",
-        name: "Ahmet Yılmaz",
-        email: "ahmet@example.com",
-        phone: "532-111-2233",
-        advisor: "Müge Hanım",
-        status: "Aktif",
-        processStarted: true,
-        createdAt: "2023-01-15T10:30:00Z",
-        updatedAt: "2023-06-22T14:15:00Z"
-      },
-      {
-        id: "student2",
-        name: "Ayşe Demir",
-        email: "ayse@example.com",
-        phone: "535-222-3344",
-        advisor: "Atanmadı",
-        status: "Beklemede",
-        processStarted: false,
-        createdAt: "2023-02-20T09:45:00Z",
-        updatedAt: "2023-02-20T09:45:00Z"
-      },
-      {
-        id: "student3",
-        name: "Mehmet Kaya",
-        email: "mehmet@example.com", 
-        phone: "542-333-4455",
-        advisor: "Murat Bey",
-        status: "Aktif",
-        processStarted: true,
-        createdAt: "2023-03-10T11:20:00Z",
-        updatedAt: "2023-05-15T16:30:00Z"
-      }
-    ];
-    
-    return NextResponse.json({
-      success: true,
-      students: mockStudents
+    // Öğrenci verilerini formatla
+    const students = data.customers.map((student: any) => {
+      // Türkçe karakterleri düzelt
+      const status = student.stage || 'Beklemede';
+      const advisor = student.advisorName || 'Atanmadı';
+      
+      return {
+        id: student.email, // email'i id olarak kullan
+        name: student.name,
+        email: student.email,
+        phone: student.phone || '',
+        advisor: advisor,
+        status: status,
+        processStarted: student.processStarted || false,
+        createdAt: student.createdAt,
+        updatedAt: student.updatedAt,
+        advisorId: student.advisorId,
+        advisorEmail: student.advisorEmail,
+        salesId: student.salesId,
+        salesName: student.salesName,
+        salesEmail: student.salesEmail,
+        documents: student.documents || []
+      };
     });
+    
+    // Response header'larını ayarla
+    const headers = new Headers();
+    headers.set('Content-Type', 'application/json; charset=utf-8');
+    headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+    
+    return new NextResponse(
+      JSON.stringify({
+      success: true,
+        students
+      }, null, 2),
+      {
+        status: 200,
+        headers
+      }
+    );
   } catch (error) {
     console.error('Admin öğrenci listesi hatası:', error);
     return NextResponse.json(
       { error: 'Öğrenci listesi alınırken bir hata oluştu' },
-      { status: 500 }
+      { 
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8'
+        }
+      }
     );
   }
 }
@@ -80,16 +87,34 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Öğrenci oluştur veya güncelle
-    const newStudent = await updateOrCreateRecord({
+    // customers.json dosyasını oku
+    const filePath = path.join(process.cwd(), 'data', 'customers.json');
+    const fileContent = await fs.readFile(filePath, 'utf8');
+    const data = JSON.parse(fileContent);
+    
+    // Yeni öğrenciyi oluştur
+    const newStudent = {
       email: body.email,
       name: body.name,
       phone: body.phone || '',
-      stage: 'Beklemede',
+      stage: 'new',
       processStarted: false,
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    });
+      updatedAt: new Date().toISOString(),
+      advisorId: null,
+      advisorName: null,
+      advisorEmail: null,
+      salesId: 'admin-user',
+      salesName: 'Admin',
+      salesEmail: 'admin@campusglobal.com',
+      documents: []
+    };
+    
+    // Öğrenciyi listeye ekle
+    data.customers.push(newStudent);
+    
+    // Dosyaya kaydet
+    await fs.writeFile(filePath, JSON.stringify(data, null, 2));
     
     // Yanıt olarak oluşturulan öğrenciyi döndür
     return NextResponse.json({
@@ -98,9 +123,10 @@ export async function POST(request: NextRequest) {
         id: newStudent.email,
         name: newStudent.name,
         email: newStudent.email,
-        phone: newStudent.phone || '',
+        phone: newStudent.phone,
         advisor: newStudent.advisorName || 'Atanmadı',
-        status: newStudent.stage || 'Beklemede',
+        status: newStudent.stage,
+        processStarted: newStudent.processStarted,
         createdAt: newStudent.createdAt,
         updatedAt: newStudent.updatedAt
       }

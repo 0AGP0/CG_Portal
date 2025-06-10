@@ -6,7 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Layout from '@/components/Layout';
 import { useAuth } from '@/context/AuthContext';
-import { useStudentDetail } from '@/hooks/useStudents';
+import { useStudentDetail } from '@/hooks/useData';
 import { toast } from 'react-hot-toast';
 
 // Animasyon varyantları
@@ -129,7 +129,7 @@ export default function StudentDetailPage() {
           </div>
           
           <Link 
-            href={`/advisor/students/${encodeURIComponent(studentEmail)}/documents`}
+            href={`/advisor/documents?student=${encodeURIComponent(studentEmail)}`}
             className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center gap-2"
           >
             <span className="text-lg">📁</span>
