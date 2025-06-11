@@ -40,32 +40,62 @@ const itemVariants = {
 
 // Aşama tanımlamaları
 const STAGES = {
-  SUREC_BASLATILDI: 'Süreç Başlatıldı',
-  ISLEMDE: 'İşlemde',
-  VIZE_BASVURU: 'Vize Başvuru',
-  VIZE_RANDEVU: 'Vize Randevu',
-  VIZE_SONUC: 'Vize Sonuç',
-  BITEN: 'BİTEN'
+  HAZIRLIK_ASAMASI: 'Hazırlık Aşaması',
+  CEVIRI_HAZIR: 'Çeviri Hazır',
+  UNIVERSITE_BASVURUSU: 'Üniversite Başvurusu Yapıldı',
+  KABUL_GELDI: 'Kabul Geldi',
+  VIZE_BASVURU: 'Vize Başvuru Aşaması',
+  SUREC_ASAMASI: 'Süreç Aşaması',
+  VIZE_RANDEVU: 'Vize Randevusu Atandı',
+  VIZE_BEKLEME: 'Vize Bekleme Aşaması',
+  ALMANYA_ASAMASI: 'Almanya Aşaması',
+  BITEN: 'Süreç Tamamlandı'
 } as const;
 
 // Aşama sıralaması
 const STAGE_ORDER = [
-  'SUREC_BASLATILDI',
-  'ISLEMDE',
+  'HAZIRLIK_ASAMASI',
+  'CEVIRI_HAZIR',
+  'UNIVERSITE_BASVURUSU',
+  'KABUL_GELDI',
   'VIZE_BASVURU',
+  'SUREC_ASAMASI',
   'VIZE_RANDEVU',
-  'VIZE_SONUC',
+  'VIZE_BEKLEME',
+  'ALMANYA_ASAMASI',
   'BITEN'
 ] as const;
 
-// Aşama eşleştirme tablosu
+// Odoo'dan gelen aşama değerlerini bizim aşama değerlerimize eşleştirme
 const STAGE_MAPPING: Record<string, typeof STAGE_ORDER[number]> = {
-  'Süreç Başlatıldı': 'SUREC_BASLATILDI',
-  'İşlemde': 'ISLEMDE',
-  'Vize Başvuru': 'VIZE_BASVURU',
-  'Vize Randevu': 'VIZE_RANDEVU',
-  'Vize Sonuç': 'VIZE_SONUC',
-  'BİTEN': 'BITEN'
+  // Odoo'dan gelen aşamalar -> Portal aşamaları
+  'Hazırlık Aşaması': 'HAZIRLIK_ASAMASI',
+  'Çeviri Hazır': 'CEVIRI_HAZIR',
+  'Üniversite Başvurusu Yapılanlar': 'UNIVERSITE_BASVURUSU',
+  'Kabul Gelenler': 'KABUL_GELDI',
+  'Vize Başvuru Aşaması': 'VIZE_BASVURU',
+  'Süreç Aşaması': 'SUREC_ASAMASI',
+  'Vize Randevusu Atananlar': 'VIZE_RANDEVU',
+  'Vize Bekleme Aşaması': 'VIZE_BEKLEME',
+  'Almanya Aşaması': 'ALMANYA_ASAMASI',
+  'BİTEN': 'BITEN',
+  
+  // Portal aşamaları (geriye dönük uyumluluk için)
+  'HAZIRLIK_ASAMASI': 'HAZIRLIK_ASAMASI',
+  'CEVIRI_HAZIR': 'CEVIRI_HAZIR',
+  'UNIVERSITE_BASVURUSU': 'UNIVERSITE_BASVURUSU',
+  'KABUL_GELDI': 'KABUL_GELDI',
+  'VIZE_BASVURU': 'VIZE_BASVURU',
+  'SUREC_ASAMASI': 'SUREC_ASAMASI',
+  'VIZE_RANDEVU': 'VIZE_RANDEVU',
+  'VIZE_BEKLEME': 'VIZE_BEKLEME',
+  'ALMANYA_ASAMASI': 'ALMANYA_ASAMASI',
+  'BITEN': 'BITEN',
+  
+  // Eski değerler (geriye dönük uyumluluk için)
+  'Süreç Başlatıldı': 'HAZIRLIK_ASAMASI',
+  'İşlemde': 'SUREC_ASAMASI',
+  'biten': 'BITEN'
 };
 
 // Aşama renkleri ve ikonları
@@ -77,21 +107,37 @@ const STAGE_CONFIG: Record<string, {
   iconBgColor: string;
   label: string;
 }> = {
-  SUREC_BASLATILDI: {
+  HAZIRLIK_ASAMASI: {
     color: 'text-blue-600 dark:text-blue-400',
-    icon: '🚀',
+    icon: '📝',
     bgColor: 'bg-blue-50/50 dark:bg-blue-900/20',
     borderColor: 'border-blue-100/60 dark:border-blue-800/30',
     iconBgColor: 'bg-blue-100 dark:bg-blue-800',
-    label: 'Süreç Başlatıldı'
+    label: 'Hazırlık Aşaması'
   },
-  ISLEMDE: {
+  CEVIRI_HAZIR: {
+    color: 'text-indigo-600 dark:text-indigo-400',
+    icon: '📚',
+    bgColor: 'bg-indigo-50/50 dark:bg-indigo-900/20',
+    borderColor: 'border-indigo-100/60 dark:border-indigo-800/30',
+    iconBgColor: 'bg-indigo-100 dark:bg-indigo-800',
+    label: 'Çeviri Hazır'
+  },
+  UNIVERSITE_BASVURUSU: {
     color: 'text-primary-600 dark:text-primary-400',
-    icon: '⚡',
+    icon: '🎓',
     bgColor: 'bg-primary-50/50 dark:bg-primary-900/20',
     borderColor: 'border-primary-100/60 dark:border-primary-800/30',
     iconBgColor: 'bg-primary-100 dark:bg-primary-800',
-    label: 'İşlemde'
+    label: 'Üniversite Başvurusu Yapıldı'
+  },
+  KABUL_GELDI: {
+    color: 'text-success-600 dark:text-success-400',
+    icon: '✅',
+    bgColor: 'bg-success-50/50 dark:bg-success-900/20',
+    borderColor: 'border-success-100/60 dark:border-success-800/30',
+    iconBgColor: 'bg-success-100 dark:bg-success-800',
+    label: 'Kabul Geldi'
   },
   VIZE_BASVURU: {
     color: 'text-accent-600 dark:text-accent-400',
@@ -99,23 +145,39 @@ const STAGE_CONFIG: Record<string, {
     bgColor: 'bg-accent-50/50 dark:bg-accent-900/20',
     borderColor: 'border-accent-100/60 dark:border-accent-800/30',
     iconBgColor: 'bg-accent-100 dark:bg-accent-800',
-    label: 'Vize Başvuru'
+    label: 'Vize Başvuru Aşaması'
   },
-  VIZE_RANDEVU: {
+  SUREC_ASAMASI: {
     color: 'text-secondary-600 dark:text-secondary-400',
-    icon: '📅',
+    icon: '⚡',
     bgColor: 'bg-secondary-50/50 dark:bg-secondary-900/20',
     borderColor: 'border-secondary-100/60 dark:border-secondary-800/30',
     iconBgColor: 'bg-secondary-100 dark:bg-secondary-800',
-    label: 'Vize Randevu'
+    label: 'Süreç Aşaması'
   },
-  VIZE_SONUC: {
-    color: 'text-success-600 dark:text-success-400',
-    icon: '✅',
-    bgColor: 'bg-success-50/50 dark:bg-success-900/20',
-    borderColor: 'border-success-100/60 dark:border-success-800/30',
-    iconBgColor: 'bg-success-100 dark:bg-success-800',
-    label: 'Vize Sonuç'
+  VIZE_RANDEVU: {
+    color: 'text-warning-600 dark:text-warning-400',
+    icon: '📅',
+    bgColor: 'bg-warning-50/50 dark:bg-warning-900/20',
+    borderColor: 'border-warning-100/60 dark:border-warning-800/30',
+    iconBgColor: 'bg-warning-100 dark:bg-warning-800',
+    label: 'Vize Randevusu Atandı'
+  },
+  VIZE_BEKLEME: {
+    color: 'text-purple-600 dark:text-purple-400',
+    icon: '⏳',
+    bgColor: 'bg-purple-50/50 dark:bg-purple-900/20',
+    borderColor: 'border-purple-100/60 dark:border-purple-800/30',
+    iconBgColor: 'bg-purple-100 dark:bg-purple-800',
+    label: 'Vize Bekleme Aşaması'
+  },
+  ALMANYA_ASAMASI: {
+    color: 'text-pink-600 dark:text-pink-400',
+    icon: '✈️',
+    bgColor: 'bg-pink-50/50 dark:bg-pink-900/20',
+    borderColor: 'border-pink-100/60 dark:border-pink-800/30',
+    iconBgColor: 'bg-pink-100 dark:bg-pink-800',
+    label: 'Almanya Aşaması'
   },
   BITEN: {
     color: 'text-gray-600 dark:text-gray-400',
@@ -123,7 +185,7 @@ const STAGE_CONFIG: Record<string, {
     bgColor: 'bg-gray-50/50 dark:bg-gray-800/50',
     borderColor: 'border-gray-100/60 dark:border-gray-700/30',
     iconBgColor: 'bg-gray-100 dark:bg-gray-700',
-    label: 'Biten'
+    label: 'Süreç Tamamlandı'
   }
 };
 
@@ -174,8 +236,12 @@ export default function AdvisorDashboard() {
         student.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (student.university && student.university.toLowerCase().includes(searchTerm.toLowerCase()));
       
-      // Öğrencinin stage değerini normalize et
-      const normalizedStage = student.stage ? STAGE_MAPPING[student.stage] || 'SUREC_BASLATILDI' : 'SUREC_BASLATILDI';
+      // Öğrencinin stage değerini al ve normalize et
+      const studentStage = student.stage || 'Hazırlık Aşaması';
+      const normalizedStage = STAGE_MAPPING[studentStage] || 'HAZIRLIK_ASAMASI';
+      
+      // Debug için log
+      console.log(`Öğrenci: ${student.name}, Orijinal Stage: ${studentStage}, Normalize Edilmiş Stage: ${normalizedStage}, Hedef Stage: ${stage}`);
       
       return matchesSearch && normalizedStage === stage;
     }) : [];
@@ -341,7 +407,7 @@ export default function AdvisorDashboard() {
                     ) : (
                       stageStudents.map((student: Student) => (
                         <div
-                          key={student.id || student.email}
+                          key={student.email}
                           className="card-blur rounded-lg p-4 hover:shadow-md transition-all duration-200"
                         >
                           <div className="flex items-start space-x-3">

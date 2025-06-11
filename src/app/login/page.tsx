@@ -54,24 +54,14 @@ export default function Login() {
     try {
       logger.info('Giriş başlatılıyor:', { email, role });
       
-      const success = await login(email, password, role);
-      logger.info('Giriş sonucu:', success);
+      await login(email, password, role);
+      logger.info('Giriş başarılı');
       
-      if (success) {
-        setToast({
-          show: true,
-          message: 'Giriş başarılı! Yönlendiriliyorsunuz...',
-          type: 'success'
-        });
-        
-        // Kısa bir gecikme ile yönlendirme yap
-        setTimeout(() => {
-          const redirectPath = role === 'admin' ? '/admin' : 
-                             role === 'advisor' ? '/advisor/dashboard' : 
-                             '/dashboard';
-          router.replace(redirectPath);
-        }, 500);
-      }
+      setToast({
+        show: true,
+        message: 'Giriş başarılı! Yönlendiriliyorsunuz...',
+        type: 'success'
+      });
     } catch (error) {
       logger.error('Giriş hatası:', error);
       setToast({

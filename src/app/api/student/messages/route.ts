@@ -1,118 +1,102 @@
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
+import { promises as fsPromises } from 'fs';
 import path from 'path';
+import { logger } from '@/utils/logger';
 
-interface Ticket {
-  id: string | number;
-  subject: string;
-  preview: string;
-  date: string;
-  isRead: boolean;
-  studentId?: string;
-  studentEmail?: string;
+interface MessageData {
   messages: Array<{
-    sender: 'user' | 'advisor';
+    id: string;
+    senderEmail: string;
+    receiverEmail: string;
+    senderRole: string;
     content: string;
-    timestamp: string;
+    subject: string;
+    category: string;
+    replyToId?: string;
+    createdAt: string;
+    isRead: boolean;
   }>;
 }
 
 export async function GET(request: NextRequest) {
   try {
+    logger.info('Öğrenci mesajları isteği alındı');
+    
     // Kullanıcı e-posta adresini al
     const email = request.headers.get('x-user-email');
     
     if (!email) {
-      console.error('Kullanıcı email bilgisi bulunamadı');
+      logger.error('Kullanıcı email bilgisi bulunamadı');
       return NextResponse.json(
         { success: false, error: 'Kullanıcı bilgisi bulunamadı' },
         { status: 401 }
       );
     }
 
-    // messages.json dosyasını oku
+    // messages.json dosyasının yolunu belirle
     const filePath = path.join(process.cwd(), 'data', 'messages.json');
     
-    // Dosya varlığını kontrol et
+    // Dosya varlığını kontrol et ve yoksa oluştur
     if (!fs.existsSync(filePath)) {
-      console.log('Mesaj veritabanı bulunamadı, boş liste döndürülüyor');
-      return NextResponse.json({
-        success: true,
-        tickets: []
-      });
+      logger.info('Mesaj veritabanı bulunamadı, yeni dosya oluşturuluyor');
+      const initialData: MessageData = { messages: [] };
+      await fsPromises.writeFile(filePath, JSON.stringify(initialData, null, 2));
     }
 
     // Dosyayı oku
-    let data;
+    let data: MessageData;
     try {
-      const fileContent = fs.readFileSync(filePath, 'utf-8');
+      const fileContent = await fsPromises.readFile(filePath, 'utf-8');
       data = JSON.parse(fileContent);
     } catch (error) {
-      console.error('Mesaj veritabanı okuma hatası:', error);
+      logger.error('Mesaj veritabanı okuma hatası:', error);
       return NextResponse.json(
         { success: false, error: 'Mesaj veritabanı okunamadı' },
         { status: 500 }
       );
     }
 
-    // Kullanıcının mesajlarını filtrele
+    // Kullanıcının mesajlarını filtrele ve ticket formatına dönüştür
     const messages = data.messages || [];
-    const userMessages = messages.filter((message: any) => 
-      message.senderEmail.toLowerCase() === email.toLowerCase() || 
-      message.receiverEmail.toLowerCase() === email.toLowerCase()
-    );
-
-    // Mesajları konulara (ticket) grupla
-    const tickets = userMessages.reduce((acc: Ticket[], message: any) => {
-      const ticketId = message.replyToId || message.id;
-      const existingTicket = acc.find(t => t.id === ticketId);
-      
-      if (existingTicket) {
-        // Mevcut konuya mesaj ekle
-        existingTicket.messages.push({
-          sender: message.senderEmail.toLowerCase() === email.toLowerCase() ? 'user' : 'advisor',
+    const userMessages = messages
+      .filter((message) => 
+        message.senderEmail.toLowerCase() === email.toLowerCase() || 
+        message.receiverEmail.toLowerCase() === email.toLowerCase()
+      )
+      .map((message) => ({
+        id: parseInt(message.id.split('-')[1]),
+        subject: message.subject,
+        preview: message.content.substring(0, 100),
+        date: message.createdAt,
+        isRead: message.isRead,
+        studentEmail: message.senderEmail === email ? message.receiverEmail : message.senderEmail,
+        studentName: message.senderEmail === email ? 'Danışman' : 'Öğrenci',
+        messages: [{
+          sender: message.senderEmail === email ? 'user' : 'advisor',
           content: message.content,
           timestamp: message.createdAt
-        });
-        
-        // Konu bilgilerini güncelle
-        existingTicket.isRead = existingTicket.isRead && message.isRead;
-        existingTicket.date = message.createdAt;
-        existingTicket.preview = message.content;
-      } else {
-        // Yeni konu oluştur
-        acc.push({
-          id: ticketId,
-          subject: message.subject || 'Yeni Konu',
-          preview: message.content,
-          date: message.createdAt,
-          isRead: message.isRead,
-          studentId: message.senderEmail.toLowerCase() === email.toLowerCase() ? message.receiverEmail : message.senderEmail,
-          studentEmail: message.senderEmail.toLowerCase() === email.toLowerCase() ? message.receiverEmail : message.senderEmail,
-          messages: [{
-            sender: message.senderEmail.toLowerCase() === email.toLowerCase() ? 'user' : 'advisor',
-            content: message.content,
-            timestamp: message.createdAt
-          }]
-        });
-      }
-      
-      return acc;
-    }, []);
+        }]
+      }));
 
-    console.log('Öğrenci mesajları başarıyla getirildi:', email);
-    
+    // Mesajları tarihe göre sırala
+    const sortedMessages = userMessages.sort((a, b) => 
+      new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+
+    logger.info('Öğrenci mesajları başarıyla getirildi', { 
+      messageCount: sortedMessages.length 
+    });
+
     return NextResponse.json({
       success: true,
-      tickets: tickets.sort((a: Ticket, b: Ticket) => 
-        new Date(b.date).getTime() - new Date(a.date).getTime()
-      )
+      tickets: sortedMessages
     });
     
   } catch (error) {
-    console.error('Öğrenci mesajları getirme hatası:', error);
+    logger.error('Öğrenci mesajları getirme hatası:', error);
     return NextResponse.json(
-      { success: false, error: 'Mesajlar alınamadı' },
+      { success: false, error: 'Mesajlar alınırken bir hata oluştu' },
       { status: 500 }
     );
   }

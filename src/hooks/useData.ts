@@ -1,28 +1,32 @@
 import useSWR from 'swr';
 import { useAuth } from '@/context/AuthContext';
 import { useMessages as useMessagesContext } from '@/context/MessagesContext';
+import { logger } from '@/utils/logger';
 
 // SWR fetcher fonksiyonu
-const fetcher = async (url: string, userEmail?: string) => {
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json'
-  };
-  
-  if (userEmail) {
-    headers['x-user-email'] = userEmail;
-  }
-  
-  const res = await fetch(url, { headers });
-  
-  if (!res.ok) {
-    const error = new Error('Veri çekme başarısız oldu');
-    const errorInfo = await res.json().catch(() => ({}));
-    (error as any).info = errorInfo;
-    (error as any).status = res.status;
+const fetcher = async (url: string, email?: string) => {
+  try {
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json'
+    };
+
+    // Email parametresi varsa header'a ekle
+    if (email) {
+      headers['x-user-email'] = email;
+    }
+
+    const response = await fetch(url, { headers });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Veri getirme hatası');
+    }
+
+    return response.json();
+  } catch (error) {
+    logger.error('Fetcher hatası:', error);
     throw error;
   }
-  
-  return res.json();
 };
 
 /**
@@ -94,16 +98,19 @@ export function useUnreadMessagesCount(refreshInterval: number = 30000) {
   const { user } = useAuth();
   
   // Giriş yapılmamışsa null dön
-  const shouldFetch = user !== null;
+  const shouldFetch = Boolean(user?.email);
   
   const { data, error, isLoading, isValidating, mutate } = useSWR(
     shouldFetch ? '/api/messages/unread' : null,
-    fetcher,
+    (url) => fetcher(url, user?.email),
     {
       refreshInterval, 
       revalidateOnFocus: true,
       revalidateIfStale: true,
       dedupingInterval: 5000,
+      onError: (err) => {
+        logger.error('Okunmamış mesaj sayısı getirme hatası:', err);
+      }
     }
   );
   
@@ -123,24 +130,24 @@ export function useUnreadMessagesCount(refreshInterval: number = 30000) {
  * @returns SWR response nesnesi
  */
 export function useStudents(refreshInterval: number = 30000) {
-  const { user, isAdvisor } = useAuth();
+  const { user } = useAuth();
   
   // Danışman değilse veya giriş yapılmamışsa boş dizi dön
-  const shouldFetch = Boolean(user?.email && isAdvisor());
+  const shouldFetch = Boolean(user?.email && user?.role === 'advisor');
   
   // Danışman endpoint'i
   const endpoint = '/api/advisor/students';
   
   const { data, error, isLoading, isValidating, mutate } = useSWR(
-    shouldFetch ? [endpoint, user?.email] : null,
-    ([url, email]) => fetcher(url, email),
+    shouldFetch ? endpoint : null,
+    (url) => fetcher(url, user?.email),
     {
       refreshInterval,
       revalidateOnFocus: false,
       revalidateIfStale: true,
       dedupingInterval: 5000,
       onError: (err) => {
-        console.error('Öğrenci listesi getirme hatası:', err);
+        logger.error('Öğrenci listesi getirme hatası:', err);
       }
     }
   );
@@ -165,10 +172,10 @@ export function useStudents(refreshInterval: number = 30000) {
  * @returns SWR response nesnesi
  */
 export function useStudentDetail(studentEmail: string, refreshInterval: number = 10000) {
-  const { user, isAdvisor } = useAuth();
+  const { user } = useAuth();
   
   // Danışman değilse veya giriş yapılmamışsa null dön
-  const shouldFetch = user && isAdvisor() && studentEmail;
+  const shouldFetch = Boolean(user?.email && user?.role === 'advisor' && studentEmail);
   
   // Danışman endpoint'i
   const baseEndpoint = `/api/advisor/students/`;

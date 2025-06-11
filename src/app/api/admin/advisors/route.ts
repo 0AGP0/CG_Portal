@@ -1,64 +1,52 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { loadAdvisorsDb } from '@/utils/database';
+import { pool } from '@/lib/db';
+import { logger } from '@/utils/logger';
 
 export async function GET(request: NextRequest) {
   try {
-    // Danışman veritabanını yükle
-    const advisorsDb = await loadAdvisorsDb();
-    
-    // Danışman verilerini formatlayarak döndür
-    const advisors = advisorsDb.advisors.map(advisor => ({
-      id: advisor.id,
-      name: advisor.name,
-      email: advisor.email,
-      studentCount: advisor.studentIds?.length || 0,
-      updatedAt: advisor.updatedAt
-    }));
-    
-    return NextResponse.json({
-      success: true,
-      advisors
-    });
+    const client = await pool.connect();
+    try {
+      // Danışmanları veritabanından getir
+      const query = `
+        SELECT 
+          id,
+          name,
+          email,
+          created_at,
+          updated_at,
+          (SELECT COUNT(*) FROM students WHERE advisor_email = advisors.email) as student_count
+        FROM advisors
+        ORDER BY updated_at DESC
+      `;
+      
+      const result = await client.query(query);
+      const advisors = result.rows.map(advisor => ({
+        id: advisor.id,
+        name: advisor.name,
+        email: advisor.email,
+        studentCount: parseInt(advisor.student_count) || 0,
+        updatedAt: advisor.updated_at
+      }));
+      
+      return NextResponse.json({
+        success: true,
+        advisors
+      });
+    } finally {
+      client.release();
+    }
   } catch (error) {
-    console.error('Admin danışman listesi hatası:', error);
-    
-    // Hata durumunda örnek veri döndür
-    const mockAdvisors = [
-      {
-        id: "adv-1",
-        name: "Müge Hanım", 
-        email: "muge@campusglobal.com",
-        studentCount: 8,
-        updatedAt: "2023-05-10T14:30:00Z"
-      },
-      {
-        id: "adv-2",
-        name: "Murat Bey",
-        email: "murat@campusglobal.com",
-        studentCount: 12,
-        updatedAt: "2023-06-15T09:45:00Z"
-      },
-      {
-        id: "adv-3", 
-        name: "Canan Hanım",
-        email: "canan@campusglobal.com",
-        studentCount: 5,
-        updatedAt: "2023-04-20T11:20:00Z"
-      }
-    ];
-    
-    return NextResponse.json({
-      success: true,
-      advisors: mockAdvisors,
-      fromMock: true
-    });
+    logger.error('Admin danışman listesi hatası:', error);
+    return NextResponse.json(
+      { error: 'Danışman listesi alınamadı' },
+      { status: 500 }
+    );
   }
 }
 
 // POST isteği - Yeni danışman oluştur
 export async function POST(request: NextRequest) {
   try {
-    // İstek gövdesini al
     const body = await request.json();
     
     // Gerekli alanlar mevcut mu kontrol et
@@ -78,35 +66,49 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Gerçek uygulamada burada veritabanına ekleme yapılır
-    // Şimdilik mock olarak yanıt döndürelim
-    
-    const newAdvisor = {
-      id: `adv-${Date.now()}`,
-      name: body.name,
-      email: body.email,
-      phone: body.phone || '',
-      studentIds: [],
-      studentCount: 0,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-    
-    // Yanıt olarak oluşturulan danışmanı döndür
-    return NextResponse.json({
-      success: true,
-      advisor: {
-        id: newAdvisor.id,
-        name: newAdvisor.name,
-        email: newAdvisor.email,
-        phone: newAdvisor.phone || '',
-        studentCount: 0,
-        createdAt: newAdvisor.createdAt,
-        updatedAt: newAdvisor.updatedAt
+    const client = await pool.connect();
+    try {
+      // E-posta adresi kullanımda mı kontrol et
+      const checkQuery = 'SELECT id FROM advisors WHERE email = $1';
+      const checkResult = await client.query(checkQuery, [body.email]);
+      
+      if (checkResult.rows.length > 0) {
+        return NextResponse.json(
+          { error: 'Bu e-posta adresi zaten kullanımda' },
+          { status: 400 }
+        );
       }
-    }, { status: 201 });
+      
+      // Yeni danışmanı ekle
+      const insertQuery = `
+        INSERT INTO advisors (name, email, created_at, updated_at)
+        VALUES ($1, $2, NOW(), NOW())
+        RETURNING id, name, email, created_at, updated_at
+      `;
+      
+      const insertResult = await client.query(insertQuery, [
+        body.name,
+        body.email
+      ]);
+      
+      const newAdvisor = insertResult.rows[0];
+      
+      return NextResponse.json({
+        success: true,
+        advisor: {
+          id: newAdvisor.id,
+          name: newAdvisor.name,
+          email: newAdvisor.email,
+          studentCount: 0,
+          createdAt: newAdvisor.created_at,
+          updatedAt: newAdvisor.updated_at
+        }
+      }, { status: 201 });
+    } finally {
+      client.release();
+    }
   } catch (error) {
-    console.error('Danışman oluşturma hatası:', error);
+    logger.error('Danışman oluşturma hatası:', error);
     return NextResponse.json(
       { error: 'Danışman oluşturulurken bir hata oluştu' },
       { status: 500 }

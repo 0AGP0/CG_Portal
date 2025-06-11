@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getRecordByEmail } from '@/utils/database';
+import { pool } from '@/lib/db';
 import { logger } from '@/utils/logger';
+import { generateToken } from '@/utils/security';
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,64 +19,116 @@ export async function POST(request: NextRequest) {
       );
     }
     
+    const client = await pool.connect();
+    try {
     // Öğrenciyi e-posta adresine göre bul
-    const student = await getRecordByEmail(body.email);
-    logger.info('Bulunan öğrenci:', student);
+      const query = `
+        SELECT 
+          id,
+          email,
+          name,
+          process_started,
+          created_at,
+          updated_at
+        FROM students 
+        WHERE email = $1
+      `;
+      
+      const result = await client.query(query, [body.email]);
+      const student = result.rows[0];
     
     if (!student) {
-      // Öğrenci bulunamadıysa yeni kayıt oluştur
+        // Öğrenci bulunamadıysa veritabanında yeni kayıt oluştur
       logger.info('Öğrenci bulunamadı, yeni kayıt oluşturuluyor');
-      const newStudent = {
-        id: `stu-${Date.now()}`,
-        email: body.email,
-        name: body.email.split('@')[0].split('.').map((part: string) => 
+        
+        const name = body.email.split('@')[0].split('.').map((part: string) => 
           part.charAt(0).toUpperCase() + part.slice(1)
-        ).join(' ') || 'Yeni Öğrenci',
-        role: 'student', // Role bilgisini ekle
-        processStarted: false,
-        advisorId: 'adv-1',
-        updatedAt: new Date().toISOString()
-      };
+        ).join(' ') || 'Yeni Öğrenci';
+
+        const insertQuery = `
+          INSERT INTO students (
+            email,
+            name,
+            created_at,
+            updated_at
+          ) VALUES ($1, $2, NOW(), NOW())
+          RETURNING id, email, name, created_at, updated_at
+        `;
+
+        const insertResult = await client.query(insertQuery, [body.email, name]);
+        const newStudent = insertResult.rows[0];
+      
+      // Token oluştur
+      const token = generateToken({
+        id: newStudent.id.toString(),
+        email: newStudent.email,
+        role: 'student'
+      });
+
+      if (!token) {
+        logger.error('Token oluşturulamadı');
+        return NextResponse.json(
+          { error: 'Giriş yapılırken bir hata oluştu' },
+          { status: 500 }
+        );
+      }
       
       // Başarılı giriş
       return NextResponse.json(
         { 
           success: true, 
           message: 'Giriş başarılı',
-          user: { // student yerine user kullan
+          token,
+          user: {
             id: newStudent.id,
             name: newStudent.name,
             email: newStudent.email,
-            role: 'student', // Role bilgisini ekle
-            processStarted: false,
-            advisorId: 'adv-1'
+              role: 'student',
+              processStarted: false
           }
         }, 
         { status: 200 }
       );
     }
     
-    // Başarılı giriş
+      // Token oluştur
+      const token = generateToken({
+        id: student.id.toString(),
+        email: student.email,
+        role: 'student'
+      });
+
+      if (!token) {
+        logger.error('Token oluşturulamadı');
+        return NextResponse.json(
+          { error: 'Giriş yapılırken bir hata oluştu' },
+          { status: 500 }
+        );
+      }
+
+      // Mevcut öğrenci için başarılı giriş
     return NextResponse.json(
       { 
         success: true, 
         message: 'Giriş başarılı',
-        user: { // student yerine user kullan
-          id: student.lead_id || `stu-${Date.now()}`,
-          name: student.name,
-          email: student.email,
-          role: 'student', // Role bilgisini ekle
-          processStarted: student.processStarted || false,
-          advisorId: student.advisorId || 'adv-1'
-        }
-      }, 
-      { status: 200 }
-    );
-    
+        token,
+        user: {
+          id: student.id,
+        name: student.name,
+        email: student.email,
+          role: 'student',
+          processStarted: student.process_started || false
+      }
+    }, 
+    { status: 200 }
+  );
+    } finally {
+      client.release();
+    }
   } catch (error) {
     logger.error('Öğrenci girişi hatası:', error);
     return NextResponse.json(
-      { error: 'Giriş sırasında bir hata oluştu' }, 
+      { error: 'Giriş yapılırken bir hata oluştu' },
       { status: 500 }
     );
   }

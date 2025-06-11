@@ -1,49 +1,47 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { promises as fs } from 'fs';
-import path from 'path';
+import { getAllStudents, createStudent } from '@/lib/db';
+import { logger } from '@/utils/logger';
 
 // GET isteği - Tüm öğrencileri getir
 export async function GET(request: NextRequest) {
   try {
-    // customers.json dosyasını oku
-    const filePath = path.join(process.cwd(), 'data', 'customers.json');
-    const fileContent = await fs.readFile(filePath, 'utf8');
-    const data = JSON.parse(fileContent);
+    logger.info('Admin öğrenci listesi isteği alındı');
+    
+    // Veritabanından tüm öğrencileri getir
+    const students = await getAllStudents();
     
     // Öğrenci verilerini formatla
-    const students = data.customers.map((student: any) => {
-      // Türkçe karakterleri düzelt
-      const status = student.stage || 'Beklemede';
-      const advisor = student.advisorName || 'Atanmadı';
-      
-      return {
-        id: student.email, // email'i id olarak kullan
-        name: student.name,
-        email: student.email,
-        phone: student.phone || '',
-        advisor: advisor,
-        status: status,
-        processStarted: student.processStarted || false,
-        createdAt: student.createdAt,
-        updatedAt: student.updatedAt,
-        advisorId: student.advisorId,
-        advisorEmail: student.advisorEmail,
-        salesId: student.salesId,
-        salesName: student.salesName,
-        salesEmail: student.salesEmail,
-        documents: student.documents || []
-      };
-    });
+    const formattedStudents = students.map(student => ({
+      id: student.email,
+      name: student.name,
+      email: student.email,
+      phone: student.phone || '',
+      advisor: student.advisor_name || 'Atanmadı',
+      status: student.stage || 'Beklemede',
+      processStarted: student.process_started || false,
+      createdAt: student.created_at,
+      updatedAt: student.updated_at,
+      advisorId: student.advisor_id,
+      advisorEmail: student.advisor_email,
+      salesId: student.sales_id,
+      salesName: student.sales_name,
+      salesEmail: student.sales_email,
+      documents: student.documents || []
+    }));
     
     // Response header'larını ayarla
     const headers = new Headers();
     headers.set('Content-Type', 'application/json; charset=utf-8');
     headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
     
+    logger.info('Admin öğrenci listesi başarıyla getirildi', { 
+      studentCount: formattedStudents.length 
+    });
+    
     return new NextResponse(
       JSON.stringify({
-      success: true,
-        students
+        success: true,
+        students: formattedStudents
       }, null, 2),
       {
         status: 200,
@@ -51,7 +49,7 @@ export async function GET(request: NextRequest) {
       }
     );
   } catch (error) {
-    console.error('Admin öğrenci listesi hatası:', error);
+    logger.error('Admin öğrenci listesi hatası:', error);
     return NextResponse.json(
       { error: 'Öğrenci listesi alınırken bir hata oluştu' },
       { 
@@ -87,34 +85,20 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // customers.json dosyasını oku
-    const filePath = path.join(process.cwd(), 'data', 'customers.json');
-    const fileContent = await fs.readFile(filePath, 'utf8');
-    const data = JSON.parse(fileContent);
-    
-    // Yeni öğrenciyi oluştur
-    const newStudent = {
+    // Yeni öğrenciyi veritabanında oluştur
+    const newStudent = await createStudent({
       email: body.email,
       name: body.name,
       phone: body.phone || '',
-      stage: 'new',
-      processStarted: false,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      advisorId: null,
-      advisorName: null,
-      advisorEmail: null,
-      salesId: 'admin-user',
-      salesName: 'Admin',
-      salesEmail: 'admin@campusglobal.com',
+      stage: 'Hazırlık Aşaması',
+      process_started: false,
+      advisor_id: undefined,
+      advisor_name: undefined,
+      advisor_email: undefined,
       documents: []
-    };
+    });
     
-    // Öğrenciyi listeye ekle
-    data.customers.push(newStudent);
-    
-    // Dosyaya kaydet
-    await fs.writeFile(filePath, JSON.stringify(data, null, 2));
+    logger.info('Yeni öğrenci oluşturuldu', { email: newStudent.email });
     
     // Yanıt olarak oluşturulan öğrenciyi döndür
     return NextResponse.json({
@@ -124,18 +108,38 @@ export async function POST(request: NextRequest) {
         name: newStudent.name,
         email: newStudent.email,
         phone: newStudent.phone,
-        advisor: newStudent.advisorName || 'Atanmadı',
+        advisor: newStudent.advisor_name || 'Atanmadı',
         status: newStudent.stage,
-        processStarted: newStudent.processStarted,
-        createdAt: newStudent.createdAt,
-        updatedAt: newStudent.updatedAt
+        processStarted: newStudent.process_started,
+        createdAt: newStudent.created_at,
+        updatedAt: newStudent.updated_at
       }
     }, { status: 201 });
   } catch (error) {
-    console.error('Öğrenci oluşturma hatası:', error);
+    logger.error('Öğrenci oluşturma hatası:', error);
     return NextResponse.json(
       { error: 'Öğrenci oluşturulurken bir hata oluştu' },
       { status: 500 }
     );
+  }
+}
+
+// Test öğrencisi ekle
+export async function addTestStudent() {
+  try {
+    const testStudent = {
+      email: 'test@campusglobal.com',
+      name: 'Test Öğrenci',
+      phone: '5551234567',
+      stage: 'Hazırlık Aşaması',
+      process_started: false
+    };
+
+    const newStudent = await createStudent(testStudent);
+    logger.info('Test öğrencisi oluşturuldu:', { email: newStudent.email });
+    return newStudent;
+  } catch (error) {
+    logger.error('Test öğrencisi oluşturma hatası:', error);
+    throw error;
   }
 } 

@@ -1,4 +1,15 @@
 import { logger } from '@/utils/logger';
+import { Pool } from 'pg';
+
+// PostgreSQL bağlantı havuzu
+const pool = new Pool({
+  user: process.env.POSTGRES_USER || 'postgres',
+  host: process.env.POSTGRES_HOST || 'localhost',
+  database: process.env.POSTGRES_DATABASE || 'cg_portal',
+  password: process.env.POSTGRES_PASSWORD,
+  port: parseInt(process.env.POSTGRES_PORT || '5432'),
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+});
 
 // Client-side cache için basit bir veri deposu
 const cache = {
@@ -25,14 +36,10 @@ const clearCache = () => {
 };
 
 // API URL'sini oluştur
-const getApiUrl = (path: string) => {
-  // Server-side için
-  if (typeof window === 'undefined') {
-    return `http://localhost:3000${path}`;
-  }
-  // Client-side için
-  return `${window.location.origin}${path}`;
-};
+function getApiUrl(path: string) {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
+  return `${baseUrl}${path}`;
+}
 
 // Veri tipleri
 export interface CustomerRecord {
@@ -122,7 +129,7 @@ export async function getUnreadMessagesCount(email: string): Promise<number> {
 }
 
 // E-posta adresine göre kayıt bulma
-export async function getRecordByEmail(email: string): Promise<CustomerRecord | null> {
+export async function getRecordByEmail(email: string): Promise<any | null> {
   try {
     // Cache'i kontrol et
     const cachedData = cache.customers.get(email);
@@ -133,9 +140,9 @@ export async function getRecordByEmail(email: string): Promise<CustomerRecord | 
     }
 
     // API'den veriyi al
-    const url = getApiUrl(`/api/student/${encodeURIComponent(email)}`);
-    const response = await fetch(url, {
+    const response = await fetch(`/api/student/profile`, {
       headers: {
+        'x-user-email': email,
         'Content-Type': 'application/json'
       }
     });
@@ -145,7 +152,7 @@ export async function getRecordByEmail(email: string): Promise<CustomerRecord | 
     }
 
     const data = await response.json();
-    if (!data.success || !data.student) {
+    if (!data.success) {
       return null;
     }
 
@@ -161,7 +168,7 @@ export async function getRecordByEmail(email: string): Promise<CustomerRecord | 
 }
 
 // E-posta adresine göre danışman bulma
-export async function getAdvisorByEmail(email: string): Promise<AdvisorRecord | null> {
+export async function getAdvisorByEmail(email: string, token?: string): Promise<AdvisorRecord | null> {
   try {
     logger.info('Danışman arama başlatıldı:', email);
 
@@ -173,17 +180,37 @@ export async function getAdvisorByEmail(email: string): Promise<AdvisorRecord | 
       return cachedData;
     }
 
+    // Token kontrolü
+    let authToken = token;
+    if (!authToken && typeof window !== 'undefined') {
+      // Client tarafında çalışıyorsa cookie'den token'ı al
+      authToken = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('token='))
+        ?.split('=')[1];
+    }
+
+    if (!authToken) {
+      logger.error('Token bulunamadı');
+      throw new Error('Oturum süresi doldu. Lütfen tekrar giriş yapın.');
+    }
+
     // API endpoint'ine istek gönder
     const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/advisor/${encodeURIComponent(email)}`;
     logger.info('Danışman API isteği gönderiliyor:', apiUrl);
 
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': `Bearer ${authToken}`,
+      'x-user-email': email,
+      'x-user-role': 'advisor'
+    };
+
     const response = await fetch(apiUrl, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      credentials: 'include' // Cookie'leri otomatik olarak gönder
+      headers,
+      credentials: 'include'
     });
 
     if (!response.ok) {

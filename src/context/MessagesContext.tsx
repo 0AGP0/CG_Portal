@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useAuth } from './AuthContext';
 import { getRecordByEmail } from '@/utils/database';
+import { getCookie, removeCookie } from '@/utils/cookies';
 
 // Mesaj türleri
 export interface Message {
@@ -32,6 +33,7 @@ interface MessagesContextType {
   createNewTicket: (subject: string, content: string) => void;
   markAsRead: (id: number) => void;
   isLoading: boolean;
+  isSending: boolean;
   error: string | null;
 }
 
@@ -45,6 +47,7 @@ const defaultContext: MessagesContextType = {
   createNewTicket: () => {},
   markAsRead: () => {},
   isLoading: true,
+  isSending: false,
   error: null
 };
 
@@ -59,18 +62,27 @@ interface MessagesProviderProps {
 }
 
 export const MessagesProvider = ({ children }: MessagesProviderProps) => {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [selectedTicketId, setSelectedTicketId] = useState<number | null>(null);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Mesajları getir
   const fetchMessages = async () => {
     try {
-      if (!user || !isAuthenticated) {
-        console.log('Kullanıcı giriş yapmamış veya oturum geçersiz');
+      if (!user || authLoading) {
+        console.log('Kullanıcı giriş yapmamış veya oturum yükleniyor');
+        setTickets([]);
+        setIsLoading(false);
+        return;
+      }
+
+      // Admin için mesaj API'sini devre dışı bırak
+      if (user.role === 'admin') {
+        console.log('Admin için mesaj sistemi devre dışı');
         setTickets([]);
         setIsLoading(false);
         return;
@@ -78,6 +90,17 @@ export const MessagesProvider = ({ children }: MessagesProviderProps) => {
 
       setError(null);
       setIsLoading(true);
+      
+      // Token'ı al
+      const token = getCookie('token');
+      if (!token) {
+        console.error('Token bulunamadı');
+        setError('Oturum süresi dolmuş. Lütfen tekrar giriş yapın.');
+        setTickets([]);
+        setIsLoading(false);
+        return;
+      }
+
       console.log('Mesajlar getiriliyor, kullanıcı:', user);
       
       // API endpoint'ini belirle
@@ -92,8 +115,11 @@ export const MessagesProvider = ({ children }: MessagesProviderProps) => {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'x-user-email': user.email
-        }
+          'Authorization': `Bearer ${token}`,
+          'x-user-email': user.email,
+          'x-user-role': user.role
+        },
+        credentials: 'include'
       });
       
       console.log('Mesaj API yanıtı:', response.status);
@@ -103,7 +129,12 @@ export const MessagesProvider = ({ children }: MessagesProviderProps) => {
         console.error('Mesaj API hata detayı:', errorData);
         
         if (response.status === 401) {
+          // Token geçersiz veya süresi dolmuş
           setError('Oturum süresi dolmuş. Lütfen tekrar giriş yapın.');
+          // Token'ı temizle ve login sayfasına yönlendir
+          removeCookie('token');
+          removeCookie('user');
+          window.location.href = '/login';
         } else if (response.status === 404) {
           setError('Mesaj verileri bulunamadı.');
         } else if (response.status === 500) {
@@ -146,14 +177,14 @@ export const MessagesProvider = ({ children }: MessagesProviderProps) => {
 
   // Kullanıcı değiştiğinde mesajları yükle
   useEffect(() => {
-    if (user && isAuthenticated) {
+    if (user && !authLoading) {
       setIsLoading(true);
       fetchMessages();
     } else {
       setTickets([]);
       setIsLoading(false);
     }
-  }, [user, isAuthenticated]);
+  }, [user, authLoading]);
 
   // Okunmamış mesaj sayısını hesapla
   useEffect(() => {
@@ -190,20 +221,41 @@ export const MessagesProvider = ({ children }: MessagesProviderProps) => {
 
     try {
       setError(null);
-      setIsLoading(true);
+      setIsSending(true);
+
+      // Token'ı al
+      const token = getCookie('token');
+      if (!token) {
+        setError('Oturum süresi dolmuş. Lütfen tekrar giriş yapın.');
+        window.location.href = '/login';
+        return;
+      }
       
       // Alıcı e-posta adresini belirle
       let receiverEmail = '';
       
       if (user.role === 'student') {
         // Öğrenci ise, danışmanı bul
-        const student = await getRecordByEmail(user.email);
-        if (!student || !student.advisorEmail) {
+        const profileResponse = await fetch('/api/student/profile', {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            'x-user-email': user.email,
+            'x-user-role': user.role
+          },
+          credentials: 'include'
+        });
+
+        if (!profileResponse.ok) {
+          throw new Error('Danışman bilgisi alınamadı');
+        }
+
+        const profileData = await profileResponse.json();
+        if (!profileData.success || !profileData.student || !profileData.student.advisor_email) {
           throw new Error('Danışman bilgisi bulunamadı');
         }
-        receiverEmail = student.advisorEmail;
+        receiverEmail = profileData.student.advisor_email;
       } else if (user.role === 'advisor') {
-        // Danışman ise, öğrenciye mesaj gönder
         receiverEmail = ticket.studentEmail || ticket.studentId || '';
         
         if (!receiverEmail) {
@@ -212,12 +264,15 @@ export const MessagesProvider = ({ children }: MessagesProviderProps) => {
       }
       
       // API isteği 
-      const response = await fetch('/api/messages/send', {
+      const messageResponse = await fetch('/api/messages/send', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-user-email': user.email
+          'Authorization': `Bearer ${token}`,
+          'x-user-email': user.email,
+          'x-user-role': user.role
         },
+        credentials: 'include',
         body: JSON.stringify({
           receiverEmail,
           content,
@@ -228,20 +283,38 @@ export const MessagesProvider = ({ children }: MessagesProviderProps) => {
         })
       });
       
-      const data = await response.json();
+      const messageData = await messageResponse.json();
       
-      if (!response.ok || !data.success) {
-        throw new Error(data.error || 'Mesaj gönderilemedi');
+      if (!messageResponse.ok || !messageData.success) {
+        throw new Error(messageData.error || 'Mesaj gönderilemedi');
       }
 
-      // Mesajlar başarıyla gönderildi, listeyi yenile
-      await fetchMessages();
-      
+      // Yeni mesajı mevcut ticket'a ekle
+      const newMessage: Message = {
+        sender: 'user',
+        content,
+        timestamp: new Date().toISOString()
+      };
+
+      setTickets(prevTickets => 
+        prevTickets.map(t => {
+          if (t.id === ticket.id) {
+            return {
+              ...t,
+              messages: [...t.messages, newMessage],
+              preview: content,
+              date: new Date().toISOString()
+            };
+          }
+          return t;
+        })
+      );
+
     } catch (error) {
       console.error('Mesaj gönderme hatası:', error);
       setError(error instanceof Error ? error.message : 'Mesaj gönderilirken bir hata oluştu');
     } finally {
-      setIsLoading(false);
+      setIsSending(false);
     }
   };
 
@@ -254,24 +327,37 @@ export const MessagesProvider = ({ children }: MessagesProviderProps) => {
     
     try {
       setError(null);
-      setIsLoading(true);
+      setIsSending(true);
       
       if (user.role === 'student') {
         // Öğrenci ise, danışmanı bul
-        const student = await getRecordByEmail(user.email);
-        if (!student || !student.advisorEmail) {
+        const profileResponse = await fetch('/api/student/profile', {
+          headers: {
+            'x-user-email': user.email,
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${getCookie('token')}`
+          }
+        });
+
+        if (!profileResponse.ok) {
+          throw new Error('Danışman bilgisi alınamadı');
+        }
+
+        const profileData = await profileResponse.json();
+        if (!profileData.success || !profileData.student || !profileData.student.advisor_email) {
           throw new Error('Danışman bilgisi bulunamadı');
         }
         
         // Alıcıya mesaj gönder
-        const response = await fetch('/api/messages/send', {
+        const messageResponse = await fetch('/api/messages/send', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'x-user-email': user.email
+            'x-user-email': user.email,
+            'Authorization': `Bearer ${getCookie('token')}`
           },
           body: JSON.stringify({
-            receiverEmail: student.advisorEmail,
+            receiverEmail: profileData.student.advisor_email,
             content,
             senderRole: user.role,
             subject,
@@ -279,14 +365,30 @@ export const MessagesProvider = ({ children }: MessagesProviderProps) => {
           })
         });
         
-        const data = await response.json();
+        const messageData = await messageResponse.json();
         
-        if (!response.ok || !data.success) {
-          throw new Error(data.error || 'Yeni konu oluşturulamadı');
+        if (!messageResponse.ok || !messageData.success) {
+          throw new Error(messageData.error || 'Yeni konu oluşturulamadı');
         }
 
-        // Mesajlar başarıyla gönderildi, listeyi yenile
-        await fetchMessages();
+        // Yeni ticket'ı listeye ekle
+        const newTicket: Ticket = {
+          id: Date.now(),
+          subject,
+          preview: content,
+          date: new Date().toISOString(),
+          isRead: true,
+          studentEmail: user.email,
+          studentName: user.name,
+          messages: [{
+            sender: 'user',
+            content,
+            timestamp: new Date().toISOString()
+          }]
+        };
+
+        setTickets(prevTickets => [newTicket, ...prevTickets]);
+        setSelectedTicketId(newTicket.id);
         
       } else {
         throw new Error('Sadece öğrenciler yeni konu oluşturabilir');
@@ -295,7 +397,7 @@ export const MessagesProvider = ({ children }: MessagesProviderProps) => {
       console.error('Yeni konu oluşturma hatası:', error);
       setError(error instanceof Error ? error.message : 'Yeni konu oluşturulurken bir hata oluştu');
     } finally {
-      setIsLoading(false);
+      setIsSending(false);
     }
   };
 
@@ -309,6 +411,7 @@ export const MessagesProvider = ({ children }: MessagesProviderProps) => {
       createNewTicket,
       markAsRead,
       isLoading,
+      isSending,
       error
     }}>
       {children}

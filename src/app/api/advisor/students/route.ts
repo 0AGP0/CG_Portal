@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
+import { getStudentsByAdvisor, getAdvisorByEmail } from '@/lib/db';
 import { logger } from '@/utils/logger';
 
 export async function GET(request: NextRequest) {
@@ -19,23 +18,8 @@ export async function GET(request: NextRequest) {
     
     logger.info('Danışman öğrenci listesi getiriliyor', { userEmail });
 
-    // advisors.json dosyasını oku
-    const advisorsPath = path.join(process.cwd(), 'data', 'advisors.json');
-    if (!fs.existsSync(advisorsPath)) {
-      logger.error('Danışman veritabanı bulunamadı');
-      return NextResponse.json(
-        { success: false, error: 'Danışman veritabanı bulunamadı' },
-        { status: 404 }
-      );
-    }
-
-    // Danışmanı bul
-    const advisorsContent = fs.readFileSync(advisorsPath, 'utf-8');
-    const advisorsData = JSON.parse(advisorsContent);
-    const advisor = advisorsData.advisors?.find((a: any) => 
-      a.email.toLowerCase() === userEmail.toLowerCase()
-    );
-
+    // Önce danışmanın varlığını kontrol et
+    const advisor = await getAdvisorByEmail(userEmail);
     if (!advisor) {
       logger.error('Danışman bulunamadı:', userEmail);
       return NextResponse.json(
@@ -44,49 +28,33 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // customers.json dosyasını oku
-    const customersPath = path.join(process.cwd(), 'data', 'customers.json');
-    if (!fs.existsSync(customersPath)) {
-      logger.info('Öğrenci veritabanı bulunamadı, boş liste döndürülüyor');
-      return NextResponse.json({
-        success: true,
-        students: []
-      });
-    }
-
-    // Öğrencileri filtrele
-    const customersContent = fs.readFileSync(customersPath, 'utf-8');
-    const customersData = JSON.parse(customersContent);
+    // Danışmanın öğrencilerini getir
+    const students = await getStudentsByAdvisor(userEmail);
     
-    // Danışmanın öğrencilerini filtrele
-    const students = customersData.customers?.filter((student: any) => 
-      student.advisorEmail?.toLowerCase() === userEmail.toLowerCase()
-    ).map((student: any) => ({
-      id: student.lead_id || student.email,
+    // Öğrenci verilerini formatla
+    const formattedStudents = students.map(student => ({
+      id: student.email,
       name: student.name,
       email: student.email,
-      stage: student.stage || 'YENI',
-      university: student.university,
-      program: student.program,
-      phone: student.phone,
-      updatedAt: student.updatedAt,
-      processStarted: student.processStarted,
-      processStartDate: student.processStartDate,
+      phone: student.phone || '',
+      stage: student.stage || 'Hazırlık Aşaması',
+      processStarted: student.process_started || false,
+      createdAt: student.created_at,
+      updatedAt: student.updated_at,
       documents: student.documents || []
-    })) || [];
+    }));
 
-    logger.info('Öğrenci listesi başarıyla getirildi', { 
-      advisorEmail: userEmail, 
-      studentCount: students.length 
+    logger.info('Danışman öğrenci listesi başarıyla getirildi', { 
+      advisorEmail: userEmail,
+      studentCount: formattedStudents.length 
     });
-    
+
     return NextResponse.json({
       success: true,
-      students
+      students: formattedStudents
     });
-    
   } catch (error) {
-    logger.error('Öğrenci listesi getirme hatası:', error);
+    logger.error('Danışman öğrenci listesi hatası:', error);
     return NextResponse.json(
       { success: false, error: 'Öğrenci listesi alınamadı' },
       { status: 500 }

@@ -26,10 +26,11 @@ export default function PersonalInfoPage() {
           
           if (response.ok) {
             const data = await response.json();
+            console.log('API yanıtı:', data); // Debug için
             setStudentData(data.student);
             
             // Son güncelleme tarihi
-            const updateDate = data.student?.systemDetails?.lastUpdateTime || data.student?.systemDetails?.lastUpdated;
+            const updateDate = data.student?.updated_at;
             setLastUpdated(updateDate);
           }
         }
@@ -56,34 +57,32 @@ export default function PersonalInfoPage() {
       </Layout>
     );
   }
-  
+
   return (
     <Layout>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        className="space-y-6"
       >
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-[#002757]">Kişisel Bilgiler</h1>
-          <p className="text-default mt-1">Başvuru sürecinizdeki kişisel bilgilerinizi görebilirsiniz.</p>
-          
+        {/* Başlık ve Son Güncelleme */}
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
+            Kişisel Bilgiler
+          </h1>
           {lastUpdated && (
-            <div className="mt-2 text-sm text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 p-2 rounded-md inline-block">
-              Son güncelleme: {lastUpdated}
-            </div>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Son güncelleme: {new Date(lastUpdated).toLocaleString('tr-TR')}
+            </p>
           )}
         </div>
-        
-        {/* Temel Bilgiler */}
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-6 rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30 mb-6"
+
+        {/* Kişisel Bilgiler */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6"
         >
-          <h2 className="text-xl font-semibold text-[#002757] dark:text-blue-300 mb-4">Temel Bilgiler</h2>
-          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <p className="text-gray-500 dark:text-gray-400 text-sm">Ad Soyad</p>
@@ -92,7 +91,7 @@ export default function PersonalInfoPage() {
             
             <div>
               <p className="text-gray-500 dark:text-gray-400 text-sm">E-posta</p>
-              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_mail_adresi || "-"}</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.email || "-"}</p>
             </div>
             
             <div>
@@ -111,237 +110,204 @@ export default function PersonalInfoPage() {
             </div>
             
             <div>
-              <p className="text-gray-500 dark:text-gray-400 text-sm">Yaş</p>
-              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_ya || "-"}</p>
-            </div>
-
-            <div>
               <p className="text-gray-500 dark:text-gray-400 text-sm">Medeni Durum</p>
               <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_medeni_durum_1 || "-"}</p>
             </div>
 
             <div>
-              <p className="text-gray-500 dark:text-gray-400 text-sm">Finansal Kant</p>
-              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_finansal_kant || "-"}</p>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Aile Bilgileri */}
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-6 rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30 mb-6"
-        >
-          <h2 className="text-xl font-semibold text-[#002757] dark:text-blue-300 mb-4">Aile Bilgileri</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Anne Bilgileri */}
-            <div className="p-4 bg-gray-50/80 dark:bg-gray-700/30 rounded-lg">
-              <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-3">Anne Bilgileri</h3>
-              <div className="space-y-2">
-                <div>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">Ad Soyad</p>
-                  <p className="font-medium text-gray-800 dark:text-gray-200">
-                    {studentData?.x_studio_anne_ad} {studentData?.x_studio_anne_soyad || "-"}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">Doğum Tarihi</p>
-                  <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_anne_doum_tarihi || "-"}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">Doğum Yeri</p>
-                  <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_anne_doum_yeri || "-"}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">İkamet</p>
-                  <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_anne_ikamet_sehrilke || "-"}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">Telefon</p>
-                  <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_anne_telefon || "-"}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Baba Bilgileri */}
-            <div className="p-4 bg-gray-50/80 dark:bg-gray-700/30 rounded-lg">
-              <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-3">Baba Bilgileri</h3>
-              <div className="space-y-2">
-                <div>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">Ad Soyad</p>
-                  <p className="font-medium text-gray-800 dark:text-gray-200">
-                    {studentData?.x_studio_baba_ad} {studentData?.x_studio_baba_soyad || "-"}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">Doğum Tarihi</p>
-                  <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_baba_doum_tarihi || "-"}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">Doğum Yeri</p>
-                  <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_baba_doum_yeri || "-"}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">İkamet</p>
-                  <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_baba_ikamet_ehrilkesi || "-"}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">Telefon</p>
-                  <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_baba_telefon || "-"}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-        
-        {/* Adres Bilgileri */}
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-6 rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30 mb-6"
-        >
-          <h2 className="text-xl font-semibold text-[#002757] dark:text-blue-300 mb-4">Adres Bilgileri</h2>
-          
-          <div className="mb-4">
-            <p className="text-gray-500 dark:text-gray-400 text-sm">İletişim Adresi</p>
-            <p className="font-medium text-gray-800 dark:text-gray-200 whitespace-pre-line">{studentData?.contact_address || "-"}</p>
-          </div>
-        </motion.div>
-        
-        {/* Pasaport Bilgileri */}
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-6 rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30 mb-6"
-        >
-          <h2 className="text-xl font-semibold text-[#002757] dark:text-blue-300 mb-4">Pasaport Bilgileri</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
               <p className="text-gray-500 dark:text-gray-400 text-sm">Pasaport Numarası</p>
               <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_pasaport_numaras || "-"}</p>
             </div>
-            
+
             <div>
-              <p className="text-gray-500 dark:text-gray-400 text-sm">Pasaport Tipi</p>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Pasaport Türü</p>
               <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_pasaport_tr || "-"}</p>
             </div>
-            
+
             <div>
-              <p className="text-gray-500 dark:text-gray-400 text-sm">Veriliş Tarihi</p>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Pasaport Veriliş Tarihi</p>
               <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_verili_tarihi || "-"}</p>
             </div>
-            
+
             <div>
-              <p className="text-gray-500 dark:text-gray-400 text-sm">Geçerlilik Tarihi</p>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Pasaport Geçerlilik Tarihi</p>
               <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_geerlilik_tarihi || "-"}</p>
             </div>
-            
+
             <div>
               <p className="text-gray-500 dark:text-gray-400 text-sm">Veren Makam</p>
               <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_veren_makam || "-"}</p>
             </div>
-            
+
             <div>
               <p className="text-gray-500 dark:text-gray-400 text-sm">PNR Numarası</p>
               <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_pnr_numaras || "-"}</p>
             </div>
           </div>
         </motion.div>
-        
-        {/* Eğitim Bilgileri */}
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-6 rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30 mb-6"
-        >
-          <h2 className="text-xl font-semibold text-[#002757] dark:text-blue-300 mb-4">Eğitim Bilgileri</h2>
-          
-          <div className="space-y-6">
-            {/* Lise Bilgileri */}
-            <div className="p-4 bg-gray-50/80 dark:bg-gray-700/30 rounded-lg">
-              <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-3">Lise Bilgileri</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">Lise Adı</p>
-                  <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_lise_ad || "-"}</p>
-                </div>
-                
-                <div>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">Lise Tipi</p>
-                  <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_lise_tr || "-"}</p>
-                </div>
-                
-                <div>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">Şehir</p>
-                  <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_lise_ehir || "-"}</p>
-                </div>
-                
-                <div>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">Mezuniyet Tarihi</p>
-                  <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_lise_biti_tarihi || "-"}</p>
-                </div>
 
-                <div>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">YKS Yerleştirme Tarihi</p>
-                  <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_sym_yerlestirme_sonuc_tarihi || "-"}</p>
-                </div>
-              </div>
+        {/* Anne Bilgileri */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mt-6"
+        >
+          <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-3">Anne Bilgileri</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Ad</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_anne_ad || "-"}</p>
             </div>
             
-            {/* Üniversite Bilgileri */}
-            <div className="p-4 bg-gray-50/80 dark:bg-gray-700/30 rounded-lg">
-              <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-3">Üniversite Bilgileri</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">Üniversite Adı</p>
-                  <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_niversite_ad || "-"}</p>
-                </div>
-                
-                <div>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">Bölüm</p>
-                  <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_niversite_blm_ad || "-"}</p>
-                </div>
-                
-                <div>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">Başlangıç Tarihi</p>
-                  <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_niversite_balang_tarihi || "-"}</p>
-                </div>
-                
-                <div>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">Mezuniyet Tarihi</p>
-                  <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_niversite_biti_tarihi || "-"}</p>
-                </div>
-
-                <div>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">Mezuniyet Durumu</p>
-                  <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_mezuniyet_durumu || "-"}</p>
-                </div>
-
-                <div>
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">Mezuniyet Yılı</p>
-                  <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_mezuniyet_yl || "-"}</p>
-                </div>
-              </div>
+            <div>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Soyad</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_anne_soyad || "-"}</p>
+            </div>
+            
+            <div>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Doğum Tarihi</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_anne_doum_tarihi || "-"}</p>
+            </div>
+            
+            <div>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Doğum Yeri</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_anne_doum_yeri || "-"}</p>
+            </div>
+            
+            <div>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">İkamet</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_anne_ikamet_sehrilke || "-"}</p>
+            </div>
+            
+            <div>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Telefon</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_anne_telefon || "-"}</p>
             </div>
           </div>
         </motion.div>
-        
-        {/* Dil Bilgileri */}
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-6 rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30"
+
+        {/* Baba Bilgileri */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mt-6"
         >
-          <h2 className="text-xl font-semibold text-[#002757] dark:text-blue-300 mb-4">Dil Bilgileri</h2>
-          
+          <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-3">Baba Bilgileri</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Ad</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_baba_ad || "-"}</p>
+            </div>
+            
+            <div>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Soyad</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_baba_soyad || "-"}</p>
+            </div>
+            
+            <div>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Doğum Tarihi</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_baba_doum_tarihi || "-"}</p>
+            </div>
+            
+            <div>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Doğum Yeri</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_baba_doum_yeri || "-"}</p>
+            </div>
+            
+            <div>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">İkamet</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_baba_ikamet_ehrilkesi || "-"}</p>
+            </div>
+            
+            <div>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Telefon</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_baba_telefon || "-"}</p>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Eğitim Bilgileri */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mt-6"
+        >
+          <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-3">Eğitim Bilgileri</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Lise Adı</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_lise_ad || "-"}</p>
+            </div>
+            
+            <div>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Lise Türü</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_lise_tr || "-"}</p>
+            </div>
+            
+            <div>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Lise Şehri</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_lise_ehir || "-"}</p>
+            </div>
+            
+            <div>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Lise Başlangıç Tarihi</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_lise_balang_tarihi_1 || "-"}</p>
+            </div>
+            
+            <div>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Lise Bitiş Tarihi</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_lise_biti_tarihi || "-"}</p>
+            </div>
+            
+            <div>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Üniversite Adı</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_niversite_ad || "-"}</p>
+            </div>
+            
+            <div>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Üniversite Bölümü</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_niversite_blm_ad || "-"}</p>
+            </div>
+            
+            <div>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Üniversite Başlangıç Tarihi</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_niversite_balang_tarihi || "-"}</p>
+            </div>
+            
+            <div>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Üniversite Bitiş Tarihi</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_niversite_biti_tarihi || "-"}</p>
+            </div>
+            
+            <div>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Mezuniyet Durumu</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_mezuniyet_durumu || "-"}</p>
+            </div>
+            
+            <div>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Mezuniyet Yılı</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_mezuniyet_yl || "-"}</p>
+            </div>
+            
+            <div>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Üniversite Tercihleri</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_niversite_tercihleri || "-"}</p>
+            </div>
+            
+            <div>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Almanya Bölüm Tercihi</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_de_blm_tercihi || "-"}</p>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Dil Bilgileri */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mt-6"
+        >
+          <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-3">Dil Bilgileri</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <p className="text-gray-500 dark:text-gray-400 text-sm">Almanca Seviyesi</p>
@@ -354,13 +320,78 @@ export default function PersonalInfoPage() {
             </div>
             
             <div>
-              <p className="text-gray-500 dark:text-gray-400 text-sm">Dil Kursu Kaydı</p>
-              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_dil_kursu_kayt || "-"}</p>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Dil Öğrenim Durumu</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_dil_renim_durumu || "-"}</p>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Vize Bilgileri */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mt-6"
+        >
+          <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-3">Vize Bilgileri</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Konsolosluk</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_konsolosluk_1 || "-"}</p>
             </div>
             
             <div>
-              <p className="text-gray-500 dark:text-gray-400 text-sm">Dil Öğrenim Durumu</p>
-              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_dil_renim_durumu || "-"}</p>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Vize Başvuru Tarihi</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_vize_bavuru_tarihi_1 || "-"}</p>
+            </div>
+            
+            <div>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Vize Randevu Tarihi</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_vize_randevu_tarihi || "-"}</p>
+            </div>
+            
+            <div>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Vize Randevu Belgesi</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_vize_randevu_belgesi || "-"}</p>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Finansal Bilgiler */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mt-6"
+        >
+          <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-3">Finansal Bilgiler</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Finansal Kanıt</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_finansal_kant || "-"}</p>
+            </div>
+            
+            <div>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Maddi Kanıt Durumu</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_maddi_kant_durumu || "-"}</p>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Sınav Bilgileri */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mt-6"
+        >
+          <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-3">Sınav Bilgileri</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Sınav Girişi</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_sym_snav_giri ? "Evet" : "Hayır"}</p>
+            </div>
+            
+            <div>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Sınav Sonuç Tarihi</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{studentData?.x_studio_sym_yerlestirme_sonuc_tarihi || "-"}</p>
             </div>
           </div>
         </motion.div>

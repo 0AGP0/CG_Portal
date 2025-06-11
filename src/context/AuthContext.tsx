@@ -20,6 +20,8 @@ export type AuthContextType = {
   logout: () => Promise<void>;
   isAdvisor: () => boolean;
   isAdmin: () => boolean;
+  startProcess: () => Promise<void>;
+  resetProcess: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -39,8 +41,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           .split('; ')
           .find(row => row.startsWith('user='))
           ?.split('=')[1];
+        const tokenCookie = document.cookie
+          .split('; ')
+          .find(row => row.startsWith('token='))
+          ?.split('=')[1];
 
-        if (userCookie) {
+        if (userCookie && tokenCookie) {
           try {
             const decodedCookie = decodeURIComponent(userCookie);
             const userData = JSON.parse(decodedCookie);
@@ -52,6 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${tokenCookie}`
                 },
                 body: JSON.stringify({ email: userData.email, role: userData.role }),
                 credentials: 'include'
@@ -176,6 +183,58 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return user?.role === 'admin';
   };
 
+  const startProcess = async () => {
+    if (!user) return;
+    
+    try {
+      const response = await fetch('/api/student/start-process', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-email': user.email
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Süreç başlatılamadı');
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        setUser(prev => prev ? { ...prev, processStarted: true } : null);
+      }
+    } catch (error) {
+      logger.error('Süreç başlatma hatası:', error);
+      throw error;
+    }
+  };
+
+  const resetProcess = async () => {
+    if (!user) return;
+    
+    try {
+      const response = await fetch('/api/student/reset-process', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-email': user.email
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Süreç sıfırlanamadı');
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        setUser(prev => prev ? { ...prev, processStarted: false } : null);
+      }
+    } catch (error) {
+      logger.error('Süreç sıfırlama hatası:', error);
+      throw error;
+    }
+  };
+
   const value = {
     user,
     isAuthenticated,
@@ -184,7 +243,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     login,
     logout,
     isAdvisor,
-    isAdmin
+    isAdmin,
+    startProcess,
+    resetProcess
   };
 
   return (

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { promises as fs } from 'fs';
-import path from 'path';
+import { pool } from '@/lib/db';
+import { logger } from '@/utils/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,61 +15,77 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // customers.json dosyasını oku
-    const filePath = path.join(process.cwd(), 'data', 'customers.json');
-    const fileContent = await fs.readFile(filePath, 'utf8');
-    const data = JSON.parse(fileContent);
-    
-    // Öğrenciyi bul
-    const studentIndex = data.customers.findIndex((s: any) => s.email === body.studentId);
-    if (studentIndex === -1) {
-      return NextResponse.json(
-        { error: 'Öğrenci bulunamadı' },
-        { status: 404 }
-      );
-    }
-    
-    // Danışman bilgilerini al (gerçek uygulamada danışman veritabanından alınır)
-    const advisor = {
-      id: body.advisorId,
-      name: "Emre Danışman", // Gerçek uygulamada danışman veritabanından alınır
-      email: "emre.danisman@example.com" // Gerçek uygulamada danışman veritabanından alınır
-    };
-    
-    // Öğrenci bilgilerini güncelle
-    const updatedStudent = {
-      ...data.customers[studentIndex],
-      advisorId: advisor.id,
-      advisorName: advisor.name,
-      advisorEmail: advisor.email,
-      stage: 'Süreç Başlatıldı',
-      processStarted: true,
-      processStartDate: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-    
-    // Güncellenmiş öğrenciyi kaydet
-    data.customers[studentIndex] = updatedStudent;
-    await fs.writeFile(filePath, JSON.stringify(data, null, 2));
-    
-    // Başarılı yanıt döndür
-    return NextResponse.json({
-      success: true,
-      message: 'Danışman başarıyla atandı',
-      student: {
-        id: updatedStudent.email,
-        email: updatedStudent.email,
-        name: updatedStudent.name,
-        advisor: updatedStudent.advisorName,
-        advisorId: updatedStudent.advisorId,
-        status: updatedStudent.stage,
-        processStarted: updatedStudent.processStarted,
-        updatedAt: updatedStudent.updatedAt
+    const client = await pool.connect();
+    try {
+      // Öğrenciyi ve danışmanı kontrol et
+      const checkQuery = `
+        SELECT 
+          s.id as student_id,
+          s.email as student_email,
+          s.name as student_name,
+          a.id as advisor_id,
+          a.email as advisor_email,
+          a.name as advisor_name
+        FROM students s
+        CROSS JOIN advisors a
+        WHERE s.email = $1 AND a.id = $2
+      `;
+      
+      const checkResult = await client.query(checkQuery, [body.studentId, body.advisorId]);
+      
+      if (checkResult.rows.length === 0) {
+        return NextResponse.json(
+          { error: 'Öğrenci veya danışman bulunamadı' },
+          { status: 404 }
+        );
       }
-    });
-    
+      
+      const { student_id, student_email, student_name, advisor_id, advisor_email, advisor_name } = checkResult.rows[0];
+      
+      // Öğrencinin danışmanını güncelle
+      const updateQuery = `
+        UPDATE students
+        SET 
+          advisor_email = $1,
+          advisor_id = $2,
+          stage = 'Hazırlık Aşaması',
+          process_started = true,
+          process_start_date = NOW(),
+          updated_at = NOW()
+        WHERE email = $3
+        RETURNING *
+      `;
+      
+      const updateResult = await client.query(updateQuery, [
+        advisor_email,
+        advisor_id,
+        student_email
+      ]);
+      
+      const updatedStudent = updateResult.rows[0];
+      
+      // Başarılı yanıt döndür
+      return NextResponse.json({
+        success: true,
+        message: 'Danışman başarıyla atandı',
+        student: {
+          id: updatedStudent.id,
+          email: updatedStudent.email,
+          name: updatedStudent.name,
+          advisor: advisor_name,
+          advisorId: advisor_id,
+          advisorEmail: advisor_email,
+          status: updatedStudent.stage,
+          processStarted: updatedStudent.process_started,
+          updatedAt: updatedStudent.updated_at
+        }
+      });
+      
+    } finally {
+      client.release();
+    }
   } catch (error) {
-    console.error('Danışman atama hatası:', error);
+    logger.error('Danışman atama hatası:', error);
     return NextResponse.json(
       { error: 'Danışman atama işlemi sırasında bir hata oluştu' },
       { status: 500 }

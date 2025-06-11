@@ -82,11 +82,77 @@ const ProtectedPanel = ({ children, panelName }: { children: React.ReactNode, pa
   return <>{children}</>;
 };
 
+// Aşama tipleri
+type StageKey = 
+  | 'Hazırlık Aşaması'
+  | 'Çeviri Hazır'
+  | 'Üniversite Başvurusu Yapıldı'
+  | 'Kabul Geldi'
+  | 'Vize Başvuru Aşaması'
+  | 'Süreç Aşaması'
+  | 'Vize Randevusu Atandı'
+  | 'Vize Bekleme Aşaması'
+  | 'Almanya Aşaması'
+  | 'Süreç Tamamlandı';
+
+interface StageDescription {
+  description: string;
+  documents?: string[];
+}
+
+// Aşama açıklamaları
+const stageDescriptions: Record<StageKey, StageDescription> = {
+  'Hazırlık Aşaması': {
+    description: 'Bu aşamada başvuru için gerekli belgelerinizi hazırlamanız gerekiyor. Aşağıdaki belgeleri yüklemeniz gerekecek:',
+    documents: [
+      'Lise diploması',
+      'Transkript',
+      'Pasaport',
+      'CV',
+      'Motivasyon mektubu'
+    ]
+  },
+  'Çeviri Hazır': {
+    description: 'Belgeleriniz çeviri için hazırlanıyor. Bu süreçte herhangi bir belge yüklemenize gerek yok.'
+  },
+  'Üniversite Başvurusu Yapıldı': {
+    description: 'Üniversite başvurularınız yapılıyor. Başvuru sonuçlarını beklerken herhangi bir belge yüklemenize gerek yok.'
+  },
+  'Kabul Geldi': {
+    description: 'Üniversiteden kabul mektubunuz geldi. Vize başvurusu için hazırlıklara başlayacağız.'
+  },
+  'Vize Başvuru Aşaması': {
+    description: 'Vize başvurusu için gerekli belgeleri hazırlamanız gerekiyor. Aşağıdaki belgeleri yüklemeniz gerekecek:',
+    documents: [
+      'Kabul mektubu',
+      'Finansal belgeler',
+      'Sağlık sigortası',
+      'Konaklama belgesi'
+    ]
+  },
+  'Süreç Aşaması': {
+    description: 'Vize başvuru süreciniz devam ediyor. Konsolosluk randevusu için hazırlık yapılıyor.'
+  },
+  'Vize Randevusu Atandı': {
+    description: 'Vize randevunuz atandı. Randevu tarihinize kadar gerekli belgelerinizi hazır tutun.'
+  },
+  'Vize Bekleme Aşaması': {
+    description: 'Vize başvurunuz yapıldı. Konsolosluktan sonuç bekleniyor.'
+  },
+  'Almanya Aşaması': {
+    description: 'Vizeniz onaylandı. Almanya\'ya gidiş planlaması yapılıyor.'
+  },
+  'Süreç Tamamlandı': {
+    description: 'Tebrikler! Tüm süreç başarıyla tamamlandı.'
+  }
+};
+
 export default function ProcessPanel() {
   const { user } = useAuth();
   const [studentData, setStudentData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [expandedStage, setExpandedStage] = useState<number | null>(3);
+  const [expandedStage, setExpandedStage] = useState(1);
+  const [normalizedStage, setNormalizedStage] = useState<StageKey>('Hazırlık Aşaması');
 
   // Öğrenci verilerini API'den çek
   useEffect(() => {
@@ -106,27 +172,45 @@ export default function ProcessPanel() {
             setStudentData(data.student);
             
             // Duruma göre aşama belirle
-            const stageMapping: {[key: string]: number} = {
+            const stageMapping: Record<string, number> = {
               'Hazırlık Aşaması': 1,
-              'Ceviri Hazir': 2,
-              'Ödeme Yapilacaklar': 3,
-              'Üniversite Başvurusu Yapılanlar': 4,
-              'Kabul Gelenler': 5,
-              'Vize Başvuru Aşaması': 6,
-              'Süreç Aşaması': 7,
-              'Vize Randevusu Atananlar': 8,
-              'Vize Bekleme Aşaması': 9,
-              'Almanya Aşaması': 10,
-              'BİTEN': 11
+              'Çeviri Hazır': 2,
+              'Üniversite Başvurusu Yapıldı': 3,
+              'Kabul Geldi': 4,
+              'Vize Başvuru Aşaması': 5,
+              'Süreç Aşaması': 6,
+              'Vize Randevusu Atandı': 7,
+              'Vize Bekleme Aşaması': 8,
+              'Almanya Aşaması': 9,
+              'Süreç Tamamlandı': 10
             };
             
-            const stage = data.student?.systemDetails?.stage;
-            if (stage === 'BİTEN') {
-              setExpandedStage(11); // Son aşama
-            } else {
-              // Mevcut aşamayı bul veya varsayılan olarak 3'ü kullan
-              setExpandedStage(stageMapping[stage] || 3);
-            }
+            // Öğrencinin mevcut aşamasını al ve normalize et
+            const stage = data.student?.stage;
+            let newNormalizedStage: StageKey = 'Hazırlık Aşaması';
+            
+            // Eski aşama isimlerini yeni isimlere dönüştür
+            if (stage === 'Ceviri Hazir') newNormalizedStage = 'Çeviri Hazır';
+            else if (stage === 'Üniversite Başvurusu Yapılanlar') newNormalizedStage = 'Üniversite Başvurusu Yapıldı';
+            else if (stage === 'Kabul Gelenler') newNormalizedStage = 'Kabul Geldi';
+            else if (stage === 'Vize Randevusu Atananlar') newNormalizedStage = 'Vize Randevusu Atandı';
+            else if (stage === 'BİTEN') newNormalizedStage = 'Süreç Tamamlandı';
+            else if (stage in stageMapping) newNormalizedStage = stage as StageKey;
+            
+            setNormalizedStage(newNormalizedStage);
+            
+            // Aşama numarasını belirle
+            const stageNumber = stageMapping[newNormalizedStage] || 1;
+            setExpandedStage(stageNumber);
+            
+            // Debug için log
+            console.log('Öğrenci Aşama Bilgisi:', {
+              originalStage: stage,
+              normalizedStage: newNormalizedStage,
+              stageNumber,
+              studentData: data.student,
+              stageDescription: stageDescriptions[newNormalizedStage]
+            });
           }
         }
       } catch (error) {
@@ -146,101 +230,93 @@ export default function ProcessPanel() {
       { 
         id: 1, 
         name: "Hazırlık Aşaması", 
-        status: "completed", 
-        date: "10 Ocak 2023",
-        description: "Başvuru sürecinizin hazırlık aşaması tamamlandı.",
+        status: "pending", 
+        date: "Başlangıç",
+        description: "Başvuru sürecinizin hazırlık aşaması başladı.",
         icon: "📝"
       },
       { 
         id: 2, 
         name: "Çeviri Hazır", 
-        status: "completed", 
-        date: "25 Şubat 2023",
-        description: "Belgelerinizin çevirileri tamamlandı.",
+        status: "pending", 
+        date: "Bekliyor",
+        description: "Belgelerinizin çevirileri yapılacak.",
         icon: "📄"
       },
       { 
         id: 3, 
-        name: "Ödeme Yapılacaklar", 
-        status: "in-progress", 
-        date: "15 Mart 2023",
-        description: "Ödeme işlemleri devam ediyor.",
-        icon: "💰"
-      },
-      { 
-        id: 4, 
-        name: "Üniversite Başvurusu Yapılanlar", 
+        name: "Üniversite Başvurusu Yapıldı", 
         status: "pending", 
-        date: "Tahmini: Nisan 2023",
+        date: "Bekliyor",
         description: "Üniversite başvurularınız yapılacak.",
         icon: "🏛️"
       },
       { 
-        id: 5, 
-        name: "Kabul Gelenler", 
+        id: 4, 
+        name: "Kabul Geldi", 
         status: "pending", 
-        date: "Tahmini: Mayıs 2023",
+        date: "Bekliyor",
         description: "Üniversiteden kabul mektubu bekleniyor.",
         icon: "📨"
       },
       { 
-        id: 6, 
+        id: 5, 
         name: "Vize Başvuru Aşaması", 
         status: "pending", 
-        date: "Tahmini: Haziran 2023",
+        date: "Bekliyor",
         description: "Vize başvurusu için hazırlık yapılacak.",
         icon: "📋"
       },
       { 
-        id: 7, 
+        id: 6, 
         name: "Süreç Aşaması", 
         status: "pending", 
-        date: "Tahmini: Temmuz 2023",
-        description: "Vize süreciniz devam ediyor.",
+        date: "Bekliyor",
+        description: "Vize süreciniz devam edecek.",
         icon: "⏳"
       },
       { 
-        id: 8, 
-        name: "Vize Randevusu Atananlar", 
+        id: 7, 
+        name: "Vize Randevusu Atandı", 
         status: "pending", 
-        date: "Tahmini: Ağustos 2023",
+        date: "Bekliyor",
         description: "Vize randevunuz konsolosluktan alınacak.",
         icon: "🗓️"
       },
       { 
-        id: 9, 
+        id: 8, 
         name: "Vize Bekleme Aşaması", 
         status: "pending", 
-        date: "Tahmini: Eylül 2023",
-        description: "Vize başvurunuz yapıldı, sonuç bekleniyor.",
+        date: "Bekliyor",
+        description: "Vize başvurunuz yapılacak, sonuç bekleniyor.",
         icon: "⌛"
       },
       { 
-        id: 10, 
+        id: 9, 
         name: "Almanya Aşaması", 
         status: "pending", 
-        date: "Tahmini: Ekim 2023",
+        date: "Bekliyor",
         description: "Almanya'ya gidiş planlaması yapılacak.",
         icon: "✈️"
       },
       { 
-        id: 11, 
-        name: "BİTEN", 
+        id: 10, 
+        name: "Süreç Tamamlandı", 
         status: "pending", 
-        date: "Tahmini: Kasım 2023",
-        description: "Süreç tamamlandı.",
+        date: "Bekliyor",
+        description: "Süreç tamamlanacak.",
         icon: "🎓"
       }
     ];
     
     // Öğrenci verisi yoksa varsayılan aşamaları döndür
-    if (!studentData || !studentData.systemDetails) {
+    if (!studentData || !studentData.stage) {
       return {
-        currentStage: 3,
-        totalStages: 11,
-        startDate: "10 Ocak 2023",
-        estimatedCompletionDate: "15 Kasım 2023",
-        progress: 27, // yüzde (3/11*100)
+        currentStage: 1,
+        totalStages: 10,
+        startDate: "Başlangıç",
+        estimatedCompletionDate: "Tahmin edilemiyor",
+        progress: 0,
         stages: defaultStages
       };
     }
@@ -249,71 +325,84 @@ export default function ProcessPanel() {
     const updatedStages = [...defaultStages];
     
     // Gelen aşama durumuna göre ilerleme durumunu güncelle
-    const stage = studentData.systemDetails.stage;
-    let currentStage = 3; // Varsayılan aşama
-    let progress = 42;    // Varsayılan ilerleme
+    const stage = studentData.stage;
+    let normalizedStage = stage;
+    
+    // Eski aşama isimlerini yeni isimlere dönüştür
+    if (stage === 'Ceviri Hazir') normalizedStage = 'Çeviri Hazır';
+    if (stage === 'Üniversite Başvurusu Yapılanlar') normalizedStage = 'Üniversite Başvurusu Yapıldı';
+    if (stage === 'Kabul Gelenler') normalizedStage = 'Kabul Geldi';
+    if (stage === 'Vize Randevusu Atananlar') normalizedStage = 'Vize Randevusu Atandı';
+    if (stage === 'BİTEN') normalizedStage = 'Süreç Tamamlandı';
     
     // Aşama durumlarını belirleme
     const stageMapping: {[key: string]: number} = {
       'Hazırlık Aşaması': 1,
-      'Ceviri Hazir': 2,
-      'Ödeme Yapilacaklar': 3,
-      'Üniversite Başvurusu Yapılanlar': 4,
-      'Kabul Gelenler': 5,
-      'Vize Başvuru Aşaması': 6,
-      'Süreç Aşaması': 7,
-      'Vize Randevusu Atananlar': 8,
-      'Vize Bekleme Aşaması': 9,
-      'Almanya Aşaması': 10,
-      'BİTEN': 11
+      'Çeviri Hazır': 2,
+      'Üniversite Başvurusu Yapıldı': 3,
+      'Kabul Geldi': 4,
+      'Vize Başvuru Aşaması': 5,
+      'Süreç Aşaması': 6,
+      'Vize Randevusu Atandı': 7,
+      'Vize Bekleme Aşaması': 8,
+      'Almanya Aşaması': 9,
+      'Süreç Tamamlandı': 10
     };
     
     // Öğrencinin mevcut aşamasını al
-    const currentStageNumber = stageMapping[stage] || 3; // Varsayılan olarak 3. aşama
+    const currentStageNumber = stageMapping[normalizedStage] || 1;
+    let currentStage = currentStageNumber;
+    let progress = Math.round((currentStageNumber / 10) * 100);
     
-    if (stage === 'BİTEN') {
+    // Debug için log
+    console.log('Süreç Durumu Hesaplama:', {
+      originalStage: stage,
+      normalizedStage,
+      currentStageNumber,
+      progress
+    });
+    
+    if (normalizedStage === 'Süreç Tamamlandı') {
       // Süreç tamamlandıysa tüm aşamaları tamamlandı olarak işaretle
-      currentStage = 11;
+      currentStage = 10;
       progress = 100;
       
       updatedStages.forEach((s, index) => {
         updatedStages[index].status = "completed";
         
         // Tamamlanma tarihini güncelle
-        if (index === 10) { // Son aşama için
-          updatedStages[index].date = studentData.systemDetails.lastUpdateTime || "Tamamlandı";
+        if (index === 9) { // Son aşama için
+          updatedStages[index].date = studentData.updated_at || "Tamamlandı";
           updatedStages[index].description = "Süreciniz başarıyla tamamlandı. Tebrikler!";
         }
       });
     } else {
       // Mevcut aşamaya kadar olan tüm aşamaları tamamlanmış olarak işaretle
-      currentStage = currentStageNumber;
-      progress = Math.round((currentStageNumber / 11) * 100);
-      
-      // Önceki aşamaları tamamlanmış olarak işaretle
       for (let i = 0; i < currentStageNumber - 1; i++) {
         if (i < updatedStages.length) {
           updatedStages[i].status = "completed";
+          updatedStages[i].date = "Tamamlandı";
         }
       }
       
       // Mevcut aşamayı "in-progress" olarak işaretle
       if (currentStageNumber - 1 < updatedStages.length) {
         updatedStages[currentStageNumber - 1].status = "in-progress";
+        updatedStages[currentStageNumber - 1].date = "Devam Ediyor";
         
-        // Vize randevusu bilgisini ekle (eğer 8. aşamadaysa)
-        if (currentStageNumber === 8 && studentData.visa && studentData.visa.appointmentDate) {
-          updatedStages[7].date = `Randevu: ${studentData.visa.appointmentDate}`;
-          updatedStages[7].description = `Vize randevunuz ${studentData.visa.appointmentDate} tarihine alındı. ${studentData.visa.consulate ? studentData.visa.consulate+' konsolosluğunda' : 'Konsoloslukta'} olacak.`;
+        // Vize randevusu bilgisini ekle (eğer 7. aşamadaysa)
+        if (currentStageNumber === 7 && studentData.visa_appointment_date) {
+          updatedStages[6].date = `Randevu: ${studentData.visa_appointment_date}`;
+          updatedStages[6].description = `Vize randevunuz ${studentData.visa_appointment_date} tarihine alındı. ${studentData.visa_consulate ? studentData.visa_consulate+' konsolosluğunda' : 'Konsoloslukta'} olacak.`;
         }
       }
     }
     
     return {
       currentStage,
-      totalStages: 11,
-      startDate: studentData.systemDetails.lastUpdated || "10 Ocak 2023",
-      estimatedCompletionDate: "15 Kasım 2023",
+      totalStages: 10,
+      startDate: studentData.created_at || "Başlangıç",
+      estimatedCompletionDate: "Tahmin edilemiyor",
       progress, 
       stages: updatedStages
     };
@@ -426,49 +515,47 @@ export default function ProcessPanel() {
             </div>
           </div>
 
-          {/* Yapılacaklar Listesi */}
-          <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-6 rounded-lg shadow-sm border border-gray-100/60 dark:border-gray-700/30">
-            <h2 className="text-xl font-semibold text-[#002757] mb-4">Yapılacaklar</h2>
+          {/* Yapılacaklar Alanı */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mt-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              Yapılacaklar
+            </h3>
             
-            <div className="space-y-3">
-              {studentData?.systemDetails?.stage === 'BİTEN' ? (
-                <div className="flex items-center p-3 border border-green-200/70 bg-green-50/70 dark:bg-green-900/20 dark:border-green-700/30 rounded-md">
-                  <span className="text-green-500 mr-3 text-lg">✅</span>
-                  <span className="text-default">Tüm işlemleriniz tamamlandı! Tebrikler.</span>
+            {studentData?.stage && (
+              <div className="space-y-4">
+                {/* Aşama Açıklaması */}
+                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+                  <p className="text-sm text-blue-800 dark:text-blue-200">
+                    {stageDescriptions[normalizedStage]?.description || 'Bu aşamada yapmanız gereken işlemler bulunmuyor.'}
+                  </p>
                 </div>
-              ) : (
-                <>
-                  <div className="flex items-center p-3 border border-yellow-200/70 bg-yellow-50/70 dark:bg-yellow-900/20 dark:border-yellow-700/30 rounded-md">
-                    <span className="text-yellow-500 mr-3 text-lg">⚠️</span>
-                    <span className="text-default">Eksik belgeleri 1 hafta içinde yükleyin</span>
+
+                {/* Belge Yükleme Bildirimi - Sadece Hazırlık ve Vize Başvuru aşamalarında göster */}
+                {(normalizedStage === 'Hazırlık Aşaması' || normalizedStage === 'Vize Başvuru Aşaması') && 
+                 stageDescriptions[normalizedStage]?.documents && (
+                  <div className="mt-4">
+                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Yüklemeniz Gereken Belgeler:
+                    </h4>
+                    <ul className="list-disc list-inside space-y-1">
+                      {stageDescriptions[normalizedStage].documents?.map((doc: string, index: number) => (
+                        <li key={index} className="text-sm text-gray-600 dark:text-gray-400">
+                          {doc}
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="mt-4">
+                      <Link
+                        href="/dashboard/documents"
+                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                      >
+                        Belgeleri Yükle
+                      </Link>
+                    </div>
                   </div>
-                  
-                  {studentData?.visa?.appointmentDate ? (
-                    <div className="flex items-center p-3 border border-green-200/70 bg-green-50/70 dark:bg-green-900/20 dark:border-green-700/30 rounded-md">
-                      <span className="text-green-500 mr-3 text-lg">🗓️</span>
-                      <span className="text-default">
-                        Vize randevunuz {studentData.visa.appointmentDate} tarihinde 
-                        {studentData.visa.consulate && ` ${studentData.visa.consulate} konsolosluğunda`}.
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center p-3 border border-blue-200/70 bg-blue-50/70 dark:bg-blue-900/20 dark:border-blue-700/30 rounded-md">
-                      <span className="text-blue-500 mr-3 text-lg">📝</span>
-                      <span className="text-default">Vize randevusu için danışmanınızla iletişime geçin</span>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-            
-            <div className="mt-6">
-              <Link 
-                href="/dashboard/messages" 
-                className="btn-primary inline-block w-full text-center"
-              >
-                Danışmanla İletişime Geç
-              </Link>
-            </div>
+                )}
+              </div>
+            )}
           </div>
         </motion.div>
       </ProtectedPanel>

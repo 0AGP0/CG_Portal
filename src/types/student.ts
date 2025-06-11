@@ -1,84 +1,110 @@
 export interface Student {
-  id?: string;
   email: string;
-  name?: string;
-  stage?: string;
-  processStartDate?: string;
-  
-  // Adres ve iletişim bilgileri
+  name: string;
+  phone: string | null;
+  stage: string;
+  updatedAt: string;
+  createdAt: string;
+  processStarted: boolean;
+  advisorId: string;
+  advisorName: string;
+  advisorEmail: string;
+  salesId: string;
+  salesName?: string;
+  salesEmail?: string;
+  documents: any[];
+  processStartDate: string;
+  lead_id?: number;
   contact_address?: string;
-  phone?: string;
-  age?: string | number;
-  
-  // Kişisel bilgiler
+  age?: number;
+  passport_number?: string | boolean;
+  passport_type?: string;
+  passport_issue_date?: string | boolean;
+  passport_expiry_date?: string | boolean;
+  issuing_authority?: string | boolean;
+  pnr_number?: string | boolean;
+  visa_application_date?: string | boolean;
+  visa_appointment_date?: string | boolean;
+  visa_document?: boolean;
+  consulate?: string;
+  has_been_to_germany?: boolean;
+  high_school_name?: string | boolean;
+  high_school_type?: string | boolean;
+  high_school_city?: string | boolean;
+  high_school_start_date?: string | boolean;
+  high_school_graduation_date?: string | boolean;
+  university_name?: string | boolean;
+  university_department?: string | boolean;
+  university_start_date?: string | boolean;
+  university_end_date?: string | boolean;
+  graduation_status?: string | boolean;
+  graduation_year?: string | boolean;
+  university_preferences?: string | boolean;
+  german_department_preference?: string | boolean;
+  language_level?: string;
+  language_certificate?: string;
+  language_course_registration?: boolean;
+  language_learning_status?: boolean;
   birth_date?: string;
   birth_place?: string;
   marital_status?: string;
-  
-  // Eğitim bilgileri
-  high_school_name?: string;
-  high_school_type?: string;
-  high_school_city?: string;
-  high_school_start_date?: string;
-  high_school_graduation_date?: string;
-  university_name?: string;
-  university_department?: string;
-  university_start_date?: string;
-  university_end_date?: string;
-  graduation_status?: string;
-  graduation_year?: string;
-  university_preferences?: string;
-  german_department_preference?: string;
-  
-  // Dil bilgileri
-  language_level?: string;
-  language_certificate?: string;
-  language_course_registration?: string;
-  language_learning_status?: string;
-  
-  // Vize/Pasaport bilgileri
-  passport_number?: string;
-  passport_type?: string;
-  passport_issue_date?: string;
-  passport_expiry_date?: string;
-  issuing_authority?: string;
-  pnr_number?: string;
-  visa_application_date?: string;
-  visa_appointment_date?: string;
-  visa_document?: string;
-  consulate?: string;
-  has_been_to_germany?: boolean;
-  
-  // Aile bilgileri
+  financial_proof?: string;
+  financial_proof_status?: boolean;
+  exam_entry?: boolean;
+  exam_result_date?: string;
   mother_name?: string;
   mother_surname?: string;
   mother_birth_date?: string;
   mother_birth_place?: string;
   mother_residence?: string;
-  mother_phone?: string;
-  
+  mother_phone?: string | boolean;
   father_name?: string;
   father_surname?: string;
   father_birth_date?: string;
   father_birth_place?: string;
   father_residence?: string;
-  father_phone?: string;
-  
-  // Finansal bilgiler
-  financial_proof?: string;
-  financial_proof_status?: string;
-  
-  // Sınav bilgileri
-  exam_entry?: string;
-  exam_result_date?: string;
-  
-  // Dökümanlar
-  documents?: Array<{
-    documentType: string;
-    documentUrl: string;
-    documentName: string;
-    updatedAt: string;
-  }>;
-  
-  updatedAt?: string;
+  father_phone?: string | boolean;
+  webhook_updated?: boolean;
+  webhook_update_timestamp?: string;
+  visa_consulate?: string;
+  unreadMessages?: number;
+  university?: string;
+  program?: string;
+  x_studio_doum_tarihi?: string;
+  x_studio_doum_yeri?: string;
+  x_studio_ya?: number;
+  x_studio_medeni_durum_1?: string;
+  x_studio_finansal_kant?: string;
+  x_studio_pasaport_numaras?: string;
+  x_studio_pasaport_tr?: string;
+  x_studio_verili_tarihi?: string;
+  x_studio_geerlilik_tarihi?: string;
+  x_studio_veren_makam?: string;
+  x_studio_pnr_numaras?: string;
+  x_studio_anne_ad?: string;
+  x_studio_anne_soyad?: string;
+  x_studio_anne_doum_tarihi?: string;
+  x_studio_anne_doum_yeri?: string;
+  x_studio_anne_ikamet_sehrilke?: string;
+  x_studio_baba_ad?: string;
+  x_studio_baba_soyad?: string;
+  x_studio_baba_doum_tarihi?: string;
+  x_studio_baba_doum_yeri?: string;
+  x_studio_baba_ikamet_ehrilkesi?: string;
+  x_studio_lise_ad?: string;
+  x_studio_lise_tr?: string;
+  x_studio_lise_ehir?: string;
+  x_studio_lise_biti_tarihi?: string;
+  x_studio_lise_balang_tarihi_1?: string;
+  x_studio_niversite_ad?: string;
+  x_studio_niversite_blm_ad?: string;
+  x_studio_mezuniyet_durumu?: string;
+  x_studio_mezuniyet_yl?: string;
+  x_studio_almanca_seviyesi_1?: string;
+  x_studio_almanca_sertifikas?: string;
+  x_studio_sym_snav_giri?: boolean;
+  x_studio_sym_yerlestirme_sonuc_tarihi?: string;
+  x_studio_vize_randevu_tarihi?: string;
+  x_studio_vize_bavuru_tarihi_1?: string;
+  x_studio_konsolosluk_1?: string;
 } 

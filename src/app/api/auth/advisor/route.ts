@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
+import { getAdvisorByEmail } from '@/lib/db';
 import { logger } from '@/utils/logger';
+import { generateToken } from '@/utils/security';
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,36 +19,8 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // advisors.json dosyasını oku
-    const filePath = path.join(process.cwd(), 'data', 'advisors.json');
-    logger.info('Danışman veritabanı dosyası:', filePath);
-    
-    if (!fs.existsSync(filePath)) {
-      logger.error('Danışman veritabanı bulunamadı:', filePath);
-      return NextResponse.json(
-        { error: 'Danışman veritabanı bulunamadı' },
-        { status: 500 }
-      );
-    }
-    
-    // Dosyayı oku
-    let data;
-    try {
-      const fileContent = fs.readFileSync(filePath, 'utf-8');
-      data = JSON.parse(fileContent);
-      logger.info('Veritabanı dosyası başarıyla okundu');
-    } catch (error) {
-      logger.error('Veritabanı okuma hatası:', error);
-      return NextResponse.json(
-        { error: 'Veritabanı okunamadı' },
-        { status: 500 }
-      );
-    }
-    
-    // Danışmanı bul
-    const advisor = data.advisors?.find((a: any) => 
-      a.email.toLowerCase() === body.email.toLowerCase()
-    );
+    // Danışmanı veritabanından getir
+    const advisor = await getAdvisorByEmail(body.email);
     
     logger.info('Danışman arama sonucu:', advisor ? {
       id: advisor.id,
@@ -63,33 +35,42 @@ export async function POST(request: NextRequest) {
         { status: 401 }
       );
     }
-    
-    // Başarılı giriş
-    logger.info('Danışman girişi başarılı:', {
-      id: advisor.id,
+
+    // Token oluştur
+    const token = generateToken({
+      id: advisor.id.toString(),
       email: advisor.email,
-      name: advisor.name
+      role: 'advisor'
     });
-    
-    return NextResponse.json(
-      { 
-        success: true, 
-        message: 'Giriş başarılı',
-        user: {
-          id: advisor.id,
-          name: advisor.name,
-          email: advisor.email,
-          role: 'advisor',
-          studentIds: advisor.studentIds || []
-        }
-      }, 
-      { status: 200 }
-    );
+
+    if (!token) {
+      logger.error('Token oluşturulamadı');
+      return NextResponse.json(
+        { error: 'Oturum başlatılamadı' },
+        { status: 500 }
+      );
+    }
+
+    // Başarılı yanıt
+    const response = {
+      success: true,
+      token,
+      user: {
+        id: advisor.id,
+        email: advisor.email,
+        name: advisor.name,
+        role: 'advisor',
+        studentIds: advisor.studentIds || []
+      }
+    };
+
+    logger.info('Danışman girişi başarılı:', { email: advisor.email });
+    return NextResponse.json(response);
     
   } catch (error) {
     logger.error('Danışman girişi hatası:', error);
     return NextResponse.json(
-      { error: 'Giriş sırasında bir hata oluştu' }, 
+      { error: 'Danışman girişi yapılırken bir hata oluştu' },
       { status: 500 }
     );
   }

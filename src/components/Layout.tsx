@@ -381,8 +381,7 @@ const Sidebar = () => {
 
   // Admin için menü öğeleri
   const adminMenuItems = [
-    { path: '/admin', label: 'Genel Bakış', icon: <HomeIcon /> },
-    { path: '/admin/students', label: 'Öğrenciler', icon: <StudentsIcon /> },
+    { path: '/admin', label: 'Öğrenciler', icon: <StudentsIcon /> },
     { path: '/admin/advisors', label: 'Danışmanlar', icon: <AdvisorIcon /> },
   ];
   

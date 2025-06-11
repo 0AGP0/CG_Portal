@@ -334,7 +334,7 @@ export default function StudentsPage() {
             >
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
                 <div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100">Öğrenci Yönetimi</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100">Öğrenciler</h1>
                 <p className="mt-2 text-gray-600 dark:text-gray-400">Tüm öğrencilerin bilgilerini buradan yönetebilirsiniz.</p>
               </div>
 
