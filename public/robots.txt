@@ -1,0 +1,19 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Özel sayfaları engelle
+Disallow: /api/
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /advisor/
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password
+
+# Sitemap
+Sitemap: https://portal.campusglobal.com.tr/sitemap.xml
+
+# Crawl-delay
+Crawl-delay: 10 

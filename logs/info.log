@@ -1,0 +1,260 @@
+[2025-05-08T13:20:56.718Z] [INFO] Webhook alındı: odoo-webhook - Durum: success
+{}
+[2025-05-08T13:23:18.408Z] [INFO] Webhook alındı: odoo-webhook - Durum: success
+{}
+[2025-05-08T13:33:26.713Z] [INFO] Webhook alındı: odoo-webhook - Durum: success
+{}
+[2025-05-08T13:33:35.838Z] [INFO] Webhook alındı: odoo-webhook - Durum: success
+{}
+[2025-05-08T13:37:28.294Z] [INFO] Webhook alındı: odoo-webhook - Durum: success
+{
+  "email": "akifgiraypusat@gmail.com",
+  "name": "Akif",
+  "action": "Send Webhook Notification(#1962)"
+}
+[2025-05-20T10:57:34.674Z] [INFO] Mesaj gönderme isteği alındı
+[2025-05-20T10:57:34.677Z] [INFO] Mesaj istenen parametreler:
+{
+  "sender": "akifgiraypusat@gmail.com",
+  "receiver": "ahmet.satis@example.com",
+  "role": "student",
+  "subject": "Voip.ms",
+  "hasContent": true
+}
+[2025-05-20T10:57:34.679Z] [INFO] Öğrenci mesajı, alıcı kontrolü atlanıyor
+[2025-05-20T10:57:34.681Z] [INFO] Çalışma dizini (CWD):
+"D:\\CG Portal\\campus-global-portal"
+[2025-05-20T10:57:34.682Z] [INFO] Veri yolu (data):
+"D:\\CG Portal\\campus-global-portal\\data"
+[2025-05-20T10:57:34.684Z] [INFO] Yeni mesaj oluşturuluyor
+[2025-05-20T10:57:34.690Z] [INFO] Mesaj başarıyla oluşturuldu:
+"msg-1747738654687"
+[2025-05-20T11:10:21.041Z] [INFO] Mesaj gönderme isteği alındı
+[2025-05-20T11:10:21.044Z] [INFO] Mesaj istenen parametreler:
+{
+  "sender": "akifgiraypusat@gmail.com",
+  "receiver": "zeynep.satis@example.com",
+  "role": "student",
+  "subject": "ddddd",
+  "hasContent": true
+}
+[2025-05-20T11:10:21.046Z] [INFO] Öğrenci mesajı, alıcı kontrolü atlanıyor
+[2025-05-20T11:10:21.048Z] [INFO] Çalışma dizini (CWD):
+"D:\\CG Portal\\campus-global-portal"
+[2025-05-20T11:10:21.049Z] [INFO] Veri yolu (data):
+"D:\\CG Portal\\campus-global-portal\\data"
+[2025-05-20T11:10:21.051Z] [INFO] Yeni mesaj oluşturuluyor
+[2025-05-20T11:10:21.056Z] [INFO] Mesaj başarıyla oluşturuldu:
+"msg-1747739421053"
+[2025-05-20T11:10:44.096Z] [INFO] Mesaj gönderme isteği alındı
+[2025-05-20T11:10:44.099Z] [INFO] Mesaj istenen parametreler:
+{
+  "sender": "zeynep.satis@example.com",
+  "receiver": "akifgiraypusat@gmail.com",
+  "role": "sales",
+  "subject": "ddddd",
+  "hasContent": true
+}
+[2025-05-20T11:10:44.101Z] [INFO] Danışman/Satış ekibi mesajı, öğrenci kontrolü yapılıyor
+[2025-05-20T11:10:44.103Z] [INFO] Öğrenci doğrulandı:
+"akifgiraypusat@gmail.com"
+[2025-05-20T11:10:44.106Z] [INFO] Çalışma dizini (CWD):
+"D:\\CG Portal\\campus-global-portal"
+[2025-05-20T11:10:44.108Z] [INFO] Veri yolu (data):
+"D:\\CG Portal\\campus-global-portal\\data"
+[2025-05-20T11:10:44.110Z] [INFO] Yeni mesaj oluşturuluyor
+[2025-05-20T11:10:44.115Z] [INFO] Mesaj başarıyla oluşturuldu:
+"msg-1747739444112"
+[2025-05-20T11:11:29.414Z] [INFO] Mesaj gönderme isteği alındı
+[2025-05-20T11:11:29.416Z] [INFO] Mesaj istenen parametreler:
+{
+  "sender": "akifgiraypusat@gmail.com",
+  "receiver": "emre.danisman@example.com",
+  "role": "student",
+  "subject": "ddddd",
+  "hasContent": true
+}
+[2025-05-20T11:11:29.420Z] [INFO] Öğrenci mesajı, alıcı kontrolü atlanıyor
+[2025-05-20T11:11:29.422Z] [INFO] Çalışma dizini (CWD):
+"D:\\CG Portal\\campus-global-portal"
+[2025-05-20T11:11:29.424Z] [INFO] Veri yolu (data):
+"D:\\CG Portal\\campus-global-portal\\data"
+[2025-05-20T11:11:29.426Z] [INFO] Yeni mesaj oluşturuluyor
+[2025-05-20T11:11:29.432Z] [INFO] Mesaj başarıyla oluşturuldu:
+"msg-1747739489429"
+[2025-05-20T11:20:41.630Z] [INFO] Mesaj gönderme isteği alındı
+[2025-05-20T11:20:41.633Z] [INFO] Mesaj istenen parametreler:
+{
+  "sender": "emre.danisman@example.com",
+  "receiver": "akifgiraypusat@gmail.com",
+  "role": "advisor",
+  "subject": "ddddd",
+  "hasContent": true
+}
+[2025-05-20T11:20:41.635Z] [INFO] Danışman/Satış ekibi mesajı, öğrenci kontrolü yapılıyor
+[2025-05-20T11:20:41.638Z] [INFO] Öğrenci doğrulandı:
+"akifgiraypusat@gmail.com"
+[2025-05-20T11:20:41.640Z] [INFO] Çalışma dizini (CWD):
+"D:\\CG Portal\\campus-global-portal"
+[2025-05-20T11:20:41.641Z] [INFO] Veri yolu (data):
+"D:\\CG Portal\\campus-global-portal\\data"
+[2025-05-20T11:20:41.643Z] [INFO] Yeni mesaj oluşturuluyor
+[2025-05-20T11:20:41.649Z] [INFO] Mesaj başarıyla oluşturuldu:
+"msg-1747740041646"
+[2025-05-20T13:03:26.473Z] [INFO] Mesaj gönderme isteği alındı
+[2025-05-20T13:03:26.475Z] [INFO] Mesaj istenen parametreler:
+{
+  "sender": "emre.danisman@example.com",
+  "receiver": "aaa@gmail.com",
+  "role": "advisor",
+  "subject": "Yeni Konu",
+  "hasContent": true
+}
+[2025-05-20T13:03:26.476Z] [INFO] Danışman/Satış ekibi mesajı, öğrenci kontrolü yapılıyor
+[2025-05-20T13:03:26.477Z] [INFO] Öğrenci doğrulandı:
+"aaa@gmail.com"
+[2025-05-20T13:03:26.477Z] [INFO] Çalışma dizini (CWD):
+"D:\\CG Portal\\campus-global-portal"
+[2025-05-20T13:03:26.478Z] [INFO] Veri yolu (data):
+"D:\\CG Portal\\campus-global-portal\\data"
+[2025-05-20T13:03:26.478Z] [INFO] Yeni mesaj oluşturuluyor
+[2025-05-20T13:03:26.482Z] [INFO] Mesaj başarıyla oluşturuldu:
+"msg-1747746206480"
+[2025-05-20T13:03:29.773Z] [INFO] Mesaj gönderme isteği alındı
+[2025-05-20T13:03:29.774Z] [INFO] Mesaj istenen parametreler:
+{
+  "sender": "emre.danisman@example.com",
+  "receiver": "aaa@gmail.com",
+  "role": "advisor",
+  "subject": "Yeni Konu",
+  "hasContent": true
+}
+[2025-05-20T13:03:29.775Z] [INFO] Danışman/Satış ekibi mesajı, öğrenci kontrolü yapılıyor
+[2025-05-20T13:03:29.776Z] [INFO] Öğrenci doğrulandı:
+"aaa@gmail.com"
+[2025-05-20T13:03:29.777Z] [INFO] Çalışma dizini (CWD):
+"D:\\CG Portal\\campus-global-portal"
+[2025-05-20T13:03:29.777Z] [INFO] Veri yolu (data):
+"D:\\CG Portal\\campus-global-portal\\data"
+[2025-05-20T13:03:29.778Z] [INFO] Yeni mesaj oluşturuluyor
+[2025-05-20T13:03:29.781Z] [INFO] Mesaj başarıyla oluşturuldu:
+"msg-1747746209779"
+[2025-05-22T11:47:56.649Z] [INFO] Webhook alındı: odoo-webhook - Durum: success
+{
+  "email": "burcu.shut@gmail.com",
+  "name": "AKİLE BURCU ŞAT",
+  "action": "Send Webhook Notification(#1962)",
+  "stage": "BİTEN"
+}
+[2025-05-22T12:01:55.268Z] [INFO] Odoo'dan burcu.shut@gmail.com için veri çekiliyor
+[2025-05-22T12:53:29.677Z] [INFO] Webhook alındı: odoo-webhook - Durum: success
+{
+  "email": "burcu.shut@gmail.com",
+  "name": "AKİLE BURCU ŞAT",
+  "action": "Send Webhook Notification(#1962)",
+  "stage": "BİTEN"
+}
+[2025-05-22T13:04:43.576Z] [INFO] Webhook alındı: odoo-webhook - Durum: success
+{
+  "email": "akifgiraypusat@gmail.com",
+  "name": "Akif",
+  "action": "Send Webhook Notification(#1962)",
+  "stage": "BİTEN"
+}
+[2025-05-22T13:08:41.710Z] [INFO] Webhook alındı: odoo-webhook - Durum: success
+{
+  "email": "burcu.shut@gmail.com",
+  "name": "AKİLE BURCU ŞAT",
+  "action": "Send Webhook Notification(#1962)",
+  "stage": "BİTEN"
+}
+[2025-05-22T13:09:43.459Z] [INFO] Webhook alındı: odoo-webhook - Durum: success
+{
+  "email": "akifgiraypusat@gmail.com",
+  "name": "Akif",
+  "action": "Send Webhook Notification(#1962)",
+  "stage": "İşlemde"
+}
+[2025-05-22T13:10:44.626Z] [INFO] Webhook alındı: odoo-webhook - Durum: success
+{
+  "email": "burcu.shut@gmail.com",
+  "name": "AKİLE BURCU ŞAT",
+  "action": "Send Webhook Notification(#1962)",
+  "stage": "İşlemde"
+}
+[2025-05-22T13:10:48.966Z] [INFO] Webhook alındı: odoo-webhook - Durum: success
+{
+  "email": "burcu.shut@gmail.com",
+  "name": "AKİLE BURCU ŞAT",
+  "action": "Send Webhook Notification(#1962)",
+  "stage": "BİTEN"
+}
+[2025-05-22T13:20:05.196Z] [INFO] Webhook alındı: odoo-webhook - Durum: success
+{
+  "email": "yagmurgokttass@icloud.com",
+  "name": "Yağmur Göktaş",
+  "action": "Send Webhook Notification(#1962)",
+  "stage": false
+}
+[2025-05-22T13:34:15.442Z] [INFO] Webhook alındı: odoo-webhook - Durum: success
+{
+  "email": "seda.yenturk@gmail.com",
+  "name": "Sedanur Yentürk",
+  "action": "Send Webhook Notification(#1962)",
+  "stage": false
+}
+[2025-05-22T13:38:01.440Z] [INFO] Webhook alındı: odoo-webhook - Durum: success
+{
+  "email": "kutay.okbay@gmail.com /murat.okbay@gmail.com",
+  "name": "Ali Kutay Okbay",
+  "action": "Send Webhook Notification(#1962)",
+  "stage": false
+}
+[2025-05-22T14:03:13.651Z] [INFO] Webhook alındı: odoo-webhook - Durum: success
+{
+  "email": "burcu.shut@gmail.com",
+  "name": "AKİLE BURCU ŞAT",
+  "action": "Send Webhook Notification(#1962)",
+  "stage": "BİTEN"
+}
+[2025-05-22T14:05:45.042Z] [INFO] Webhook alındı: odoo-webhook - Durum: success
+{
+  "email": "elifyildirim0102@outlook.com",
+  "name": "Elif Yıldırım",
+  "action": "Send Webhook Notification(#1962)",
+  "stage": false
+}
+[2025-06-03T11:22:16.612Z] [INFO] Mesaj gönderme isteği alındı
+[2025-06-03T11:22:16.618Z] [INFO] Mesaj istenen parametreler:
+{
+  "sender": "burcu.shut@gmail.com",
+  "receiver": "emre.danisman@example.com",
+  "role": "student",
+  "subject": "merhaba",
+  "hasContent": true
+}
+[2025-06-03T11:22:16.623Z] [INFO] Öğrenci mesajı, alıcı kontrolü atlanıyor
+[2025-06-03T11:22:16.626Z] [INFO] Çalışma dizini (CWD):
+"C:\\Projects\\Portal\\CG_Portal"
+[2025-06-03T11:22:16.632Z] [INFO] Veri yolu (data):
+"C:\\Projects\\Portal\\CG_Portal\\data"
+[2025-06-03T11:22:16.637Z] [INFO] Yeni mesaj oluşturuluyor
+[2025-06-03T11:22:16.655Z] [INFO] Mesaj başarıyla oluşturuldu:
+"msg-1748949736646"
+[2025-06-09T22:07:17.677Z] [INFO] Mesaj gönderme isteği alındı
+[2025-06-09T22:07:17.679Z] [INFO] Mesaj istenen parametreler:
+{
+  "sender": "akifgiraypusat@gmail.com",
+  "receiver": "emre.danisman@example.com",
+  "role": "student",
+  "subject": "faef",
+  "hasContent": true
+}
+[2025-06-09T22:07:17.680Z] [INFO] Öğrenci mesajı, alıcı kontrolü atlanıyor
+[2025-06-09T22:07:17.680Z] [INFO] Çalışma dizini (CWD):
+"D:\\Portal Yeni\\CG_Portal"
+[2025-06-09T22:07:17.681Z] [INFO] Veri yolu (data):
+"D:\\Portal Yeni\\CG_Portal\\data"
+[2025-06-09T22:07:17.681Z] [INFO] Yeni mesaj oluşturuluyor
+[2025-06-09T22:07:17.684Z] [INFO] Mesaj başarıyla oluşturuldu:
+"msg-1749506837683"

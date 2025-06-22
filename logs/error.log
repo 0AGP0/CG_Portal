@@ -1,0 +1,75 @@
+[2025-05-08T13:20:56.724Z] [ERROR] Geçersiz webhook imzası
+{
+  "signature": ""
+}
+[2025-05-08T13:23:18.411Z] [ERROR] Geçersiz webhook imzası
+{
+  "signature": ""
+}
+[2025-05-08T13:33:26.719Z] [ERROR] Email bilgisi eksik
+{
+  "_action": "Send Webhook Notification(#1962)",
+  "_id": 1041,
+  "_model": "res.partner",
+  "id": 1041,
+  "name": "Akif",
+  "x_studio_email": false,
+  "x_studio_mail_adresi": "akifgiraypusat@gmail.com"
+}
+[2025-05-08T13:33:35.841Z] [ERROR] Email bilgisi eksik
+{
+  "_action": "Send Webhook Notification(#1962)",
+  "_id": 1041,
+  "_model": "res.partner",
+  "id": 1041,
+  "name": "Akif",
+  "x_studio_email": false,
+  "x_studio_mail_adresi": "akifgiraypusat@gmail.com"
+}
+[2025-05-19T20:46:32.584Z] [ERROR] Kullanıcı kaydı hatası
+{}
+[2025-05-19T20:46:41.284Z] [ERROR] Kullanıcı kaydı hatası
+{}
+[2025-05-19T20:56:24.535Z] [ERROR] Öğrenci süreci başlatma hatası
+{}
+[2025-05-19T20:56:30.256Z] [ERROR] Öğrenci süreci başlatma hatası
+{}
+[2025-05-19T21:07:20.014Z] [ERROR] Öğrenci süreci başlatma hatası
+{}
+[2025-05-19T23:38:57.188Z] [ERROR] Satış ekibi öğrenci listesi hatası
+{}
+[2025-05-19T23:39:04.358Z] [ERROR] Satış ekibi öğrenci listesi hatası
+{}
+[2025-05-19T23:39:04.368Z] [ERROR] Okunmamış mesaj sayısı hatası
+{}
+[2025-05-19T23:39:08.092Z] [ERROR] Satış ekibi öğrenci listesi hatası
+{}
+[2025-05-19T23:39:10.106Z] [ERROR] Satış ekibi öğrenci listesi hatası
+{}
+[2025-05-19T23:39:10.115Z] [ERROR] Okunmamış mesaj sayısı hatası
+{}
+[2025-05-19T23:46:29.353Z] [ERROR] Öğrenci süreci başlatma hatası
+{}
+[2025-05-22T13:04:43.579Z] [ERROR] Geçersiz webhook secret parametresi
+{
+  "secretParam": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855   https://mighty-points-pull.loca.lt/api/odoo-webhook?secret=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "expectedSecret": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}
+[2025-05-22T13:20:05.199Z] [ERROR] Eşleşen öğrenci bulunamadı
+{
+  "email": "yagmurgokttass@icloud.com"
+}
+[2025-05-22T13:34:15.446Z] [ERROR] Eşleşen öğrenci bulunamadı
+{
+  "email": "seda.yenturk@gmail.com"
+}
+[2025-05-22T13:38:01.444Z] [ERROR] Eşleşen öğrenci bulunamadı
+{
+  "email": "kutay.okbay@gmail.com /murat.okbay@gmail.com"
+}
+[2025-05-22T14:05:45.046Z] [ERROR] Eşleşen öğrenci bulunamadı
+{
+  "email": "elifyildirim0102@outlook.com"
+}
+[2025-05-26T23:13:59.284Z] [ERROR] Vize bilgileri güncelleme hatası:
+{}

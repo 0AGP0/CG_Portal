@@ -1,0 +1,58 @@
+{
+  "name": "Campus Global Portal",
+  "short_name": "CG Portal",
+  "description": "Yurt dışı eğitim süreçlerinizi kolayca yönetin",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#002757",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Başvurularım",
+      "short_name": "Başvurular",
+      "description": "Başvuru süreçlerinizi görüntüleyin",
+      "url": "/dashboard/applications",
+      "icons": [{ "src": "/shortcut-icon.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Belgelerim",
+      "short_name": "Belgeler",
+      "description": "Belgelerinizi yönetin",
+      "url": "/dashboard/documents",
+      "icons": [{ "src": "/shortcut-icon.png", "sizes": "192x192" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "platform": "wide",
+      "label": "Ana Sayfa"
+    },
+    {
+      "src": "/screenshot2.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "platform": "wide",
+      "label": "Başvuru Takibi"
+    }
+  ],
+  "categories": ["education", "productivity"],
+  "prefer_related_applications": false
+} 
