@@ -32,17 +32,17 @@ npm install
 2. **Environment değişkenlerini ayarla:**
 ```bash
 # .env.local dosyası oluştur
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
-POSTGRES_HOST=localhost
-POSTGRES_DATABASE=cg_portal
-POSTGRES_PORT=5432
+POSTGRES_USER=
+POSTGRES_PASSWORD=
+POSTGRES_HOST=
+POSTGRES_DATABASE=
+POSTGRES_PORT=
 JWT_SECRET=your-super-secret-jwt-key
 JWT_EXPIRES_IN=24h
 API_TOKEN=your-api-token-here
 NODE_ENV=development
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-NEXT_PUBLIC_API_URL=http://localhost:3000
+NEXT_PUBLIC_APP_URL=
+NEXT_PUBLIC_API_URL=
 ```
 
 3. **Veritabanını hazırla:**
