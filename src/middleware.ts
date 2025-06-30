@@ -19,6 +19,9 @@ const API_PATHS = {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
+  // Geçici olarak middleware'i devre dışı bırak
+  return NextResponse.next();
+  
   // API istekleri için CORS ayarları
   if (pathname.startsWith('/api/')) {
     // OPTIONS isteklerini hemen yanıtla
