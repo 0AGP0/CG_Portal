@@ -8,9 +8,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     
     // Gerekli alanlar mevcut mu kontrol et
-    if (!body.studentId || !body.advisorId) {
+    if (!body.studentEmail || !body.advisorEmail) {
       return NextResponse.json(
-        { error: 'Öğrenci ID ve Danışman ID alanları zorunludur' },
+        { error: 'Öğrenci e-posta ve Danışman e-posta alanları zorunludur' },
         { status: 400 }
       );
     }
@@ -28,10 +28,10 @@ export async function POST(request: NextRequest) {
           a.name as advisor_name
         FROM students s
         CROSS JOIN advisors a
-        WHERE s.email = $1 AND a.id = $2
+        WHERE s.email = $1 AND a.email = $2
       `;
       
-      const checkResult = await client.query(checkQuery, [body.studentId, body.advisorId]);
+      const checkResult = await client.query(checkQuery, [body.studentEmail, body.advisorEmail]);
       
       if (checkResult.rows.length === 0) {
         return NextResponse.json(
