@@ -211,7 +211,7 @@ export default function StudentsPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [toast]);
+  }, []);
   
   // Sayfa yüklendiğinde verileri getir
   useEffect(() => {
@@ -229,7 +229,7 @@ export default function StudentsPage() {
     return () => {
       isMounted = false;
     };
-  }, [fetchData]);
+  }, []);
 
   // Öğrenci ekleme işlemi
   const handleAddStudent = useCallback(async () => {
