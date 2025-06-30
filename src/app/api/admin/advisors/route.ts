@@ -3,6 +3,8 @@ import { pool } from '@/lib/db';
 import { logger } from '@/utils/logger';
 
 export async function GET(request: NextRequest) {
+  logger.info('=== ADMIN ADVISORS API BAŞLADI ===');
+  
   try {
     const client = await pool.connect();
     try {
@@ -28,10 +30,17 @@ export async function GET(request: NextRequest) {
         updatedAt: advisor.updated_at
       }));
       
-      return NextResponse.json({
+      const jsonResponse = NextResponse.json({
         success: true,
         advisors
       });
+      
+      // Cache kontrolü
+      jsonResponse.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+      jsonResponse.headers.set('Pragma', 'no-cache');
+      jsonResponse.headers.set('Expires', '0');
+      
+      return jsonResponse;
     } finally {
       client.release();
     }

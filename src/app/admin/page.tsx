@@ -171,9 +171,13 @@ export default function StudentsPage() {
       
       // Öğrenci verilerini getir
       const studentsResponse = await fetch('/api/admin/students', {
+        method: 'GET',
         cache: 'no-store',
         headers: {
-          'Cache-Control': 'no-cache'
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+          'Content-Type': 'application/json'
         }
       });
       
@@ -188,9 +192,13 @@ export default function StudentsPage() {
         
       // Danışman verilerini getir
       const advisorsResponse = await fetch('/api/admin/advisors', {
+        method: 'GET',
         cache: 'no-store',
         headers: {
-          'Cache-Control': 'no-cache'
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+          'Content-Type': 'application/json'
         }
       });
       

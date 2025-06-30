@@ -6,6 +6,12 @@ import { logger } from '@/utils/logger';
 export async function GET(request: NextRequest) {
   logger.info('=== ADMIN STUDENTS API BAŞLADI ===');
   
+  // Cache kontrolü
+  const response = NextResponse.next();
+  response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+  response.headers.set('Pragma', 'no-cache');
+  response.headers.set('Expires', '0');
+  
   try {
     const client = await pool.connect();
     logger.info('Veritabanı bağlantısı kuruldu');
@@ -44,10 +50,17 @@ export async function GET(request: NextRequest) {
       
       logger.info('Öğrenci verileri formatlandı:', { formattedCount: formattedStudents.length });
       
-      return NextResponse.json({
+      const jsonResponse = NextResponse.json({
         success: true,
         students: formattedStudents
       });
+      
+      // Cache kontrolü
+      jsonResponse.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+      jsonResponse.headers.set('Pragma', 'no-cache');
+      jsonResponse.headers.set('Expires', '0');
+      
+      return jsonResponse;
       
     } finally {
       client.release();
