@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllStudents, createStudent } from '@/lib/db';
+import { pool } from '@/lib/db';
 import { logger } from '@/utils/logger';
 
 // GET isteği - Tüm öğrencileri getir
@@ -7,48 +7,28 @@ export async function GET(request: NextRequest) {
   try {
     logger.info('Admin öğrenci listesi isteği alındı');
     
-    logger.info('getAllStudents fonksiyonu çağrılıyor...');
-    // Veritabanından tüm öğrencileri getir
-    const students = await getAllStudents();
-    logger.info('getAllStudents sonucu:', { studentCount: students.length, students });
+    const client = await pool.connect();
+    logger.info('Veritabanı bağlantısı kuruldu');
     
-    // Öğrenci verilerini formatla
-    const formattedStudents = students.map(student => ({
-      id: student.email,
-      name: student.name,
-      email: student.email,
-      phone: student.phone || '',
-      advisor: student.advisor_name || 'Atanmadı',
-      status: student.stage || 'Beklemede',
-      processStarted: student.process_started || false,
-      createdAt: student.created_at,
-      updatedAt: student.updated_at,
-      advisorId: student.advisor_id,
-      advisorEmail: student.advisor_email,
-      documents: student.documents || []
-    }));
-    
-    logger.info('Öğrenci verileri formatlandı:', { formattedCount: formattedStudents.length });
-    
-    // Response header'larını ayarla
-    const headers = new Headers();
-    headers.set('Content-Type', 'application/json; charset=utf-8');
-    headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
-    
-    logger.info('Admin öğrenci listesi başarıyla getirildi', { 
-      studentCount: formattedStudents.length 
-    });
-    
-    return new NextResponse(
-      JSON.stringify({
+    try {
+      // Basit sorgu ile test edelim
+      const query = 'SELECT id, email, name FROM students LIMIT 5';
+      logger.info('SQL sorgusu:', query);
+      
+      const result = await client.query(query);
+      logger.info('Sorgu sonucu:', { rowCount: result.rowCount, rows: result.rows });
+      
+      return NextResponse.json({
         success: true,
-        students: formattedStudents
-      }, null, 2),
-      {
-        status: 200,
-        headers
-      }
-    );
+        students: result.rows,
+        message: 'Test başarılı'
+      });
+      
+    } finally {
+      client.release();
+      logger.info('Veritabanı bağlantısı kapatıldı');
+    }
+    
   } catch (error: any) {
     logger.error('Admin öğrenci listesi hatası:', error);
     logger.error('Hata detayı:', {
@@ -58,12 +38,7 @@ export async function GET(request: NextRequest) {
     });
     return NextResponse.json(
       { error: 'Öğrenci listesi alınırken bir hata oluştu' },
-      { 
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json; charset=utf-8'
-        }
-      }
+      { status: 500 }
     );
   }
 }
@@ -91,37 +66,45 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Yeni öğrenciyi veritabanında oluştur
-    const newStudent = await createStudent({
-      email: body.email,
-      name: body.name,
-      phone: body.phone || '',
-      stage: 'Hazırlık Aşaması',
-      process_started: false,
-      advisor_id: undefined,
-      advisor_name: undefined,
-      advisor_email: undefined,
-      documents: []
-    });
-    
-    logger.info('Yeni öğrenci oluşturuldu', { email: newStudent.email });
-    
-    // Yanıt olarak oluşturulan öğrenciyi döndür
-    return NextResponse.json({
-      success: true,
-      student: {
-        id: newStudent.email,
-        name: newStudent.name,
-        email: newStudent.email,
-        phone: newStudent.phone,
-        advisor: newStudent.advisor_name || 'Atanmadı',
-        status: newStudent.stage,
-        processStarted: newStudent.process_started,
-        createdAt: newStudent.created_at,
-        updatedAt: newStudent.updated_at
-      }
-    }, { status: 201 });
-  } catch (error) {
+    const client = await pool.connect();
+    try {
+      // Yeni öğrenciyi veritabanında oluştur
+      const query = `
+        INSERT INTO students (email, name, phone, stage, process_started, created_at, updated_at)
+        VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
+        RETURNING *
+      `;
+      
+      const result = await client.query(query, [
+        body.email,
+        body.name,
+        body.phone || '',
+        'Hazırlık Aşaması',
+        false
+      ]);
+      
+      const newStudent = result.rows[0];
+      logger.info('Yeni öğrenci oluşturuldu', { email: newStudent.email });
+      
+      // Yanıt olarak oluşturulan öğrenciyi döndür
+      return NextResponse.json({
+        success: true,
+        student: {
+          id: newStudent.email,
+          name: newStudent.name,
+          email: newStudent.email,
+          phone: newStudent.phone,
+          advisor: 'Atanmadı',
+          status: newStudent.stage,
+          processStarted: newStudent.process_started,
+          createdAt: newStudent.created_at,
+          updatedAt: newStudent.updated_at
+        }
+      }, { status: 201 });
+    } finally {
+      client.release();
+    }
+  } catch (error: any) {
     logger.error('Öğrenci oluşturma hatası:', error);
     return NextResponse.json(
       { error: 'Öğrenci oluşturulurken bir hata oluştu' },
