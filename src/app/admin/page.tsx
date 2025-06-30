@@ -108,6 +108,8 @@ interface Advisor {
 }
 
 export default function StudentsPage() {
+  console.log('🔄 StudentsPage component render edildi');
+  
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -156,7 +158,11 @@ export default function StudentsPage() {
   
   // Sayfa yüklendiğinde verileri getir
   useEffect(() => {
-    if (hasLoaded.current) return;
+    console.log('🔍 useEffect çalıştı, hasLoaded:', hasLoaded.current);
+    if (hasLoaded.current) {
+      console.log('🚫 useEffect zaten çalışmış, çıkılıyor');
+      return;
+    }
     
     const fetchData = async () => {
       try {
@@ -219,8 +225,10 @@ export default function StudentsPage() {
       }
     };
 
+    console.log('✅ fetchData çağrılıyor');
     fetchData();
     hasLoaded.current = true;
+    console.log('✅ hasLoaded true yapıldı');
   }, []);
 
   // Öğrenci ekleme işlemi
