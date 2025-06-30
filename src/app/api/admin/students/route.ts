@@ -25,9 +25,6 @@ export async function GET(request: NextRequest) {
       updatedAt: student.updated_at,
       advisorId: student.advisor_id,
       advisorEmail: student.advisor_email,
-      salesId: student.sales_id,
-      salesName: student.sales_name,
-      salesEmail: student.sales_email,
       documents: student.documents || []
     }));
     

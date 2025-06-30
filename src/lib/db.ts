@@ -231,12 +231,9 @@ export async function getAllStudents() {
       SELECT 
         s.*,
         a.name as advisor_name,
-        a.email as advisor_email,
-        sales.name as sales_name,
-        sales.email as sales_email
+        a.email as advisor_email
       FROM students s
       LEFT JOIN advisors a ON s.advisor_id = a.id
-      LEFT JOIN sales ON s.sales_id = sales.id
       ORDER BY s.created_at DESC
     `;
     
