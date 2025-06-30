@@ -5,48 +5,30 @@ import { logger } from '@/utils/logger';
 // GET isteği - Tüm öğrencileri getir
 export async function GET(request: NextRequest) {
   try {
-    logger.info('Admin öğrenci listesi isteği alındı');
+    logger.info('=== ADMIN STUDENTS API BAŞLADI ===');
     
     const client = await pool.connect();
     logger.info('Veritabanı bağlantısı kuruldu');
     
     try {
-      const query = `
-        SELECT 
-          s.*,
-          COALESCE(a.name, 'Atanmadı') as advisor_name,
-          a.email as advisor_email
-        FROM students s
-        LEFT JOIN advisors a ON s.advisor_email = a.email
-        ORDER BY s.created_at DESC
-      `;
-      
+      // En basit sorgu ile test
+      const query = 'SELECT COUNT(*) as count FROM students';
       logger.info('SQL sorgusu:', query);
       
       const result = await client.query(query);
-      logger.info('Sorgu sonucu:', { rowCount: result.rowCount, rows: result.rows });
+      logger.info('Sorgu sonucu:', result.rows);
       
-      // Öğrenci verilerini formatla
-      const formattedStudents = result.rows.map(student => ({
-        id: student.email,
-        name: student.name,
-        email: student.email,
-        phone: student.phone || '',
-        advisor: student.advisor_name || 'Atanmadı',
-        status: student.stage || 'Beklemede',
-        processStarted: student.process_started || false,
-        createdAt: student.created_at,
-        updatedAt: student.updated_at,
-        advisorId: student.advisor_id,
-        advisorEmail: student.advisor_email,
-        documents: student.documents || []
-      }));
+      // Şimdi gerçek sorgu
+      const realQuery = 'SELECT id, email, name FROM students LIMIT 5';
+      logger.info('Gerçek SQL sorgusu:', realQuery);
       
-      logger.info('Öğrenci verileri formatlandı:', { formattedCount: formattedStudents.length });
+      const realResult = await client.query(realQuery);
+      logger.info('Gerçek sorgu sonucu:', { rowCount: realResult.rowCount, rows: realResult.rows });
       
       return NextResponse.json({
         success: true,
-        students: formattedStudents
+        students: realResult.rows,
+        count: result.rows[0].count
       });
       
     } finally {
@@ -55,14 +37,14 @@ export async function GET(request: NextRequest) {
     }
     
   } catch (error: any) {
-    logger.error('Admin öğrenci listesi hatası:', error);
-    logger.error('Hata detayı:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name
-    });
+    logger.error('=== ADMIN STUDENTS API HATASI ===');
+    logger.error('Hata mesajı:', error.message);
+    logger.error('Hata kodu:', error.code);
+    logger.error('Hata detayı:', error.detail);
+    logger.error('Hata stack:', error.stack);
+    
     return NextResponse.json(
-      { error: 'Öğrenci listesi alınırken bir hata oluştu' },
+      { error: 'Öğrenci listesi alınırken bir hata oluştu', details: error.message },
       { status: 500 }
     );
   }
