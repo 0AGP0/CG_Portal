@@ -215,20 +215,7 @@ export default function StudentsPage() {
   
   // Sayfa yüklendiğinde verileri getir
   useEffect(() => {
-    let isMounted = true;
-
-    const loadData = async () => {
-      if (isMounted) {
-        await fetchData();
-      }
-    };
-
-    loadData();
-
-    // Cleanup function
-    return () => {
-      isMounted = false;
-    };
+    fetchData();
   }, []);
 
   // Öğrenci ekleme işlemi
@@ -281,7 +268,7 @@ export default function StudentsPage() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [newStudent, toast]);
+  }, [newStudent]);
 
   // Danışman atama işlemi
   const handleAssignAdvisor = useCallback(async () => {
@@ -345,7 +332,7 @@ export default function StudentsPage() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [selectedStudent, selectedAdvisor, toast, closeAssignAdvisorModal]);
+  }, [selectedStudent, selectedAdvisor, closeAssignAdvisorModal]);
       
   const filteredStudents = useMemo(() => {
     return students.filter(student => 
@@ -416,7 +403,7 @@ export default function StudentsPage() {
     } finally {
       setIsLoadingDetails(false);
     }
-  }, [toast]);
+  }, []);
 
   // Öğrenci düzenleme işlemi
   const handleEditStudent = useCallback(async () => {
@@ -476,7 +463,7 @@ export default function StudentsPage() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [editingStudent, toast, closeEditStudentModal]);
+  }, [editingStudent, closeEditStudentModal]);
 
   return (
     <Layout>
