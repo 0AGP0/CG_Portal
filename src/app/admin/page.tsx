@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { motion } from "framer-motion";
 import Layout from "@/components/Layout";
 import { useToast } from "@/components/ui/use-toast";
@@ -125,6 +125,9 @@ export default function StudentsPage() {
   const [studentDetails, setStudentDetails] = useState<any>(null);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   
+  // Sonsuz döngüyü önlemek için ref
+  const hasLoaded = useRef(false);
+  
   // Modal'ı kapatma fonksiyonları
   const closeAddStudentModal = () => {
     setShowAddStudentModal(false);
@@ -153,6 +156,8 @@ export default function StudentsPage() {
   
   // Sayfa yüklendiğinde verileri getir
   useEffect(() => {
+    if (hasLoaded.current) return;
+    
     const fetchData = async () => {
       try {
         setIsLoading(true);
@@ -215,6 +220,7 @@ export default function StudentsPage() {
     };
 
     fetchData();
+    hasLoaded.current = true;
   }, []);
 
   // Öğrenci ekleme işlemi
