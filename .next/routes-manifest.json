@@ -1,0 +1,263 @@
+{
+  "version": 3,
+  "pages404": true,
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/:path*",
+      "headers": [
+        {
+          "key": "X-DNS-Prefetch-Control",
+          "value": "on"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains; preload"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ],
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))?(?:/)?$"
+    }
+  ],
+  "dynamicRoutes": [
+    {
+      "page": "/advisor/students/[email]",
+      "regex": "^/advisor/students/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPemail": "nxtPemail"
+      },
+      "namedRegex": "^/advisor/students/(?<nxtPemail>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/advisor/students/[email]/documents",
+      "regex": "^/advisor/students/([^/]+?)/documents(?:/)?$",
+      "routeKeys": {
+        "nxtPemail": "nxtPemail"
+      },
+      "namedRegex": "^/advisor/students/(?<nxtPemail>[^/]+?)/documents(?:/)?$"
+    },
+    {
+      "page": "/api/admin/students/[email]",
+      "regex": "^/api/admin/students/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPemail": "nxtPemail"
+      },
+      "namedRegex": "^/api/admin/students/(?<nxtPemail>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/advisor/students/[email]",
+      "regex": "^/api/advisor/students/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPemail": "nxtPemail"
+      },
+      "namedRegex": "^/api/advisor/students/(?<nxtPemail>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/advisor/students/[email]/documents",
+      "regex": "^/api/advisor/students/([^/]+?)/documents(?:/)?$",
+      "routeKeys": {
+        "nxtPemail": "nxtPemail"
+      },
+      "namedRegex": "^/api/advisor/students/(?<nxtPemail>[^/]+?)/documents(?:/)?$"
+    },
+    {
+      "page": "/api/advisor/students/[email]/visa",
+      "regex": "^/api/advisor/students/([^/]+?)/visa(?:/)?$",
+      "routeKeys": {
+        "nxtPemail": "nxtPemail"
+      },
+      "namedRegex": "^/api/advisor/students/(?<nxtPemail>[^/]+?)/visa(?:/)?$"
+    },
+    {
+      "page": "/api/advisor/[email]",
+      "regex": "^/api/advisor/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPemail": "nxtPemail"
+      },
+      "namedRegex": "^/api/advisor/(?<nxtPemail>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/messages/[id]",
+      "regex": "^/api/messages/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/messages/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/messages/[id]/read",
+      "regex": "^/api/messages/([^/]+?)/read(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/messages/(?<nxtPid>[^/]+?)/read(?:/)?$"
+    },
+    {
+      "page": "/api/student/[email]",
+      "regex": "^/api/student/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPemail": "nxtPemail"
+      },
+      "namedRegex": "^/api/student/(?<nxtPemail>[^/]+?)(?:/)?$"
+    }
+  ],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/admin",
+      "regex": "^/admin(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin(?:/)?$"
+    },
+    {
+      "page": "/admin/advisors",
+      "regex": "^/admin/advisors(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/advisors(?:/)?$"
+    },
+    {
+      "page": "/advisor/applications",
+      "regex": "^/advisor/applications(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/advisor/applications(?:/)?$"
+    },
+    {
+      "page": "/advisor/dashboard",
+      "regex": "^/advisor/dashboard(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/advisor/dashboard(?:/)?$"
+    },
+    {
+      "page": "/advisor/documents",
+      "regex": "^/advisor/documents(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/advisor/documents(?:/)?$"
+    },
+    {
+      "page": "/advisor/messages",
+      "regex": "^/advisor/messages(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/advisor/messages(?:/)?$"
+    },
+    {
+      "page": "/advisor/reports",
+      "regex": "^/advisor/reports(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/advisor/reports(?:/)?$"
+    },
+    {
+      "page": "/advisor/test",
+      "regex": "^/advisor/test(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/advisor/test(?:/)?$"
+    },
+    {
+      "page": "/dashboard",
+      "regex": "^/dashboard(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard(?:/)?$"
+    },
+    {
+      "page": "/dashboard/applications",
+      "regex": "^/dashboard/applications(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/applications(?:/)?$"
+    },
+    {
+      "page": "/dashboard/documents",
+      "regex": "^/dashboard/documents(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/documents(?:/)?$"
+    },
+    {
+      "page": "/dashboard/education",
+      "regex": "^/dashboard/education(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/education(?:/)?$"
+    },
+    {
+      "page": "/dashboard/messages",
+      "regex": "^/dashboard/messages(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/messages(?:/)?$"
+    },
+    {
+      "page": "/dashboard/process",
+      "regex": "^/dashboard/process(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/process(?:/)?$"
+    },
+    {
+      "page": "/dashboard/visa",
+      "regex": "^/dashboard/visa(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/visa(?:/)?$"
+    },
+    {
+      "page": "/favicon.ico",
+      "regex": "^/favicon\\.ico(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/favicon\\.ico(?:/)?$"
+    },
+    {
+      "page": "/login",
+      "regex": "^/login(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/login(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "RSC",
+    "varyHeader": "RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch",
+    "prefetchHeader": "Next-Router-Prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSuffix": ".prefetch.rsc",
+    "prefetchSegmentHeader": "Next-Router-Segment-Prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments"
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  },
+  "rewrites": []
+}

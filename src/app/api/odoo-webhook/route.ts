@@ -5,6 +5,129 @@ import { logger } from '@/utils/logger';
 // Webhook secret sabit değeri
 const WEBHOOK_SECRET = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
 
+// Odoo alanlarını veritabanı alanlarına eşleyen mapping
+const FIELD_MAPPING = {
+  // Temel bilgiler
+  name: 'name',
+  phone: 'phone',
+  contact_address: 'contact_address',
+  x_studio_mail_adresi: 'email',
+  
+  // Durum bilgisi
+  x_studio_selection_field_8en_1iqnrqang: 'stage',
+  stage: 'stage',
+  
+  // Kişisel Bilgiler
+  x_studio_doum_tarihi: 'birth_date',
+  x_studio_doum_yeri: 'birth_place',
+  x_studio_ya: 'age',
+  x_studio_medeni_durum_1: 'marital_status',
+  x_studio_finansal_kant: 'financial_proof',
+  
+  // Pasaport Bilgileri
+  x_studio_pasaport_numaras: 'passport_number',
+  x_studio_pasaport_tr: 'passport_type',
+  x_studio_verili_tarihi: 'passport_issue_date',
+  x_studio_geerlilik_tarihi: 'passport_expiry_date',
+  x_studio_veren_makam: 'issuing_authority',
+  x_studio_pnr_numaras: 'pnr_number',
+  
+  // Aile Bilgileri
+  x_studio_anne_ad: 'mother_name',
+  x_studio_anne_soyad: 'mother_surname',
+  x_studio_anne_doum_tarihi: 'mother_birth_date',
+  x_studio_anne_doum_yeri: 'mother_birth_place',
+  x_studio_anne_ikamet_sehrilke: 'mother_residence',
+  x_studio_anne_telefon: 'mother_phone',
+  
+  x_studio_baba_ad: 'father_name',
+  x_studio_baba_soyad: 'father_surname',
+  x_studio_baba_doum_tarihi: 'father_birth_date',
+  x_studio_baba_doum_yeri: 'father_birth_place',
+  x_studio_baba_ikamet_ehrilkesi: 'father_residence',
+  x_studio_baba_telefon: 'father_phone',
+  
+  // Eğitim Bilgileri
+  x_studio_lise_ad: 'high_school_name',
+  x_studio_lise_tr: 'high_school_type',
+  x_studio_lise_ehir: 'high_school_city',
+  x_studio_lise_biti_tarihi: 'high_school_graduation_date',
+  x_studio_lise_balang_tarihi_1: 'high_school_start_date',
+  
+  x_studio_niversite_ad: 'university_name',
+  x_studio_niversite_blm_ad: 'university_department',
+  x_studio_niversite_balang_tarihi: 'university_start_date',
+  x_studio_niversite_biti_tarihi: 'university_end_date',
+  x_studio_mezuniyet_durumu: 'graduation_status',
+  x_studio_mezuniyet_yl: 'graduation_year',
+  
+  // Dil Bilgileri
+  x_studio_almanca_seviyesi_1: 'language_level',
+  x_studio_almanca_sertifikas: 'language_certificate',
+  x_studio_dil_renim_durumu: 'language_learning_status',
+  
+  // Sınav ve Vize Bilgileri
+  x_studio_sym_snav_giri: 'exam_entry',
+  x_studio_sym_yerlestirme_sonuc_tarihi: 'exam_result_date',
+  x_studio_vize_randevu_tarihi: 'visa_appointment_date',
+  x_studio_vize_bavuru_tarihi_1: 'visa_application_date',
+  x_studio_konsolosluk_1: 'visa_consulate',
+  x_studio_vize_randevu_belgesi: 'visa_document',
+  
+  // Diğer Bilgiler
+  x_studio_almanya_bulunma: 'has_been_to_germany',
+  x_studio_de_blm_tercihi: 'german_department_preference',
+  x_studio_niversite_tercihleri: 'university_preferences',
+  x_studio_maddi_kant_durumu: 'financial_proof_status',
+  x_studio_bilgiler_1: 'additional_info'
+};
+
+// Değerleri temizleyen yardımcı fonksiyon
+function cleanValue(value: any): any {
+  if (value === null || value === undefined || value === '') {
+    return null;
+  }
+  
+  // String değerleri trim et
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    return trimmed === '' ? null : trimmed;
+  }
+  
+  return value;
+}
+
+// Dinamik UPDATE sorgusu oluşturan fonksiyon
+function buildUpdateQuery(fieldsToUpdate: Record<string, any>): { query: string, values: any[] } {
+  const setClauses: string[] = [];
+  const values: any[] = [];
+  let paramIndex = 1;
+  
+  // updated_at her zaman güncellenir
+  setClauses.push('updated_at = NOW()');
+  
+  // process_started her zaman true olarak ayarlanır
+  setClauses.push('process_started = true');
+  
+  // Diğer alanları ekle
+  for (const [field, value] of Object.entries(fieldsToUpdate)) {
+    if (value !== null && value !== undefined) {
+      setClauses.push(`${field} = $${paramIndex}`);
+      values.push(value);
+      paramIndex++;
+    }
+  }
+  
+  const query = `
+    UPDATE students 
+    SET ${setClauses.join(', ')}
+    WHERE email = $${paramIndex}
+    RETURNING *
+  `;
+  
+  return { query, values };
+}
+
 export async function POST(request: NextRequest) {
   console.log('\n=== WEBHOOK İSTEĞİ BAŞLADI ===');
   console.log('Zaman:', new Date().toISOString());
@@ -83,172 +206,52 @@ export async function POST(request: NextRequest) {
       const existingStudent = checkResult.rows[0];
       console.log('✅ Öğrenci bulundu:', existingStudent.name);
 
-      // Durum kontrolü
+      // Güncellenecek alanları hazırla
+      console.log('\nGüncellenecek alanlar hazırlanıyor...');
+      const fieldsToUpdate: Record<string, any> = {};
+      
+      // FIELD_MAPPING kullanarak alanları eşle
+      for (const [odooField, dbField] of Object.entries(FIELD_MAPPING)) {
+        if (body.hasOwnProperty(odooField)) {
+          const cleanedValue = cleanValue(body[odooField]);
+          if (cleanedValue !== null) {
+            fieldsToUpdate[dbField] = cleanedValue;
+            console.log(`📝 ${odooField} -> ${dbField}: ${cleanedValue}`);
+          }
+        }
+      }
+      
+      // Özel durum kontrolü - stage alanı
       const stage = body.x_studio_selection_field_8en_1iqnrqang || body.stage || '';
-      console.log('\nDurum Kontrolü:', stage);
+      if (stage) {
+        fieldsToUpdate.stage = stage;
+        console.log(`📝 Stage güncelleniyor: ${stage}`);
+      }
 
-      // Öğrenci verisini güncelle
-      console.log('\nÖğrenci güncelleniyor...');
+      console.log('\nGüncellenecek alanlar:', Object.keys(fieldsToUpdate));
+      console.log('Güncellenecek değerler:', fieldsToUpdate);
+
+      // Dinamik UPDATE sorgusu oluştur
+      const { query: updateQuery, values: updateValues } = buildUpdateQuery(fieldsToUpdate);
       
-      const updateQuery = `
-        UPDATE students SET
-          name = $1,
-          phone = $2,
-          contact_address = $3,
-          stage = $4,
-          process_started = $5,
-          updated_at = NOW(),
-          
-          -- Kişisel Bilgiler
-          birth_date = $6,
-          birth_place = $7,
-          age = $8,
-          marital_status = $9,
-          financial_proof = $10,
-          
-          -- Pasaport Bilgileri
-          passport_number = $11,
-          passport_type = $12,
-          passport_issue_date = $13,
-          passport_expiry_date = $14,
-          issuing_authority = $15,
-          pnr_number = $16,
-          
-          -- Aile Bilgileri
-          mother_name = $17,
-          mother_surname = $18,
-          mother_birth_date = $19,
-          mother_birth_place = $20,
-          mother_residence = $21,
-          mother_phone = $22,
-          
-          father_name = $23,
-          father_surname = $24,
-          father_birth_date = $25,
-          father_birth_place = $26,
-          father_residence = $27,
-          father_phone = $28,
-          
-          -- Eğitim Bilgileri
-          high_school_name = $29,
-          high_school_type = $30,
-          high_school_city = $31,
-          high_school_graduation_date = $32,
-          high_school_start_date = $33,
-          
-          university_name = $34,
-          university_department = $35,
-          university_start_date = $36,
-          university_end_date = $37,
-          graduation_status = $38,
-          graduation_year = $39,
-          
-          -- Dil Bilgileri
-          language_level = $40,
-          language_certificate = $41,
-          language_learning_status = $42,
-          
-          -- Sınav ve Vize Bilgileri
-          exam_entry = $43,
-          exam_result_date = $44,
-          visa_appointment_date = $45,
-          visa_application_date = $46,
-          visa_consulate = $47,
-          visa_document = $48,
-          
-          -- Diğer Bilgiler
-          has_been_to_germany = $49,
-          german_department_preference = $50,
-          university_preferences = $51,
-          financial_proof_status = $52,
-          additional_info = $53
-          
-        WHERE email = $54
-        RETURNING *
-      `;
+      // Email'i values array'ine ekle
+      updateValues.push(email);
       
-      const updateValues = [
-        body.name || existingStudent.name,
-        body.phone || existingStudent.phone,
-        body.contact_address || existingStudent.contact_address,
-        stage,
-        true,
-        
-        // Kişisel Bilgiler
-        body.x_studio_doum_tarihi || existingStudent.birth_date,
-        body.x_studio_doum_yeri || existingStudent.birth_place,
-        body.x_studio_ya || existingStudent.age,
-        body.x_studio_medeni_durum_1 || existingStudent.marital_status,
-        body.x_studio_finansal_kant || existingStudent.financial_proof,
-        
-        // Pasaport Bilgileri
-        body.x_studio_pasaport_numaras || existingStudent.passport_number,
-        body.x_studio_pasaport_tr || existingStudent.passport_type,
-        body.x_studio_verili_tarihi || existingStudent.passport_issue_date,
-        body.x_studio_geerlilik_tarihi || existingStudent.passport_expiry_date,
-        body.x_studio_veren_makam || existingStudent.issuing_authority,
-        body.x_studio_pnr_numaras || existingStudent.pnr_number,
-        
-        // Aile Bilgileri
-        body.x_studio_anne_ad || existingStudent.mother_name,
-        body.x_studio_anne_soyad || existingStudent.mother_surname,
-        body.x_studio_anne_doum_tarihi || existingStudent.mother_birth_date,
-        body.x_studio_anne_doum_yeri || existingStudent.mother_birth_place,
-        body.x_studio_anne_ikamet_sehrilke || existingStudent.mother_residence,
-        body.x_studio_anne_telefon || existingStudent.mother_phone,
-        
-        body.x_studio_baba_ad || existingStudent.father_name,
-        body.x_studio_baba_soyad || existingStudent.father_surname,
-        body.x_studio_baba_doum_tarihi || existingStudent.father_birth_date,
-        body.x_studio_baba_doum_yeri || existingStudent.father_birth_place,
-        body.x_studio_baba_ikamet_ehrilkesi || existingStudent.father_residence,
-        body.x_studio_baba_telefon || existingStudent.father_phone,
-        
-        // Eğitim Bilgileri
-        body.x_studio_lise_ad || existingStudent.high_school_name,
-        body.x_studio_lise_tr || existingStudent.high_school_type,
-        body.x_studio_lise_ehir || existingStudent.high_school_city,
-        body.x_studio_lise_biti_tarihi || existingStudent.high_school_graduation_date,
-        body.x_studio_lise_balang_tarihi_1 || existingStudent.high_school_start_date,
-        
-        body.x_studio_niversite_ad || existingStudent.university_name,
-        body.x_studio_niversite_blm_ad || existingStudent.university_department,
-        body.x_studio_niversite_balang_tarihi || existingStudent.university_start_date,
-        body.x_studio_niversite_biti_tarihi || existingStudent.university_end_date,
-        body.x_studio_mezuniyet_durumu || existingStudent.graduation_status,
-        body.x_studio_mezuniyet_yl || existingStudent.graduation_year,
-        
-        // Dil Bilgileri
-        body.x_studio_almanca_seviyesi_1 || existingStudent.language_level,
-        body.x_studio_almanca_sertifikas || existingStudent.language_certificate,
-        body.x_studio_dil_renim_durumu || existingStudent.language_learning_status,
-        
-        // Sınav ve Vize Bilgileri
-        body.x_studio_sym_snav_giri || existingStudent.exam_entry,
-        body.x_studio_sym_yerlestirme_sonuc_tarihi || existingStudent.exam_result_date,
-        body.x_studio_vize_randevu_tarihi || existingStudent.visa_appointment_date,
-        body.x_studio_vize_bavuru_tarihi_1 || existingStudent.visa_application_date,
-        body.x_studio_konsolosluk_1 || existingStudent.visa_consulate,
-        body.x_studio_vize_randevu_belgesi || existingStudent.visa_document,
-        
-        // Diğer Bilgiler
-        body.x_studio_almanya_bulunma || existingStudent.has_been_to_germany,
-        body.x_studio_de_blm_tercihi || existingStudent.german_department_preference,
-        body.x_studio_niversite_tercihleri || existingStudent.university_preferences,
-        body.x_studio_maddi_kant_durumu || existingStudent.financial_proof_status,
-        body.x_studio_bilgiler_1 || existingStudent.additional_info,
-        
-        email
-      ];
+      console.log('\nSQL Sorgusu:', updateQuery);
+      console.log('Parametreler:', updateValues);
       
+      // Güncelleme işlemini gerçekleştir
       const updateResult = await client.query(updateQuery, updateValues);
       const updatedStudent = updateResult.rows[0];
 
-      console.log('\n✅ Öğrenci başarıyla güncellendi:', JSON.stringify(updatedStudent, null, 2));
+      console.log('\n✅ Öğrenci başarıyla güncellendi');
+      console.log('Güncellenen alan sayısı:', Object.keys(fieldsToUpdate).length);
+      console.log('Güncellenen öğrenci:', JSON.stringify(updatedStudent, null, 2));
 
       return NextResponse.json({
         success: true,
         message: 'Öğrenci bilgileri güncellendi',
+        updatedFields: Object.keys(fieldsToUpdate),
         student: updatedStudent
       }, { status: 200 });
 
