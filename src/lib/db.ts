@@ -230,7 +230,7 @@ export async function getAllStudents() {
     const query = `
       SELECT 
         s.*,
-        a.name as advisor_name,
+        COALESCE(a.name, 'Atanmadı') as advisor_name,
         a.email as advisor_email
       FROM students s
       LEFT JOIN advisors a ON s.advisor_id = a.id
