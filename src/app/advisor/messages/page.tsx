@@ -517,11 +517,11 @@ export default function AdvisorMessagesPage() {
                       >
                         <div 
                           className={`max-w-[70%] rounded-lg p-3 ${
-                            message.sender === 'advisor' 
+                          message.sender === 'advisor' 
                               ? 'bg-blue-500 text-white' 
                               : 'bg-gray-200/80 dark:bg-gray-700/80 text-gray-800 dark:text-gray-200'
-                          }`}
-                        >
+                        }`}
+                      >
                           <p>{message.content}</p>
                           <p className="text-xs opacity-70 text-right mt-1">
                             {message.timestamp || ""}

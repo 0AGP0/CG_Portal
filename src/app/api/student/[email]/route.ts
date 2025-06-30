@@ -3,7 +3,7 @@ import { getStudentByEmail, updateStudentProfile } from '@/lib/db';
 import { logger } from '@/utils/logger';
 
 export async function GET(
-  request: NextRequest, 
+  request: NextRequest,
   { params }: { params: Promise<{ email: string }> }
 ) {
   try {
@@ -27,20 +27,20 @@ export async function GET(
       student
     });
 
-  } catch (error) {
+    } catch (error) {
     logger.error('Öğrenci bilgisi getirme hatası:', error);
-    return NextResponse.json(
+      return NextResponse.json(
       { error: 'Öğrenci bilgisi alınamadı' },
-      { status: 500 }
-    );
-  }
+        { status: 500 }
+      );
+    }
 }
 
 export async function PUT(
   request: NextRequest, 
   { params }: { params: Promise<{ email: string }> }
 ) {
-  try {
+        try {
     const { email } = await params;
     const decodedEmail = decodeURIComponent(email);
     const body = await request.json();

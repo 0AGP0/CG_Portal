@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     }
 
     const count = await getUnreadMessageCount(email);
-    
+
     return NextResponse.json({
       success: true,
       count

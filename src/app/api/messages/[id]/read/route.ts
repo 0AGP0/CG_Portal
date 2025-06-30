@@ -25,7 +25,7 @@ export async function POST(
         { status: 404 }
       );
     }
-
+    
     return NextResponse.json({
       success: true,
       message: 'Mesaj okundu olarak işaretlendi',

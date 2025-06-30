@@ -3,20 +3,20 @@ import { createMessage } from '@/lib/db';
 import { logError, logInfo } from '@/utils/logger';
 
 interface Message {
-  id: string;
-  senderEmail: string;
-  senderRole: 'student' | 'advisor' | 'sales';
-  content: string;
+    id: string;
+    senderEmail: string;
+    senderRole: 'student' | 'advisor' | 'sales';
+    content: string;
   timestamp: string;
   isRead: boolean;
 }
 
 interface Conversation {
   id: string;
-  subject: string;
+    subject: string;
   studentEmail: string;
   advisorEmail: string;
-  createdAt: string;
+    createdAt: string;
   lastMessageAt: string;
   messages: Message[];
 }

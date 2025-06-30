@@ -608,7 +608,7 @@ createTables().catch(error => {
   process.exit(1);
 });
 
-export default pool;
+export default pool; 
 
 // Mesaj işlemleri
 export async function createMessage(data: {

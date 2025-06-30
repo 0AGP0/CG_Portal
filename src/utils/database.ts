@@ -345,7 +345,7 @@ export async function markMessageAsRead(messageId: string): Promise<boolean> {
 // Periyodik olarak cache'i temizle
 if (typeof window !== 'undefined') {
   setInterval(clearCache, CACHE_DURATION);
-}
+} 
 
 // Eksik fonksiyonları ekle
 export async function updateOrCreateRecord(data: any): Promise<any> {
