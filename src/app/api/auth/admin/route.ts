@@ -11,11 +11,11 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     logger.info('Gelen veri:', body);
     
-    // E-posta kontrolü
-    if (!body.email) {
-      logger.error('E-posta eksik');
+    // E-posta ve şifre kontrolü
+    if (!body.email || !body.password) {
+      logger.error('E-posta veya şifre eksik');
       return NextResponse.json(
-        { error: 'E-posta adresi gereklidir' }, 
+        { error: 'E-posta adresi ve şifre gereklidir' }, 
         { status: 400 }
       );
     }
@@ -29,6 +29,7 @@ export async function POST(request: NextRequest) {
           email,
           name,
           role,
+          password,
           created_at,
           updated_at
         FROM admins 
@@ -42,6 +43,15 @@ export async function POST(request: NextRequest) {
         logger.error('Admin bulunamadı:', body.email);
         return NextResponse.json(
           { error: 'Bu e-posta adresi ile kayıtlı admin bulunamadı' }, 
+          { status: 401 }
+        );
+      }
+
+      // Şifre kontrolü
+      if (admin.password !== body.password) {
+        logger.error('Yanlış şifre:', body.email);
+        return NextResponse.json(
+          { error: 'Yanlış şifre' }, 
           { status: 401 }
         );
       }

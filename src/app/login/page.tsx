@@ -31,10 +31,10 @@ export default function Login() {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email) {
+    if (!email.trim()) {
       setToast({
         show: true,
-        message: 'Lütfen e-posta adresinizi girin.',
+        message: 'E-posta adresi gereklidir.',
         type: 'error'
       });
       return;
@@ -54,14 +54,18 @@ export default function Login() {
     try {
       logger.info('Giriş başlatılıyor:', { email, role });
       
-      await login(email, password, role);
-      logger.info('Giriş başarılı');
+      const success = await login(email, password, role);
       
-      setToast({
-        show: true,
-        message: 'Giriş başarılı! Yönlendiriliyorsunuz...',
-        type: 'success'
-      });
+      if (success) {
+        logger.info('Giriş başarılı');
+        setToast({
+          show: true,
+          message: 'Giriş başarılı! Yönlendiriliyorsunuz...',
+          type: 'success'
+        });
+      } else {
+        throw new Error('Giriş başarısız');
+      }
     } catch (error) {
       logger.error('Giriş hatası:', error);
       setToast({
