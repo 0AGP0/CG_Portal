@@ -1,8 +1,4 @@
 {
-  "/api/auth/admin/route": "app/api/auth/admin/route.js",
-  "/api/auth/advisor/route": "app/api/auth/advisor/route.js",
-  "/api/advisor/students/route": "app/api/advisor/students/route.js",
-  "/api/advisor/messages/route": "app/api/advisor/messages/route.js",
   "/login/page": "app/login/page.js",
   "/advisor/dashboard/page": "app/advisor/dashboard/page.js"
 }
