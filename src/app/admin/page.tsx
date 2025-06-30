@@ -67,7 +67,6 @@ export default function StudentsPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [students, setStudents] = useState<Student[]>([]);
   const [advisors, setAdvisors] = useState<Advisor[]>([]);
-  const hasLoaded = useRef(false);
   
   const [showAddStudentModal, setShowAddStudentModal] = useState(false);
   const [showAssignAdvisorModal, setShowAssignAdvisorModal] = useState(false);
@@ -81,69 +80,66 @@ export default function StudentsPage() {
   const [studentDetails, setStudentDetails] = useState<any>(null);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   
-  // Verileri getir
-  const fetchData = async () => {
-    if (hasLoaded.current) return;
-    
-    console.log('📡 Veriler getiriliyor...');
-    setIsLoading(true);
-    
-    try {
-      // Öğrencileri getir
-      const studentsResponse = await fetch('/api/admin/students', {
-        method: 'GET',
-        headers: {
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache'
-        }
-      });
-      
-      if (studentsResponse.ok) {
-        const studentsData = await studentsResponse.json();
-        console.log('✅ Öğrenciler alındı:', studentsData);
-        setStudents(studentsData.students || []);
-      } else {
-        console.error('❌ Öğrenciler alınamadı:', studentsResponse.status);
-        toast({
-          title: "Hata",
-          description: "Öğrenci listesi alınamadı.",
-          variant: "destructive"
-        });
-      }
-      
-      // Danışmanları getir
-      const advisorsResponse = await fetch('/api/admin/advisors', {
-        method: 'GET',
-        headers: {
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache'
-        }
-      });
-      
-      if (advisorsResponse.ok) {
-        const advisorsData = await advisorsResponse.json();
-        console.log('✅ Danışmanlar alındı:', advisorsData);
-        setAdvisors(advisorsData.advisors || []);
-      } else {
-        console.error('❌ Danışmanlar alınamadı:', advisorsResponse.status);
-      }
-      
-    } catch (error) {
-      console.error('❌ Veri getirme hatası:', error);
-      toast({
-        title: "Hata",
-        description: "Veriler alınırken bir hata oluştu.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
-      hasLoaded.current = true;
-    }
-  };
-  
   // Component mount olduğunda verileri getir
   useEffect(() => {
     console.log('🚀 useEffect çalıştı');
+    
+    const fetchData = async () => {
+      console.log('📡 Veriler getiriliyor...');
+      setIsLoading(true);
+      
+      try {
+        // Öğrencileri getir
+        const studentsResponse = await fetch('/api/admin/students', {
+          method: 'GET',
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          }
+        });
+        
+        if (studentsResponse.ok) {
+          const studentsData = await studentsResponse.json();
+          console.log('✅ Öğrenciler alındı:', studentsData);
+          setStudents(studentsData.students || []);
+        } else {
+          console.error('❌ Öğrenciler alınamadı:', studentsResponse.status);
+          toast({
+            title: "Hata",
+            description: "Öğrenci listesi alınamadı.",
+            variant: "destructive"
+          });
+        }
+        
+        // Danışmanları getir
+        const advisorsResponse = await fetch('/api/admin/advisors', {
+          method: 'GET',
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          }
+        });
+        
+        if (advisorsResponse.ok) {
+          const advisorsData = await advisorsResponse.json();
+          console.log('✅ Danışmanlar alındı:', advisorsData);
+          setAdvisors(advisorsData.advisors || []);
+        } else {
+          console.error('❌ Danışmanlar alınamadı:', advisorsResponse.status);
+        }
+        
+      } catch (error) {
+        console.error('❌ Veri getirme hatası:', error);
+        toast({
+          title: "Hata",
+          description: "Veriler alınırken bir hata oluştu.",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
     fetchData();
   }, []);
   
