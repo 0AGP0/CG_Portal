@@ -221,32 +221,40 @@ export interface CustomerRecord {
   }>;
 }
 
-// Tüm öğrencileri getir (Admin paneli için)
+// Tüm öğrencileri getir
 export async function getAllStudents() {
-  let client;
+  const client = await pool.connect();
   try {
-    client = await pool.connect();
+    logger.info('getAllStudents: Veritabanı bağlantısı kuruldu');
     
     const query = `
       SELECT 
         s.*,
         a.name as advisor_name,
         a.email as advisor_email,
-        a.id as advisor_id
+        sales.name as sales_name,
+        sales.email as sales_email
       FROM students s
-      LEFT JOIN advisors a ON s.advisor_email = a.email
-      ORDER BY s.updated_at DESC
+      LEFT JOIN advisors a ON s.advisor_id = a.id
+      LEFT JOIN sales ON s.sales_id = sales.id
+      ORDER BY s.created_at DESC
     `;
-
+    
+    logger.info('getAllStudents: SQL sorgusu hazırlandı:', query);
+    
     const result = await client.query(query);
+    logger.info('getAllStudents: Sorgu sonucu:', { 
+      rowCount: result.rowCount,
+      rows: result.rows 
+    });
+    
     return result.rows;
   } catch (error) {
-    logger.error('Tüm öğrencileri getirme hatası:', error);
+    logger.error('getAllStudents hatası:', error);
     throw error;
   } finally {
-    if (client) {
-      client.release();
-    }
+    client.release();
+    logger.info('getAllStudents: Veritabanı bağlantısı kapatıldı');
   }
 }
 

@@ -7,8 +7,10 @@ export async function GET(request: NextRequest) {
   try {
     logger.info('Admin öğrenci listesi isteği alındı');
     
+    logger.info('getAllStudents fonksiyonu çağrılıyor...');
     // Veritabanından tüm öğrencileri getir
     const students = await getAllStudents();
+    logger.info('getAllStudents sonucu:', { studentCount: students.length, students });
     
     // Öğrenci verilerini formatla
     const formattedStudents = students.map(student => ({
@@ -28,6 +30,8 @@ export async function GET(request: NextRequest) {
       salesEmail: student.sales_email,
       documents: student.documents || []
     }));
+    
+    logger.info('Öğrenci verileri formatlandı:', { formattedCount: formattedStudents.length });
     
     // Response header'larını ayarla
     const headers = new Headers();
