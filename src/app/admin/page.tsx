@@ -48,54 +48,6 @@ interface Student {
   processStarted?: boolean;
   createdAt?: string;
   updatedAt?: string;
-  birthDate?: string;
-  birthPlace?: string;
-  maritalStatus?: string;
-  contactAddress?: string;
-  passportNumber?: string;
-  passportType?: string;
-  passportIssueDate?: string;
-  passportExpiryDate?: string;
-  issuingAuthority?: string;
-  pnrNumber?: string;
-  visaApplicationDate?: string;
-  visaAppointmentDate?: string;
-  visaDocument?: string;
-  visaConsulate?: string;
-  hasBeenToGermany?: boolean;
-  highSchoolName?: string;
-  highSchoolType?: string;
-  highSchoolCity?: string;
-  highSchoolStartDate?: string;
-  highSchoolGraduationDate?: string;
-  universityName?: string;
-  universityDepartment?: string;
-  universityStartDate?: string;
-  universityEndDate?: string;
-  graduationStatus?: string;
-  graduationYear?: string;
-  universityPreferences?: string;
-  germanDepartmentPreference?: string;
-  languageLevel?: string;
-  languageCertificate?: string;
-  languageCourseRegistration?: string;
-  languageLearningStatus?: string;
-  financialProof?: string;
-  financialProofStatus?: string;
-  examEntry?: boolean;
-  examResultDate?: string;
-  motherName?: string;
-  motherSurname?: string;
-  motherBirthDate?: string;
-  motherBirthPlace?: string;
-  motherResidence?: string;
-  motherPhone?: string;
-  fatherName?: string;
-  fatherSurname?: string;
-  fatherBirthDate?: string;
-  fatherBirthPlace?: string;
-  fatherResidence?: string;
-  fatherPhone?: string;
 }
 
 interface Advisor {
@@ -112,9 +64,47 @@ export default function StudentsPage() {
   
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
-  const [students, setStudents] = useState<Student[]>([]);
-  const [advisors, setAdvisors] = useState<Advisor[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Statik test verileri
+  const [students] = useState<Student[]>([
+    {
+      id: "1",
+      name: "Test Öğrenci 1",
+      email: "test1@example.com",
+      phone: "555-0001",
+      advisor: "Test Danışman",
+      status: "Aktif",
+      stage: "Hazırlık Aşaması",
+      processStarted: true,
+      createdAt: "2024-01-01",
+      updatedAt: "2024-01-01"
+    },
+    {
+      id: "2", 
+      name: "Test Öğrenci 2",
+      email: "test2@example.com",
+      phone: "555-0002",
+      advisor: "Atanmadı",
+      status: "Beklemede",
+      stage: "Hazırlık Aşaması",
+      processStarted: false,
+      createdAt: "2024-01-02",
+      updatedAt: "2024-01-02"
+    }
+  ]);
+  
+  const [advisors] = useState<Advisor[]>([
+    {
+      id: "1",
+      name: "Test Danışman",
+      email: "advisor@example.com",
+      phone: "555-1000",
+      studentCount: 1,
+      updatedAt: "2024-01-01"
+    }
+  ]);
+  
   const [showAddStudentModal, setShowAddStudentModal] = useState(false);
   const [showAssignAdvisorModal, setShowAssignAdvisorModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -126,10 +116,6 @@ export default function StudentsPage() {
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
   const [studentDetails, setStudentDetails] = useState<any>(null);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
-  
-  // Sonsuz döngüyü önlemek için ref
-  const hasLoaded = useRef(false);
-  const isInitialized = useRef(false);
   
   // Modal'ı kapatma fonksiyonları
   const closeAddStudentModal = () => {
@@ -157,92 +143,6 @@ export default function StudentsPage() {
     setStudentDetails(null);
   };
   
-  // Veri yükleme fonksiyonu
-  const fetchData = async () => {
-    if (hasLoaded.current) {
-      console.log('🚫 fetchData zaten çalışmış, çıkılıyor');
-      return;
-    }
-    
-    try {
-      hasLoaded.current = true;
-      setIsLoading(true);
-      console.log('Veri yükleme başlatılıyor...');
-      
-      // Öğrenci verilerini getir
-      const studentsResponse = await fetch('/api/admin/students', {
-        method: 'GET',
-        cache: 'no-store',
-        headers: {
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
-          'Expires': '0',
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      console.log('Öğrenci API yanıtı:', studentsResponse.status, studentsResponse.ok);
-      
-      if (!studentsResponse.ok) {
-        throw new Error(`Öğrenci verileri alınamadı: ${studentsResponse.status}`);
-      }
-      
-      const studentsData = await studentsResponse.json();
-      console.log('Öğrenci verisi:', studentsData);
-        
-      // Danışman verilerini getir
-      const advisorsResponse = await fetch('/api/admin/advisors', {
-        method: 'GET',
-        cache: 'no-store',
-        headers: {
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
-          'Expires': '0',
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      console.log('Danışman API yanıtı:', advisorsResponse.status, advisorsResponse.ok);
-      
-      if (!advisorsResponse.ok) {
-        throw new Error(`Danışman verileri alınamadı: ${advisorsResponse.status}`);
-      }
-      
-      const advisorsData = await advisorsResponse.json();
-      console.log('Danışman verisi:', advisorsData);
-      
-      if (studentsData.success && advisorsData.success) {
-        console.log('Veriler başarıyla yüklendi:', { 
-          students: studentsData.students.length, 
-          advisors: advisorsData.advisors.length 
-        });
-        setStudents(studentsData.students);
-        setAdvisors(advisorsData.advisors);
-      } else {
-        throw new Error('Veri formatı hatalı');
-      }
-    } catch (error) {
-      console.error('Veri yükleme hatası:', error);
-      toast({
-        title: 'Hata',
-        description: 'Veriler yüklenirken bir hata oluştu. Lütfen sayfayı yenileyin.',
-        variant: 'destructive'
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Component mount olduğunda veri yükle
-  if (!isInitialized.current) {
-    console.log('🚀 Component ilk kez render edildi, veri yükleme başlatılıyor');
-    isInitialized.current = true;
-    // setTimeout ile bir sonraki tick'te çalıştır
-    setTimeout(() => {
-      fetchData();
-    }, 0);
-  }
-
   // Öğrenci ekleme işlemi
   const handleAddStudent = async () => {
     if (!newStudent.name || !newStudent.email) {
@@ -254,45 +154,12 @@ export default function StudentsPage() {
       return;
     }
     
-    try {
-    setIsSubmitting(true);
+    toast({
+      title: "Başarılı",
+      description: "Öğrenci başarıyla eklendi (test modu).",
+    });
     
-      const response = await fetch('/api/admin/students', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newStudent),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Öğrenci eklenemedi');
-      }
-      
-        const data = await response.json();
-        
-      // Yeni öğrenciyi listeye ekle
-      setStudents(prev => [...prev, data.student]);
-      
-      // Formu sıfırla ve modalı kapat
-      setNewStudent({ name: '', email: '', phone: '' });
-      setShowAddStudentModal(false);
-      
-      toast({
-        title: "Başarılı",
-        description: "Öğrenci başarıyla eklendi.",
-      });
-      
-    } catch (error) {
-      console.error('Öğrenci ekleme hatası:', error);
-      toast({
-        title: "Hata",
-        description: "Öğrenci eklenirken bir hata oluştu.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    closeAddStudentModal();
   };
 
   // Danışman atama işlemi
@@ -306,57 +173,12 @@ export default function StudentsPage() {
       return;
     }
     
-    try {
-    setIsSubmitting(true);
+    toast({
+      title: "Başarılı",
+      description: "Danışman başarıyla atandı (test modu).",
+    });
     
-      const response = await fetch('/api/admin/assign-advisor', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          studentId: selectedStudent.email, // email'i id olarak kullanıyoruz
-          advisorId: selectedAdvisor.id
-        }),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Danışman atanamadı');
-      }
-      
-      const data = await response.json();
-      
-      if (data.success) {
-        // Öğrenci listesini güncelle
-        setStudents(prev => prev.map(student => 
-          student.email === selectedStudent.email ? {
-            ...student,
-            advisor: selectedAdvisor.name,
-            advisorId: selectedAdvisor.id,
-            advisorEmail: selectedAdvisor.email
-          } : student
-        ));
-        
-        // Modalı kapat ve seçimleri sıfırla
-        closeAssignAdvisorModal();
-        
-        toast({
-          title: "Başarılı",
-          description: "Danışman başarıyla atandı.",
-        });
-      } else {
-        throw new Error(data.error || 'Danışman atanamadı');
-      }
-    } catch (error) {
-      console.error('Danışman atama hatası:', error);
-      toast({
-        title: "Hata",
-        description: error instanceof Error ? error.message : "Danışman atanırken bir hata oluştu.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    closeAssignAdvisorModal();
   };
       
   const filteredStudents = useMemo(() => {
@@ -406,23 +228,20 @@ export default function StudentsPage() {
   const fetchStudentDetails = async (email: string) => {
     try {
       setIsLoadingDetails(true);
-      const response = await fetch(`/api/admin/students/${email}`);
-      
-      if (!response.ok) {
-        throw new Error('Öğrenci detayları alınamadı');
-      }
-      
-      const data = await response.json();
-      if (data.success) {
-        setStudentDetails(data.student);
-      } else {
-        throw new Error(data.error || 'Öğrenci detayları alınamadı');
-      }
+      // Test verisi
+      setStudentDetails({
+        id: email,
+        name: "Test Öğrenci",
+        email: email,
+        phone: "555-0000",
+        advisor: "Test Danışman",
+        status: "Aktif"
+      });
     } catch (error) {
       console.error('Öğrenci detayları getirme hatası:', error);
       toast({
         title: "Hata",
-        description: error instanceof Error ? error.message : "Öğrenci detayları alınırken bir hata oluştu.",
+        description: "Öğrenci detayları alınırken bir hata oluştu.",
         variant: "destructive"
       });
     } finally {
@@ -441,53 +260,12 @@ export default function StudentsPage() {
       return;
     }
     
-    try {
-      setIsSubmitting(true);
-      
-      const response = await fetch(`/api/admin/students/${editingStudent.email}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(editingStudent),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Öğrenci güncellenemedi');
-      }
-      
-      const data = await response.json();
-      
-      if (data.success) {
-        // Öğrenci listesini güncelle
-        setStudents(prev => prev.map(student => 
-          student.email === editingStudent.email ? {
-            ...student,
-            name: editingStudent.name,
-            phone: editingStudent.phone
-          } : student
-        ));
-        
-        // Modalı kapat
-        closeEditStudentModal();
-        
-        toast({
-          title: "Başarılı",
-          description: "Öğrenci başarıyla güncellendi.",
-        });
-      } else {
-        throw new Error(data.error || 'Öğrenci güncellenemedi');
-      }
-    } catch (error) {
-      console.error('Öğrenci güncelleme hatası:', error);
-      toast({
-        title: "Hata",
-        description: error instanceof Error ? error.message : "Öğrenci güncellenirken bir hata oluştu.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    toast({
+      title: "Başarılı",
+      description: "Öğrenci başarıyla güncellendi (test modu).",
+    });
+    
+    closeEditStudentModal();
   };
 
   return (
