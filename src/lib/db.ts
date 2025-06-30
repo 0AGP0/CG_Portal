@@ -230,21 +230,11 @@ export async function getAllStudents() {
     const query = `
       SELECT 
         s.*,
-        json_agg(
-          json_build_object(
-            'documentType', d.document_type,
-            'documentUrl', d.file_path,
-            'documentName', d.file_name,
-            'updatedAt', d.upload_date
-          )
-        ) FILTER (WHERE d.id IS NOT NULL) as documents,
         a.name as advisor_name,
         a.email as advisor_email,
         a.id as advisor_id
       FROM students s
-      LEFT JOIN documents d ON s.id = d.student_id
       LEFT JOIN advisors a ON s.advisor_email = a.email
-      GROUP BY s.id, s.email, s.name, s.phone, s.stage, s.process_started, s.created_at, s.updated_at, s.advisor_id, s.advisor_email, a.name, a.email, a.id
       ORDER BY s.updated_at DESC
     `;
 

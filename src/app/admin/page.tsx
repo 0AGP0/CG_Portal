@@ -155,8 +155,9 @@ export default function StudentsPage() {
   const fetchData = useCallback(async () => {
     try {
       setIsLoading(true);
+      console.log('Veri yükleme başlatılıyor...');
       
-        // Öğrenci verilerini getir
+      // Öğrenci verilerini getir
       const studentsResponse = await fetch('/api/admin/students', {
         cache: 'no-store',
         headers: {
@@ -164,13 +165,16 @@ export default function StudentsPage() {
         }
       });
       
+      console.log('Öğrenci API yanıtı:', studentsResponse.status, studentsResponse.ok);
+      
       if (!studentsResponse.ok) {
         throw new Error(`Öğrenci verileri alınamadı: ${studentsResponse.status}`);
       }
       
       const studentsData = await studentsResponse.json();
+      console.log('Öğrenci verisi:', studentsData);
         
-        // Danışman verilerini getir
+      // Danışman verilerini getir
       const advisorsResponse = await fetch('/api/admin/advisors', {
         cache: 'no-store',
         headers: {
@@ -178,29 +182,36 @@ export default function StudentsPage() {
         }
       });
       
+      console.log('Danışman API yanıtı:', advisorsResponse.status, advisorsResponse.ok);
+      
       if (!advisorsResponse.ok) {
         throw new Error(`Danışman verileri alınamadı: ${advisorsResponse.status}`);
       }
       
       const advisorsData = await advisorsResponse.json();
+      console.log('Danışman verisi:', advisorsData);
       
       if (studentsData.success && advisorsData.success) {
+        console.log('Veriler başarıyla yüklendi:', { 
+          students: studentsData.students.length, 
+          advisors: advisorsData.advisors.length 
+        });
         setStudents(studentsData.students);
         setAdvisors(advisorsData.advisors);
-        } else {
+      } else {
         throw new Error('Veri formatı hatalı');
-        }
-      } catch (error) {
-        console.error('Veri yükleme hatası:', error);
+      }
+    } catch (error) {
+      console.error('Veri yükleme hatası:', error);
       toast({
         title: 'Hata',
         description: 'Veriler yüklenirken bir hata oluştu. Lütfen sayfayı yenileyin.',
         variant: 'destructive'
       });
-      } finally {
-        setIsLoading(false);
-      }
-  }, []);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [toast]);
   
   // Sayfa yüklendiğinde verileri getir
   useEffect(() => {

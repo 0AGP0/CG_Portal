@@ -19,7 +19,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    logger.info('Veritabanına bağlanılıyor...');
     const client = await pool.connect();
+    logger.info('Veritabanı bağlantısı başarılı');
+    
     try {
       // Admin'i veritabanından kontrol et
       const query = `
@@ -35,7 +38,10 @@ export async function POST(request: NextRequest) {
         WHERE email = $1
       `;
       
+      logger.info('Sorgu çalıştırılıyor:', { email: body.email });
       const result = await client.query(query, [body.email]);
+      logger.info('Sorgu sonucu:', { rowCount: result.rowCount, rows: result.rows });
+      
       const admin = result.rows[0];
 
       if (!admin) {
@@ -46,14 +52,22 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      logger.info('Admin bulundu:', { id: admin.id, email: admin.email, hasPassword: !!admin.password });
+
       // Şifre kontrolü
       if (admin.password !== body.password) {
-        logger.error('Yanlış şifre:', body.email);
+        logger.error('Yanlış şifre:', { 
+          provided: body.password, 
+          stored: admin.password,
+          email: body.email 
+        });
         return NextResponse.json(
           { error: 'Yanlış şifre' }, 
           { status: 401 }
         );
       }
+
+      logger.info('Şifre doğru, token oluşturuluyor...');
 
       // Token oluştur
       const token = generateToken({
@@ -69,6 +83,8 @@ export async function POST(request: NextRequest) {
           { status: 500 }
         );
       }
+
+      logger.info('Token oluşturuldu');
 
       // Başarılı yanıt
       const response = {
@@ -87,6 +103,7 @@ export async function POST(request: NextRequest) {
 
     } finally {
       client.release();
+      logger.info('Veritabanı bağlantısı kapatıldı');
     }
     
   } catch (error) {
