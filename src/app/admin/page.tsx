@@ -126,100 +126,99 @@ export default function StudentsPage() {
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   
   // Modal'ı kapatma fonksiyonları
-  const closeAddStudentModal = useCallback(() => {
+  const closeAddStudentModal = () => {
     setShowAddStudentModal(false);
     setNewStudent({ name: "", email: "", phone: "" });
     setIsSubmitting(false);
-  }, []);
+  };
 
-  const closeAssignAdvisorModal = useCallback(() => {
+  const closeAssignAdvisorModal = () => {
     setShowAssignAdvisorModal(false);
     setSelectedStudent(null);
     setSelectedAdvisor(null);
     setIsSubmitting(false);
-  }, []);
+  };
 
-  const closeEditStudentModal = useCallback(() => {
+  const closeEditStudentModal = () => {
     setShowEditStudentModal(false);
     setEditingStudent(null);
     setIsSubmitting(false);
-  }, []);
+  };
 
-  const closeStudentDetailsModal = useCallback(() => {
+  const closeStudentDetailsModal = () => {
     setShowStudentDetailsModal(false);
     setSelectedStudent(null);
     setStudentDetails(null);
-  }, []);
-  
-  // Veri yükleme fonksiyonu
-  const fetchData = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      console.log('Veri yükleme başlatılıyor...');
-      
-      // Öğrenci verilerini getir
-      const studentsResponse = await fetch('/api/admin/students', {
-        cache: 'no-store',
-        headers: {
-          'Cache-Control': 'no-cache'
-        }
-      });
-      
-      console.log('Öğrenci API yanıtı:', studentsResponse.status, studentsResponse.ok);
-      
-      if (!studentsResponse.ok) {
-        throw new Error(`Öğrenci verileri alınamadı: ${studentsResponse.status}`);
-      }
-      
-      const studentsData = await studentsResponse.json();
-      console.log('Öğrenci verisi:', studentsData);
-        
-      // Danışman verilerini getir
-      const advisorsResponse = await fetch('/api/admin/advisors', {
-        cache: 'no-store',
-        headers: {
-          'Cache-Control': 'no-cache'
-        }
-      });
-      
-      console.log('Danışman API yanıtı:', advisorsResponse.status, advisorsResponse.ok);
-      
-      if (!advisorsResponse.ok) {
-        throw new Error(`Danışman verileri alınamadı: ${advisorsResponse.status}`);
-      }
-      
-      const advisorsData = await advisorsResponse.json();
-      console.log('Danışman verisi:', advisorsData);
-      
-      if (studentsData.success && advisorsData.success) {
-        console.log('Veriler başarıyla yüklendi:', { 
-          students: studentsData.students.length, 
-          advisors: advisorsData.advisors.length 
-        });
-        setStudents(studentsData.students);
-        setAdvisors(advisorsData.advisors);
-      } else {
-        throw new Error('Veri formatı hatalı');
-      }
-    } catch (error) {
-      console.error('Veri yükleme hatası:', error);
-      toast({
-        title: 'Hata',
-        description: 'Veriler yüklenirken bir hata oluştu. Lütfen sayfayı yenileyin.',
-        variant: 'destructive'
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  };
   
   // Sayfa yüklendiğinde verileri getir
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        console.log('Veri yükleme başlatılıyor...');
+        
+        // Öğrenci verilerini getir
+        const studentsResponse = await fetch('/api/admin/students', {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache'
+          }
+        });
+        
+        console.log('Öğrenci API yanıtı:', studentsResponse.status, studentsResponse.ok);
+        
+        if (!studentsResponse.ok) {
+          throw new Error(`Öğrenci verileri alınamadı: ${studentsResponse.status}`);
+        }
+        
+        const studentsData = await studentsResponse.json();
+        console.log('Öğrenci verisi:', studentsData);
+          
+        // Danışman verilerini getir
+        const advisorsResponse = await fetch('/api/admin/advisors', {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache'
+          }
+        });
+        
+        console.log('Danışman API yanıtı:', advisorsResponse.status, advisorsResponse.ok);
+        
+        if (!advisorsResponse.ok) {
+          throw new Error(`Danışman verileri alınamadı: ${advisorsResponse.status}`);
+        }
+        
+        const advisorsData = await advisorsResponse.json();
+        console.log('Danışman verisi:', advisorsData);
+        
+        if (studentsData.success && advisorsData.success) {
+          console.log('Veriler başarıyla yüklendi:', { 
+            students: studentsData.students.length, 
+            advisors: advisorsData.advisors.length 
+          });
+          setStudents(studentsData.students);
+          setAdvisors(advisorsData.advisors);
+        } else {
+          throw new Error('Veri formatı hatalı');
+        }
+      } catch (error) {
+        console.error('Veri yükleme hatası:', error);
+        toast({
+          title: 'Hata',
+          description: 'Veriler yüklenirken bir hata oluştu. Lütfen sayfayı yenileyin.',
+          variant: 'destructive'
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     fetchData();
   }, []);
 
   // Öğrenci ekleme işlemi
-  const handleAddStudent = useCallback(async () => {
+  const handleAddStudent = async () => {
     if (!newStudent.name || !newStudent.email) {
       toast({
         title: "Hata",
@@ -268,10 +267,10 @@ export default function StudentsPage() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [newStudent]);
+  };
 
   // Danışman atama işlemi
-  const handleAssignAdvisor = useCallback(async () => {
+  const handleAssignAdvisor = async () => {
     if (!selectedStudent || !selectedAdvisor) {
       toast({
         title: "Hata",
@@ -332,7 +331,7 @@ export default function StudentsPage() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [selectedStudent, selectedAdvisor, closeAssignAdvisorModal]);
+  };
       
   const filteredStudents = useMemo(() => {
     return students.filter(student => 
@@ -378,7 +377,7 @@ export default function StudentsPage() {
   const completedStudents = students.filter(s => s.status === "Tamamlandı").length;
 
   // Öğrenci detaylarını getir
-  const fetchStudentDetails = useCallback(async (email: string) => {
+  const fetchStudentDetails = async (email: string) => {
     try {
       setIsLoadingDetails(true);
       const response = await fetch(`/api/admin/students/${email}`);
@@ -403,10 +402,10 @@ export default function StudentsPage() {
     } finally {
       setIsLoadingDetails(false);
     }
-  }, []);
+  };
 
   // Öğrenci düzenleme işlemi
-  const handleEditStudent = useCallback(async () => {
+  const handleEditStudent = async () => {
     if (!editingStudent || !editingStudent.name || !editingStudent.email) {
       toast({
         title: "Hata",
@@ -463,7 +462,7 @@ export default function StudentsPage() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [editingStudent, closeEditStudentModal]);
+  };
 
   return (
     <Layout>
