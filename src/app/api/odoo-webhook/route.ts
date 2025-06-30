@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { updateOrCreateRecord, getRecordByEmail } from '@/utils/database';
-import { logError, logInfo } from '@/utils/logger';
+import { pool } from '@/lib/db';
+import { logger } from '@/utils/logger';
 
 // Webhook secret sabit değeri
 const WEBHOOK_SECRET = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
@@ -62,133 +62,203 @@ export async function POST(request: NextRequest) {
     }
     console.log('✅ Email doğrulandı');
 
-    // Öğrenci kontrolü
-    console.log('\nÖğrenci kontrolü yapılıyor...');
-    const existingStudent = await getRecordByEmail(email);
+    // Veritabanı bağlantısı
+    const client = await pool.connect();
     
-    if (!existingStudent) {
-      console.error('❌ Bu email adresiyle kayıtlı öğrenci bulunamadı:', email);
+    try {
+      // Öğrenci kontrolü - doğrudan veritabanı sorgusu
+      console.log('\nÖğrenci kontrolü yapılıyor...');
+      const checkQuery = 'SELECT * FROM students WHERE email = $1';
+      const checkResult = await client.query(checkQuery, [email]);
+      
+      if (checkResult.rows.length === 0) {
+        console.error('❌ Bu email adresiyle kayıtlı öğrenci bulunamadı:', email);
+        return NextResponse.json({
+          error: 'Student not found',
+          message: 'Bu email adresiyle kayıtlı öğrenci bulunamadı',
+          email: email
+        }, { status: 404 });
+      }
+      
+      const existingStudent = checkResult.rows[0];
+      console.log('✅ Öğrenci bulundu:', existingStudent.name);
+
+      // Durum kontrolü
+      const stage = body.x_studio_selection_field_8en_1iqnrqang || body.stage || '';
+      console.log('\nDurum Kontrolü:', stage);
+
+      // Öğrenci verisini güncelle
+      console.log('\nÖğrenci güncelleniyor...');
+      
+      const updateQuery = `
+        UPDATE students SET
+          name = $1,
+          phone = $2,
+          contact_address = $3,
+          stage = $4,
+          process_started = $5,
+          updated_at = NOW(),
+          
+          -- Kişisel Bilgiler
+          birth_date = $6,
+          birth_place = $7,
+          age = $8,
+          marital_status = $9,
+          financial_proof = $10,
+          
+          -- Pasaport Bilgileri
+          passport_number = $11,
+          passport_type = $12,
+          passport_issue_date = $13,
+          passport_expiry_date = $14,
+          issuing_authority = $15,
+          pnr_number = $16,
+          
+          -- Aile Bilgileri
+          mother_name = $17,
+          mother_surname = $18,
+          mother_birth_date = $19,
+          mother_birth_place = $20,
+          mother_residence = $21,
+          mother_phone = $22,
+          
+          father_name = $23,
+          father_surname = $24,
+          father_birth_date = $25,
+          father_birth_place = $26,
+          father_residence = $27,
+          father_phone = $28,
+          
+          -- Eğitim Bilgileri
+          high_school_name = $29,
+          high_school_type = $30,
+          high_school_city = $31,
+          high_school_graduation_date = $32,
+          high_school_start_date = $33,
+          
+          university_name = $34,
+          university_department = $35,
+          university_start_date = $36,
+          university_end_date = $37,
+          graduation_status = $38,
+          graduation_year = $39,
+          
+          -- Dil Bilgileri
+          language_level = $40,
+          language_certificate = $41,
+          language_learning_status = $42,
+          
+          -- Sınav ve Vize Bilgileri
+          exam_entry = $43,
+          exam_result_date = $44,
+          visa_appointment_date = $45,
+          visa_application_date = $46,
+          visa_consulate = $47,
+          visa_document = $48,
+          
+          -- Diğer Bilgiler
+          has_been_to_germany = $49,
+          german_department_preference = $50,
+          university_preferences = $51,
+          financial_proof_status = $52,
+          additional_info = $53
+          
+        WHERE email = $54
+        RETURNING *
+      `;
+      
+      const updateValues = [
+        body.name || existingStudent.name,
+        body.phone || existingStudent.phone,
+        body.contact_address || existingStudent.contact_address,
+        stage,
+        true,
+        
+        // Kişisel Bilgiler
+        body.x_studio_doum_tarihi || existingStudent.birth_date,
+        body.x_studio_doum_yeri || existingStudent.birth_place,
+        body.x_studio_ya || existingStudent.age,
+        body.x_studio_medeni_durum_1 || existingStudent.marital_status,
+        body.x_studio_finansal_kant || existingStudent.financial_proof,
+        
+        // Pasaport Bilgileri
+        body.x_studio_pasaport_numaras || existingStudent.passport_number,
+        body.x_studio_pasaport_tr || existingStudent.passport_type,
+        body.x_studio_verili_tarihi || existingStudent.passport_issue_date,
+        body.x_studio_geerlilik_tarihi || existingStudent.passport_expiry_date,
+        body.x_studio_veren_makam || existingStudent.issuing_authority,
+        body.x_studio_pnr_numaras || existingStudent.pnr_number,
+        
+        // Aile Bilgileri
+        body.x_studio_anne_ad || existingStudent.mother_name,
+        body.x_studio_anne_soyad || existingStudent.mother_surname,
+        body.x_studio_anne_doum_tarihi || existingStudent.mother_birth_date,
+        body.x_studio_anne_doum_yeri || existingStudent.mother_birth_place,
+        body.x_studio_anne_ikamet_sehrilke || existingStudent.mother_residence,
+        body.x_studio_anne_telefon || existingStudent.mother_phone,
+        
+        body.x_studio_baba_ad || existingStudent.father_name,
+        body.x_studio_baba_soyad || existingStudent.father_surname,
+        body.x_studio_baba_doum_tarihi || existingStudent.father_birth_date,
+        body.x_studio_baba_doum_yeri || existingStudent.father_birth_place,
+        body.x_studio_baba_ikamet_ehrilkesi || existingStudent.father_residence,
+        body.x_studio_baba_telefon || existingStudent.father_phone,
+        
+        // Eğitim Bilgileri
+        body.x_studio_lise_ad || existingStudent.high_school_name,
+        body.x_studio_lise_tr || existingStudent.high_school_type,
+        body.x_studio_lise_ehir || existingStudent.high_school_city,
+        body.x_studio_lise_biti_tarihi || existingStudent.high_school_graduation_date,
+        body.x_studio_lise_balang_tarihi_1 || existingStudent.high_school_start_date,
+        
+        body.x_studio_niversite_ad || existingStudent.university_name,
+        body.x_studio_niversite_blm_ad || existingStudent.university_department,
+        body.x_studio_niversite_balang_tarihi || existingStudent.university_start_date,
+        body.x_studio_niversite_biti_tarihi || existingStudent.university_end_date,
+        body.x_studio_mezuniyet_durumu || existingStudent.graduation_status,
+        body.x_studio_mezuniyet_yl || existingStudent.graduation_year,
+        
+        // Dil Bilgileri
+        body.x_studio_almanca_seviyesi_1 || existingStudent.language_level,
+        body.x_studio_almanca_sertifikas || existingStudent.language_certificate,
+        body.x_studio_dil_renim_durumu || existingStudent.language_learning_status,
+        
+        // Sınav ve Vize Bilgileri
+        body.x_studio_sym_snav_giri || existingStudent.exam_entry,
+        body.x_studio_sym_yerlestirme_sonuc_tarihi || existingStudent.exam_result_date,
+        body.x_studio_vize_randevu_tarihi || existingStudent.visa_appointment_date,
+        body.x_studio_vize_bavuru_tarihi_1 || existingStudent.visa_application_date,
+        body.x_studio_konsolosluk_1 || existingStudent.visa_consulate,
+        body.x_studio_vize_randevu_belgesi || existingStudent.visa_document,
+        
+        // Diğer Bilgiler
+        body.x_studio_almanya_bulunma || existingStudent.has_been_to_germany,
+        body.x_studio_de_blm_tercihi || existingStudent.german_department_preference,
+        body.x_studio_niversite_tercihleri || existingStudent.university_preferences,
+        body.x_studio_maddi_kant_durumu || existingStudent.financial_proof_status,
+        body.x_studio_bilgiler_1 || existingStudent.additional_info,
+        
+        email
+      ];
+      
+      const updateResult = await client.query(updateQuery, updateValues);
+      const updatedStudent = updateResult.rows[0];
+
+      console.log('\n✅ Öğrenci başarıyla güncellendi:', JSON.stringify(updatedStudent, null, 2));
+
       return NextResponse.json({
-        error: 'Student not found',
-        message: 'Bu email adresiyle kayıtlı öğrenci bulunamadı',
-        email: email
-      }, { status: 404 });
+        success: true,
+        message: 'Öğrenci bilgileri güncellendi',
+        student: updatedStudent
+      }, { status: 200 });
+
+    } finally {
+      client.release();
     }
-    console.log('✅ Öğrenci bulundu:', existingStudent.name);
-
-    // Durum kontrolü
-    const stage = body.x_studio_selection_field_8en_1iqnrqang || body.stage || '';
-    console.log('\nDurum Kontrolü:', stage);
-
-    // Öğrenci verisini güncelle
-    console.log('\nÖğrenci güncelleniyor...');
-    const updatedStudent = await updateOrCreateRecord({
-      email: email,
-      name: body.name || existingStudent.name,
-      phone: body.phone || existingStudent.phone,
-      contact_address: body.contact_address || existingStudent.contact_address,
-      stage: stage,
-      processStarted: true,
-      updatedAt: new Date().toISOString(),
-      webhook_updated: true,
-      webhook_update_timestamp: new Date().toISOString(),
-      
-      // Kişisel Bilgiler
-      x_studio_doum_tarihi: body.x_studio_doum_tarihi || existingStudent.x_studio_doum_tarihi,
-      x_studio_doum_yeri: body.x_studio_doum_yeri || existingStudent.x_studio_doum_yeri,
-      x_studio_ya: body.x_studio_ya || existingStudent.x_studio_ya,
-      x_studio_medeni_durum_1: body.x_studio_medeni_durum_1 || existingStudent.x_studio_medeni_durum_1,
-      x_studio_finansal_kant: body.x_studio_finansal_kant || existingStudent.x_studio_finansal_kant,
-      
-      // Pasaport Bilgileri
-      x_studio_pasaport_numaras: body.x_studio_pasaport_numaras || existingStudent.x_studio_pasaport_numaras,
-      x_studio_pasaport_tr: body.x_studio_pasaport_tr || existingStudent.x_studio_pasaport_tr,
-      x_studio_verili_tarihi: body.x_studio_verili_tarihi || existingStudent.x_studio_verili_tarihi,
-      x_studio_geerlilik_tarihi: body.x_studio_geerlilik_tarihi || existingStudent.x_studio_geerlilik_tarihi,
-      x_studio_veren_makam: body.x_studio_veren_makam || existingStudent.x_studio_veren_makam,
-      x_studio_pnr_numaras: body.x_studio_pnr_numaras || existingStudent.x_studio_pnr_numaras,
-      
-      // Aile Bilgileri
-      x_studio_anne_ad: body.x_studio_anne_ad || existingStudent.x_studio_anne_ad,
-      x_studio_anne_soyad: body.x_studio_anne_soyad || existingStudent.x_studio_anne_soyad,
-      x_studio_anne_doum_tarihi: body.x_studio_anne_doum_tarihi || existingStudent.x_studio_anne_doum_tarihi,
-      x_studio_anne_doum_yeri: body.x_studio_anne_doum_yeri || existingStudent.x_studio_anne_doum_yeri,
-      x_studio_anne_ikamet_sehrilke: body.x_studio_anne_ikamet_sehrilke || existingStudent.x_studio_anne_ikamet_sehrilke,
-      x_studio_anne_telefon: body.x_studio_anne_telefon || existingStudent.x_studio_anne_telefon,
-      
-      x_studio_baba_ad: body.x_studio_baba_ad || existingStudent.x_studio_baba_ad,
-      x_studio_baba_soyad: body.x_studio_baba_soyad || existingStudent.x_studio_baba_soyad,
-      x_studio_baba_doum_tarihi: body.x_studio_baba_doum_tarihi || existingStudent.x_studio_baba_doum_tarihi,
-      x_studio_baba_doum_yeri: body.x_studio_baba_doum_yeri || existingStudent.x_studio_baba_doum_yeri,
-      x_studio_baba_ikamet_ehrilkesi: body.x_studio_baba_ikamet_ehrilkesi || existingStudent.x_studio_baba_ikamet_ehrilkesi,
-      x_studio_baba_telefon: body.x_studio_baba_telefon || existingStudent.x_studio_baba_telefon,
-      
-      // Eğitim Bilgileri
-      x_studio_lise_ad: body.x_studio_lise_ad || existingStudent.x_studio_lise_ad,
-      x_studio_lise_tr: body.x_studio_lise_tr || existingStudent.x_studio_lise_tr,
-      x_studio_lise_ehir: body.x_studio_lise_ehir || existingStudent.x_studio_lise_ehir,
-      x_studio_lise_biti_tarihi: body.x_studio_lise_biti_tarihi || existingStudent.x_studio_lise_biti_tarihi,
-      x_studio_lise_balang_tarihi_1: body.x_studio_lise_balang_tarihi_1 || existingStudent.x_studio_lise_balang_tarihi_1,
-      
-      x_studio_niversite_ad: body.x_studio_niversite_ad || existingStudent.x_studio_niversite_ad,
-      x_studio_niversite_blm_ad: body.x_studio_niversite_blm_ad || existingStudent.x_studio_niversite_blm_ad,
-      x_studio_niversite_balang_tarihi: body.x_studio_niversite_balang_tarihi || existingStudent.x_studio_niversite_balang_tarihi,
-      x_studio_niversite_biti_tarihi: body.x_studio_niversite_biti_tarihi || existingStudent.x_studio_niversite_biti_tarihi,
-      x_studio_mezuniyet_durumu: body.x_studio_mezuniyet_durumu || existingStudent.x_studio_mezuniyet_durumu,
-      x_studio_mezuniyet_yl: body.x_studio_mezuniyet_yl || existingStudent.x_studio_mezuniyet_yl,
-      
-      // Dil Bilgileri
-      x_studio_almanca_seviyesi_1: body.x_studio_almanca_seviyesi_1 || existingStudent.x_studio_almanca_seviyesi_1,
-      x_studio_almanca_sertifikas: body.x_studio_almanca_sertifikas || existingStudent.x_studio_almanca_sertifikas,
-      x_studio_dil_kursu_kayt: body.x_studio_dil_kursu_kayt || existingStudent.x_studio_dil_kursu_kayt,
-      x_studio_dil_renim_durumu: body.x_studio_dil_renim_durumu || existingStudent.x_studio_dil_renim_durumu,
-      
-      // Sınav ve Vize Bilgileri
-      x_studio_sym_snav_giri: body.x_studio_sym_snav_giri || existingStudent.x_studio_sym_snav_giri,
-      x_studio_sym_yerlestirme_sonuc_tarihi: body.x_studio_sym_yerlestirme_sonuc_tarihi || existingStudent.x_studio_sym_yerlestirme_sonuc_tarihi,
-      x_studio_vize_randevu_tarihi: body.x_studio_vize_randevu_tarihi || existingStudent.x_studio_vize_randevu_tarihi,
-      x_studio_vize_bavuru_tarihi_1: body.x_studio_vize_bavuru_tarihi_1 || existingStudent.x_studio_vize_bavuru_tarihi_1,
-      x_studio_konsolosluk_1: body.x_studio_konsolosluk_1 || existingStudent.x_studio_konsolosluk_1,
-      x_studio_vize_randevu_belgesi: body.x_studio_vize_randevu_belgesi || existingStudent.x_studio_vize_randevu_belgesi,
-      
-      // Diğer Bilgiler
-      x_studio_almanya_bulunma: body.x_studio_almanya_bulunma || existingStudent.x_studio_almanya_bulunma,
-      x_studio_de_blm_tercihi: body.x_studio_de_blm_tercihi || existingStudent.x_studio_de_blm_tercihi,
-      x_studio_niversite_tercihleri: body.x_studio_niversite_tercihleri || existingStudent.x_studio_niversite_tercihleri,
-      x_studio_maddi_kant_durumu: body.x_studio_maddi_kant_durumu || existingStudent.x_studio_maddi_kant_durumu,
-      x_studio_bilgiler_1: body.x_studio_bilgiler_1 || existingStudent.x_studio_bilgiler_1,
-      
-      // Eş Bilgileri
-      x_studio_es_ad_soyad: body.x_studio_es_ad_soyad || existingStudent.x_studio_es_ad_soyad,
-      x_studio_es_klk_soyad: body.x_studio_es_klk_soyad || existingStudent.x_studio_es_klk_soyad,
-      x_studio_es_doum_tarihi: body.x_studio_es_doum_tarihi || existingStudent.x_studio_es_doum_tarihi,
-      x_studio_es_doum_yeri: body.x_studio_es_doum_yeri || existingStudent.x_studio_es_doum_yeri,
-      x_studio_es_ikamet: body.x_studio_es_ikamet || existingStudent.x_studio_es_ikamet,
-      
-      // Çocuk Bilgileri
-      x_studio_cocuk_var_m: body.x_studio_cocuk_var_m || existingStudent.x_studio_cocuk_var_m,
-      x_studio_cocuk_ad_soyad: body.x_studio_cocuk_ad_soyad || existingStudent.x_studio_cocuk_ad_soyad,
-      x_studio_cocuk_doum_tarihi: body.x_studio_cocuk_doum_tarihi || existingStudent.x_studio_cocuk_doum_tarihi,
-      x_studio_cocuk_doum_yeri: body.x_studio_cocuk_doum_yeri || existingStudent.x_studio_cocuk_doum_yeri,
-      x_studio_cocuk_vatandaslik: body.x_studio_cocuk_vatandaslik || existingStudent.x_studio_cocuk_vatandaslik,
-      x_studio_cocuk_ikamet: body.x_studio_cocuk_ikamet || existingStudent.x_studio_cocuk_ikamet,
-      
-      // Almanya'da Bulunma Bilgileri
-      x_studio_almanya_bulunma_tarihleri: body.x_studio_almanya_bulunma_tarihleri || existingStudent.x_studio_almanya_bulunma_tarihleri,
-      x_studio_almanya_bulunma_sehir: body.x_studio_almanya_bulunma_sehir || existingStudent.x_studio_almanya_bulunma_sehir,
-    });
-
-    console.log('\n✅ Öğrenci başarıyla güncellendi:', JSON.stringify(updatedStudent, null, 2));
-
-    return NextResponse.json({
-      success: true,
-      message: 'Öğrenci bilgileri güncellendi',
-      student: updatedStudent
-    }, { status: 200 });
 
   } catch (error: any) {
     console.error('\n❌ Webhook işleme hatası:', error);
-    logError('Webhook error', error);
+    logger.error('Webhook error', error);
     
     return NextResponse.json(
       { error: 'Internal server error', details: error.message },
