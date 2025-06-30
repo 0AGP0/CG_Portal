@@ -49,8 +49,13 @@ export async function GET(request: NextRequest) {
         headers
       }
     );
-  } catch (error) {
+  } catch (error: any) {
     logger.error('Admin öğrenci listesi hatası:', error);
+    logger.error('Hata detayı:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
     return NextResponse.json(
       { error: 'Öğrenci listesi alınırken bir hata oluştu' },
       { 
