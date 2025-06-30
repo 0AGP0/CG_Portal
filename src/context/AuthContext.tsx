@@ -120,14 +120,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         body: JSON.stringify({ email, password }),
       });
 
+      logger.info('API yanıtı alındı:', { status: response.status, ok: response.ok });
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: 'Sunucu hatası' }));
+        logger.error('API hatası:', errorData);
         throw new Error(errorData.error || 'Giriş başarısız');
       }
 
       const data = await response.json();
+      logger.info('API yanıt verisi:', data);
       
       if (!data.success || !data.user) {
+        logger.error('Geçersiz API yanıtı:', data);
         throw new Error(data.error || 'Geçersiz yanıt formatı');
       }
 
@@ -137,15 +142,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         role: data.user.role || userRole
       };
 
+      logger.info('Kullanıcı verisi hazırlandı:', userData);
+
       // Token ve kullanıcı bilgilerini cookie'ye kaydet
-      document.cookie = `token=${data.token || 'dummy-token'}; path=/; max-age=86400; SameSite=Lax; Secure`;
-      document.cookie = `user=${encodeURIComponent(JSON.stringify(userData))}; path=/; max-age=86400; SameSite=Lax; Secure`;
+      const tokenValue = data.token || 'dummy-token';
+      const userValue = encodeURIComponent(JSON.stringify(userData));
+      
+      document.cookie = `token=${tokenValue}; path=/; max-age=86400; SameSite=Lax`;
+      document.cookie = `user=${userValue}; path=/; max-age=86400; SameSite=Lax`;
+
+      logger.info('Cookie\'ler ayarlandı');
 
       // State'i güncelle
       setUser(userData);
       setIsAuthenticated(true);
       
-      logger.info('Giriş başarılı:', userData);
+      logger.info('State güncellendi, kullanıcı giriş yaptı:', userData);
       return true;
     } catch (error) {
       logger.error('Giriş hatası:', error);
