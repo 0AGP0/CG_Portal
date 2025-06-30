@@ -233,7 +233,7 @@ export async function getAllStudents() {
         COALESCE(a.name, 'Atanmadı') as advisor_name,
         a.email as advisor_email
       FROM students s
-      LEFT JOIN advisors a ON s.advisor_id = a.id
+      LEFT JOIN advisors a ON s.advisor_email = a.email
       ORDER BY s.created_at DESC
     `;
     
