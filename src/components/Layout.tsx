@@ -724,12 +724,12 @@ const Layout = ({ children }: LayoutProps) => {
           </motion.div>
         )}
         
-        <main className={`flex-1 p-4 sm:p-6 md:p-8 transition-all duration-300 ${showSidebar ? 'md:ml-[280px]' : ''} pb-24 md:pb-8`}>
+        <main className={`flex-1 p-4 sm:p-6 md:p-8 transition-all duration-300 ${showSidebar ? 'md:ml-[280px]' : ''} pb-24 md:pb-8 overflow-hidden`}>
           <motion.div
             variants={fadeInUp}
             initial="hidden"
             animate="visible"
-            className="max-w-7xl mx-auto"
+            className="w-full max-w-full mx-auto"
           >
             {isSpecialPage ? (
               // Admin, danışman veya öğrenci sayfaları için özel stil

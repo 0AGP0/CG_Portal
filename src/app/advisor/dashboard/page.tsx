@@ -263,7 +263,7 @@ export default function AdvisorDashboard() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="max-w-[1920px] mx-auto px-3 sm:px-4"
+        className="w-full max-w-full mx-auto px-2 sm:px-3 md:px-4 overflow-hidden"
       >
         <div className="mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-[#002757] dark:text-blue-300">
@@ -367,8 +367,8 @@ export default function AdvisorDashboard() {
         </div>
 
         {/* Aşama Sütunları */}
-        <div className="relative w-full overflow-x-auto pb-4">
-          <div className="flex gap-4 sm:gap-6 min-w-max px-2 sm:px-1">
+        <div className="relative w-full overflow-x-auto pb-4 max-w-full">
+          <div className="flex gap-3 sm:gap-4 md:gap-6 min-w-max px-1 sm:px-2 max-w-full">
             {STAGE_ORDER.map((stage) => {
               const stageStudents = getStudentsByStage(stage);
               const config = STAGE_CONFIG[stage];
@@ -379,7 +379,7 @@ export default function AdvisorDashboard() {
                   variants={itemVariants}
                   initial="hidden"
                   animate="visible"
-                  className={`${config.bgColor} ${config.borderColor} rounded-xl border shadow-sm w-[320px] sm:w-[360px] md:w-[400px] flex-shrink-0`}
+                  className={`${config.bgColor} ${config.borderColor} rounded-xl border shadow-sm w-[280px] sm:w-[320px] md:w-[360px] lg:w-[400px] flex-shrink-0`}
                 >
                   <div className="sticky top-0 z-10 p-4 border-b border-gray-100/60 dark:border-gray-700/30 bg-inherit backdrop-blur-sm">
                     <div className="flex items-center justify-between">
@@ -399,7 +399,7 @@ export default function AdvisorDashboard() {
                     </div>
                   </div>
 
-                  <div className="p-3 sm:p-4 space-y-3 sm:space-y-4 max-h-[calc(100vh-350px)] sm:max-h-[calc(100vh-300px)] overflow-y-auto">
+                  <div className="p-3 sm:p-4 space-y-3 sm:space-y-4 max-h-[calc(100vh-400px)] sm:max-h-[calc(100vh-350px)] md:max-h-[calc(100vh-300px)] overflow-y-auto">
                     {stageStudents.length === 0 ? (
                       <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
                         Bu aşamada öğrenci bulunmuyor

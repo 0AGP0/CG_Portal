@@ -307,8 +307,8 @@
     ".next\\BUILD_ID",
     ".next\\server\\next-font-manifest.js",
     ".next\\server\\next-font-manifest.json",
-    ".next\\static\\css\\931b179cff3131dc.css",
-    ".next\\static\\css\\d7c89340a4597855.css"
+    ".next\\static\\css\\06a212a77dd15e17.css",
+    ".next\\static\\css\\931b179cff3131dc.css"
   ],
   "ignore": [
     "node_modules\\next\\dist\\compiled\\@ampproject\\toolbox-optimizer\\**\\*"
