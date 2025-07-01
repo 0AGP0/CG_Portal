@@ -263,7 +263,7 @@ export default function AdvisorDashboard() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="max-w-[1920px] mx-auto px-4"
+        className="w-full max-w-[1920px] mx-auto px-2 sm:px-4"
       >
         <div className="mb-6 lg:mb-8">
           <h1 className="text-2xl lg:text-3xl font-bold text-[#002757] dark:text-blue-300">
@@ -275,12 +275,12 @@ export default function AdvisorDashboard() {
         </div>
 
         {/* İstatistik Kartları */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-6 mb-4 lg:mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-1 sm:gap-2 lg:gap-6 mb-4 lg:mb-8">
           <motion.div
             variants={itemVariants}
             initial="hidden"
             animate="visible"
-            className="card-blur p-3 lg:p-6 rounded-xl"
+            className="card-blur p-2 sm:p-3 lg:p-6 rounded-xl"
           >
             <div className="flex justify-between items-center">
               <div>
@@ -298,7 +298,7 @@ export default function AdvisorDashboard() {
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.1 }}
-            className="card-blur p-3 lg:p-6 rounded-xl"
+            className="card-blur p-2 sm:p-3 lg:p-6 rounded-xl"
           >
             <div className="flex justify-between items-center">
               <div>
@@ -316,7 +316,7 @@ export default function AdvisorDashboard() {
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.2 }}
-            className="card-blur p-3 lg:p-6 rounded-xl"
+            className="card-blur p-2 sm:p-3 lg:p-6 rounded-xl"
           >
             <div className="flex justify-between items-center">
               <div>
@@ -334,7 +334,7 @@ export default function AdvisorDashboard() {
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.3 }}
-            className="card-blur p-3 lg:p-6 rounded-xl"
+            className="card-blur p-2 sm:p-3 lg:p-6 rounded-xl"
           >
             <div className="flex justify-between items-center">
               <div>
@@ -350,7 +350,7 @@ export default function AdvisorDashboard() {
 
         {/* Arama Kutusu */}
         <div className="mb-4 lg:mb-6">
-          <div className="relative max-w-xl">
+          <div className="relative w-full max-w-xl">
             <input
               type="text"
               placeholder="İsim, email veya üniversite ile ara..."
@@ -471,7 +471,7 @@ export default function AdvisorDashboard() {
         <div className="lg:hidden">
           {/* Aşama Seçici */}
           <div className="mb-4">
-            <div className="flex space-x-2 overflow-x-auto scrollbar-hide pb-2">
+            <div className="flex space-x-1 sm:space-x-2 overflow-x-auto scrollbar-hide pb-2">
               {STAGE_ORDER.map((stage) => {
                 const stageStudents = getStudentsByStage(stage);
                 const config = STAGE_CONFIG[stage];
@@ -479,7 +479,7 @@ export default function AdvisorDashboard() {
                 return (
                   <button
                     key={stage}
-                    className={`flex-shrink-0 px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 ${
+                    className={`flex-shrink-0 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs font-medium transition-all duration-200 ${
                       stageStudents.length > 0 
                         ? 'bg-primary-500 text-white shadow-md' 
                         : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
