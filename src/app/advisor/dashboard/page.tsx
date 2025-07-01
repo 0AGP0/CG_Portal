@@ -467,11 +467,11 @@ export default function AdvisorDashboard() {
           </div>
         </div>
 
-        {/* Mobil Görünüm - Modern Kart Tasarımı */}
+        {/* Mobil Görünüm - Kompakt Kart Tasarımı */}
         <div className="lg:hidden">
           {/* Aşama Seçici */}
-          <div className="mb-6">
-            <div className="flex space-x-2 overflow-x-auto pb-2 scrollbar-hide">
+          <div className="mb-4">
+            <div className="flex space-x-1 overflow-x-auto pb-2 scrollbar-hide">
               {STAGE_ORDER.map((stage) => {
                 const stageStudents = getStudentsByStage(stage);
                 const config = STAGE_CONFIG[stage];
@@ -480,15 +480,15 @@ export default function AdvisorDashboard() {
                 return (
                   <button
                     key={stage}
-                    className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                    className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
                       isActive 
-                        ? 'bg-primary-500 text-white shadow-lg' 
+                        ? 'bg-primary-500 text-white shadow-md' 
                         : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
                     }`}
                   >
-                    <span className="mr-2">{config.icon}</span>
+                    <span className="mr-1">{config.icon}</span>
                     {STAGES[stage]}
-                    <span className="ml-2 bg-white/20 dark:bg-black/20 px-2 py-0.5 rounded-full text-xs">
+                    <span className="ml-1 bg-white/20 dark:bg-black/20 px-1.5 py-0.5 rounded text-xs">
                       {stageStudents.length}
                     </span>
                   </button>
@@ -498,7 +498,7 @@ export default function AdvisorDashboard() {
           </div>
 
           {/* Öğrenci Kartları */}
-          <div className="space-y-4">
+          <div className="space-y-3">
             {STAGE_ORDER.map((stage) => {
               const stageStudents = getStudentsByStage(stage);
               const config = STAGE_CONFIG[stage];
@@ -511,76 +511,78 @@ export default function AdvisorDashboard() {
                   variants={itemVariants}
                   initial="hidden"
                   animate="visible"
-                  className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden"
+                  className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden"
                 >
-                  {/* Üst Kısım - Öğrenci Bilgileri */}
-                  <div className="p-5">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center space-x-4">
-                        <div className="relative">
-                          <div className="h-16 w-16 rounded-full bg-gradient-to-br from-primary-500 via-primary-600 to-primary-700 flex items-center justify-center text-white font-bold text-xl shadow-lg">
-                            {student.name?.charAt(0) || student.email?.charAt(0) || '?'}
-                          </div>
-                          <div className={`absolute -bottom-1 -right-1 h-6 w-6 rounded-full ${config.iconBgColor} flex items-center justify-center text-xs`}>
-                            {config.icon}
-                          </div>
+                  {/* Ana İçerik */}
+                  <div className="p-4">
+                    {/* Üst Satır - Avatar ve İsim */}
+                    <div className="flex items-center space-x-3 mb-3">
+                      <div className="relative">
+                        <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-bold text-lg shadow-sm">
+                          {student.name?.charAt(0) || student.email?.charAt(0) || '?'}
                         </div>
-                        <div className="flex-1">
-                          <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">
-                            {student.name}
-                          </h3>
-                          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-                            {student.email}
-                          </p>
-                          {student.university && (
-                            <p className="text-xs text-gray-400 dark:text-gray-500">
-                              {student.university}
-                              {student.program && ` • ${student.program}`}
-                            </p>
-                          )}
+                        <div className={`absolute -bottom-0.5 -right-0.5 h-5 w-5 rounded-full ${config.iconBgColor} flex items-center justify-center text-xs`}>
+                          {config.icon}
                         </div>
                       </div>
                       
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-base font-semibold text-gray-900 dark:text-white truncate">
+                            {student.name}
+                          </h3>
+                          {(student.unreadMessages ?? 0) > 0 && (
+                            <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full ml-2 flex-shrink-0">
+                              {student.unreadMessages}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                          {student.email}
+                        </p>
+                      </div>
+                      
                       {/* Aşama Etiketi */}
-                      <div className={`px-3 py-1 rounded-full text-xs font-medium ${config.color} ${config.bgColor} border ${config.borderColor}`}>
+                      <div className={`px-2 py-1 rounded-lg text-xs font-medium ${config.color} ${config.bgColor} border ${config.borderColor} flex-shrink-0`}>
                         {STAGES[stage]}
                       </div>
                     </div>
 
-                    {/* İstatistikler */}
-                    <div className="grid grid-cols-3 gap-4 mb-4">
-                      <div className="text-center">
-                        <div className="text-lg font-bold text-primary-600 dark:text-primary-400">12</div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400">Belge</div>
+                    {/* Üniversite Bilgisi */}
+                    {student.university && (
+                      <div className="mb-3">
+                        <p className="text-xs text-gray-400 dark:text-gray-500">
+                          {student.university}
+                          {student.program && ` • ${student.program}`}
+                        </p>
                       </div>
-                      <div className="text-center">
-                        <div className="text-lg font-bold text-success-600 dark:text-success-400">5</div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400">Mesaj</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-lg font-bold text-warning-600 dark:text-warning-400">3</div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400">Bekleyen</div>
-                      </div>
+                    )}
+
+                    {/* Hızlı İstatistikler */}
+                    <div className="flex items-center justify-between mb-3 text-xs text-gray-500 dark:text-gray-400">
+                      <span>📄 12 belge</span>
+                      <span>💬 5 mesaj</span>
+                      <span>⏳ 3 bekleyen</span>
                     </div>
 
-                    {/* Butonlar */}
-                    <div className="flex space-x-3">
+                    {/* Butonlar - Dikey Düzen */}
+                    <div className="grid grid-cols-3 gap-2">
                       <button
                         onClick={() => setSelectedStudent(student)}
-                        className="flex-1 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white py-3 px-4 rounded-xl font-medium text-sm transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center space-x-2"
+                        className="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-2 px-3 rounded-lg font-medium text-xs transition-all duration-200 flex items-center justify-center space-x-1"
                       >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                         </svg>
-                        <span>Detaylar</span>
+                        <span>Detay</span>
                       </button>
                       
                       <Link 
                         href={`/advisor/messages?student=${encodeURIComponent(student.email || '')}`}
-                        className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-3 px-4 rounded-xl font-medium text-sm transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center space-x-2"
+                        className="bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 py-2 px-3 rounded-lg font-medium text-xs transition-all duration-200 flex items-center justify-center space-x-1"
                       >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                         </svg>
                         <span>Mesaj</span>
@@ -588,33 +590,25 @@ export default function AdvisorDashboard() {
                       
                       <Link 
                         href={`/advisor/documents?student=${encodeURIComponent(student.email || '')}`}
-                        className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 px-4 rounded-xl font-medium text-sm transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center space-x-2"
+                        className="bg-green-100 dark:bg-green-900/30 hover:bg-green-200 dark:hover:bg-green-900/50 text-green-700 dark:text-green-300 py-2 px-3 rounded-lg font-medium text-xs transition-all duration-200 flex items-center justify-center space-x-1"
                       >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                        <span>Belgeler</span>
+                        <span>Belge</span>
                       </Link>
                     </div>
                   </div>
 
-                  {/* Alt Kısım - Hızlı Aksiyonlar */}
-                  <div className="bg-gray-50 dark:bg-gray-700 px-5 py-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4">
-                        <button className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          <span>Son Güncelleme: 2 saat önce</span>
-                        </button>
-                      </div>
-                      
+                  {/* Alt Bilgi */}
+                  <div className="bg-gray-50 dark:bg-gray-700/50 px-4 py-2 border-t border-gray-100 dark:border-gray-600">
+                    <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                      <span>Son güncelleme: 2 saat önce</span>
                       {(student.unreadMessages ?? 0) > 0 && (
-                        <div className="flex items-center space-x-2">
-                          <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-                          <span className="text-sm font-medium text-red-600 dark:text-red-400">
-                            {student.unreadMessages} yeni mesaj
+                        <div className="flex items-center space-x-1">
+                          <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></div>
+                          <span className="text-red-600 dark:text-red-400 font-medium">
+                            {student.unreadMessages} yeni
                           </span>
                         </div>
                       )}
