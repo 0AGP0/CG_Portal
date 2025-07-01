@@ -265,30 +265,30 @@ export default function AdvisorDashboard() {
         transition={{ duration: 0.5 }}
         className="max-w-[1920px] mx-auto px-4"
       >
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-[#002757] dark:text-blue-300">
+        <div className="mb-6 lg:mb-8">
+          <h1 className="text-2xl lg:text-3xl font-bold text-[#002757] dark:text-blue-300">
             Öğrenciler
           </h1>
-          <p className="text-default mt-1">
+          <p className="text-sm lg:text-base text-default mt-1">
             Tüm öğrencilerinizi ve süreçlerinizi buradan yönetebilirsiniz.
           </p>
         </div>
 
         {/* İstatistik Kartları */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
           <motion.div
             variants={itemVariants}
             initial="hidden"
             animate="visible"
-            className="card-blur p-6 rounded-xl"
+            className="card-blur p-4 lg:p-6 rounded-xl"
           >
             <div className="flex justify-between items-center">
               <div>
-                <p className="text-sm font-medium text-primary-600 dark:text-primary-400">Toplam Öğrenci</p>
-                <p className="text-2xl font-bold text-primary-700 dark:text-primary-300 mt-1">{statsData.totalStudents}</p>
+                <p className="text-xs lg:text-sm font-medium text-primary-600 dark:text-primary-400">Toplam Öğrenci</p>
+                <p className="text-xl lg:text-2xl font-bold text-primary-700 dark:text-primary-300 mt-1">{statsData.totalStudents}</p>
               </div>
-              <div className="h-12 w-12 rounded-full bg-primary-100/50 dark:bg-primary-900/30 flex items-center justify-center">
-                <span className="text-2xl">👥</span>
+              <div className="h-10 w-10 lg:h-12 lg:w-12 rounded-full bg-primary-100/50 dark:bg-primary-900/30 flex items-center justify-center">
+                <span className="text-lg lg:text-2xl">👥</span>
               </div>
             </div>
           </motion.div>
@@ -298,15 +298,15 @@ export default function AdvisorDashboard() {
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.1 }}
-            className="card-blur p-6 rounded-xl"
+            className="card-blur p-4 lg:p-6 rounded-xl"
           >
             <div className="flex justify-between items-center">
               <div>
-                <p className="text-sm font-medium text-success-600 dark:text-success-400">Aktif Süreçler</p>
-                <p className="text-2xl font-bold text-success-700 dark:text-success-300 mt-1">{statsData.activeProcesses}</p>
+                <p className="text-xs lg:text-sm font-medium text-success-600 dark:text-success-400">Aktif Süreçler</p>
+                <p className="text-xl lg:text-2xl font-bold text-success-700 dark:text-success-300 mt-1">{statsData.activeProcesses}</p>
               </div>
-              <div className="h-12 w-12 rounded-full bg-success-100/50 dark:bg-success-900/30 flex items-center justify-center">
-                <span className="text-2xl">📊</span>
+              <div className="h-10 w-10 lg:h-12 lg:w-12 rounded-full bg-success-100/50 dark:bg-success-900/30 flex items-center justify-center">
+                <span className="text-lg lg:text-2xl">📊</span>
               </div>
             </div>
           </motion.div>
@@ -316,15 +316,15 @@ export default function AdvisorDashboard() {
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.2 }}
-            className="card-blur p-6 rounded-xl"
+            className="card-blur p-4 lg:p-6 rounded-xl"
           >
             <div className="flex justify-between items-center">
               <div>
-                <p className="text-sm font-medium text-warning-600 dark:text-warning-400">Bekleyen Belgeler</p>
-                <p className="text-2xl font-bold text-warning-700 dark:text-warning-300 mt-1">{statsData.pendingDocuments}</p>
+                <p className="text-xs lg:text-sm font-medium text-warning-600 dark:text-warning-400">Bekleyen Belgeler</p>
+                <p className="text-xl lg:text-2xl font-bold text-warning-700 dark:text-warning-300 mt-1">{statsData.pendingDocuments}</p>
               </div>
-              <div className="h-12 w-12 rounded-full bg-warning-100/50 dark:bg-warning-900/30 flex items-center justify-center">
-                <span className="text-2xl">📄</span>
+              <div className="h-10 w-10 lg:h-12 lg:w-12 rounded-full bg-warning-100/50 dark:bg-warning-900/30 flex items-center justify-center">
+                <span className="text-lg lg:text-2xl">📄</span>
               </div>
             </div>
           </motion.div>
@@ -334,40 +334,40 @@ export default function AdvisorDashboard() {
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.3 }}
-            className="card-blur p-6 rounded-xl"
+            className="card-blur p-4 lg:p-6 rounded-xl"
           >
             <div className="flex justify-between items-center">
               <div>
-                <p className="text-sm font-medium text-accent-600 dark:text-accent-400">Yaklaşan Randevular</p>
-                <p className="text-2xl font-bold text-accent-700 dark:text-accent-300 mt-1">{statsData.upcomingAppointments}</p>
+                <p className="text-xs lg:text-sm font-medium text-accent-600 dark:text-accent-400">Yaklaşan Randevular</p>
+                <p className="text-xl lg:text-2xl font-bold text-accent-700 dark:text-accent-300 mt-1">{statsData.upcomingAppointments}</p>
               </div>
-              <div className="h-12 w-12 rounded-full bg-accent-100/50 dark:bg-accent-900/30 flex items-center justify-center">
-                <span className="text-2xl">📅</span>
+              <div className="h-10 w-10 lg:h-12 lg:w-12 rounded-full bg-accent-100/50 dark:bg-accent-900/30 flex items-center justify-center">
+                <span className="text-lg lg:text-2xl">📅</span>
               </div>
             </div>
           </motion.div>
         </div>
 
         {/* Arama Kutusu */}
-        <div className="mb-6">
+        <div className="mb-4 lg:mb-6">
           <div className="relative max-w-xl">
             <input
               type="text"
               placeholder="İsim, email veya üniversite ile ara..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-3 pl-12 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-transparent shadow-sm"
+              className="w-full px-3 lg:px-4 py-2 lg:py-3 pl-10 lg:pl-12 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-transparent shadow-sm text-sm lg:text-base"
             />
-            <div className="absolute left-4 top-3.5 text-gray-400">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="absolute left-3 lg:left-4 top-2.5 lg:top-3.5 text-gray-400">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 lg:h-5 lg:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
           </div>
         </div>
 
-        {/* Aşama Sütunları */}
-        <div className="relative w-full overflow-x-auto pb-4">
+        {/* Aşama Sütunları - Desktop */}
+        <div className="hidden lg:block relative w-full overflow-x-auto pb-4">
           <div className="flex gap-6 min-w-max px-1">
             {STAGE_ORDER.map((stage) => {
               const stageStudents = getStudentsByStage(stage);
@@ -465,6 +465,99 @@ export default function AdvisorDashboard() {
               );
             })}
           </div>
+        </div>
+
+        {/* Mobil Görünüm - Dikey Liste */}
+        <div className="lg:hidden space-y-6">
+          {STAGE_ORDER.map((stage) => {
+            const stageStudents = getStudentsByStage(stage);
+            const config = STAGE_CONFIG[stage];
+            
+            if (stageStudents.length === 0) return null;
+            
+            return (
+              <motion.div
+                key={stage}
+                variants={itemVariants}
+                initial="hidden"
+                animate="visible"
+                className={`${config.bgColor} ${config.borderColor} rounded-xl border shadow-sm`}
+              >
+                <div className="p-4 border-b border-gray-100/60 dark:border-gray-700/30">
+                  <div className="flex items-center space-x-3">
+                    <div className={`p-2 rounded-lg ${config.iconBgColor}`}>
+                      {config.icon}
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-[#002757] dark:text-blue-300 text-lg">
+                        {STAGES[stage]}
+                      </h3>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {stageStudents.length} öğrenci
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-4 space-y-4">
+                  {stageStudents.map((student: Student) => (
+                    <div
+                      key={student.email}
+                      className="card-blur rounded-lg p-4 hover:shadow-md transition-all duration-200"
+                    >
+                      <div className="flex items-start space-x-3">
+                        <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-bold text-base shadow-sm flex-shrink-0">
+                          {student.name?.charAt(0) || student.email?.charAt(0) || '?'}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between mb-2">
+                            <p className="text-base font-medium text-gray-900 dark:text-gray-100">
+                              {student.name}
+                            </p>
+                            {(student.unreadMessages ?? 0) > 0 && (
+                              <span className="bg-danger-500 text-white text-xs px-2 py-1 rounded-full shadow-sm flex-shrink-0">
+                                {student.unreadMessages}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+                            {student.email}
+                          </p>
+                          {student.university && (
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                              {student.university}
+                              {student.program && ` - ${student.program}`}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div className="mt-4 grid grid-cols-3 gap-2">
+                        <button
+                          onClick={() => setSelectedStudent(student)}
+                          className="px-3 py-2 bg-gradient-to-r from-secondary-500 to-secondary-600 text-white text-sm rounded-lg hover:from-secondary-600 hover:to-secondary-700 text-center font-medium shadow-sm transition-all duration-200 hover:shadow-md"
+                        >
+                          Detaylar
+                        </button>
+                        <Link 
+                          href={`/advisor/messages?student=${encodeURIComponent(student.email || '')}`}
+                          className="px-3 py-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white text-sm rounded-lg hover:from-primary-600 hover:to-primary-700 text-center font-medium shadow-sm transition-all duration-200 hover:shadow-md"
+                        >
+                          Mesaj
+                        </Link>
+                        <Link 
+                          href={`/advisor/documents?student=${encodeURIComponent(student.email || '')}`}
+                          className="px-3 py-2 bg-gradient-to-r from-accent-500 to-accent-600 text-white text-sm rounded-lg hover:from-accent-600 hover:to-accent-700 text-center font-medium shadow-sm transition-all duration-200 hover:shadow-md"
+                        >
+                          Belgeler
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
 
         {/* Öğrenci Detay Modalı */}
