@@ -83,7 +83,7 @@ const FIELD_MAPPING = {
 };
 
 // Değerleri temizleyen yardımcı fonksiyon
-function cleanValue(value: any): any {
+function cleanValue(value: any, fieldName?: string): any {
   if (value === null || value === undefined || value === '' || value === false) {
     return null;
   }
@@ -92,6 +92,22 @@ function cleanValue(value: any): any {
   if (typeof value === 'string') {
     const trimmed = value.trim();
     if (trimmed === '') return null;
+    
+    // graduation_year alanı için özel işlem
+    if (fieldName === 'graduation_year') {
+      // Tarih formatından yıl çıkar
+      if (isDateField(trimmed)) {
+        const parts = trimmed.split('.');
+        if (parts.length === 3) {
+          return parseInt(parts[2], 10); // Yıl kısmını integer olarak döndür
+        }
+      }
+      // Sadece yıl içeren string'i integer'a çevir
+      if (/^\d{4}$/.test(trimmed)) {
+        return parseInt(trimmed, 10);
+      }
+      return null;
+    }
     
     // Tarih formatını kontrol et ve düzelt
     if (isDateField(trimmed)) {
@@ -248,7 +264,7 @@ export async function POST(request: NextRequest) {
       // FIELD_MAPPING kullanarak alanları eşle
       for (const [odooField, dbField] of Object.entries(FIELD_MAPPING)) {
         if (body.hasOwnProperty(odooField)) {
-          const cleanedValue = cleanValue(body[odooField]);
+          const cleanedValue = cleanValue(body[odooField], dbField);
           if (cleanedValue !== null) {
             fieldsToUpdate[dbField] = cleanedValue;
             console.log(`📝 ${odooField} -> ${dbField}: ${cleanedValue}`);
