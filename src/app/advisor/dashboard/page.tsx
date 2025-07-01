@@ -263,32 +263,32 @@ export default function AdvisorDashboard() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full mx-auto"
+        className="max-w-[1920px] mx-auto px-3 sm:px-4"
       >
-        <div className="mb-6 lg:mb-8">
-          <h1 className="text-2xl lg:text-3xl font-bold text-[#002757] dark:text-blue-300">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#002757] dark:text-blue-300">
             Öğrenciler
           </h1>
-          <p className="text-sm lg:text-base text-default mt-1">
+          <p className="text-sm sm:text-base text-default mt-1">
             Tüm öğrencilerinizi ve süreçlerinizi buradan yönetebilirsiniz.
           </p>
         </div>
 
         {/* İstatistik Kartları */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-1 sm:gap-2 lg:gap-6 mb-4 lg:mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <motion.div
             variants={itemVariants}
             initial="hidden"
             animate="visible"
-            className="card-blur p-2 sm:p-3 lg:p-6 rounded-xl"
+            className="card-blur p-6 rounded-xl"
           >
             <div className="flex justify-between items-center">
               <div>
-                <p className="text-xs lg:text-sm font-medium text-primary-600 dark:text-primary-400">Toplam Öğrenci</p>
-                <p className="text-lg lg:text-2xl font-bold text-primary-700 dark:text-primary-300 mt-1">{statsData.totalStudents}</p>
+                <p className="text-sm font-medium text-primary-600 dark:text-primary-400">Toplam Öğrenci</p>
+                <p className="text-2xl font-bold text-primary-700 dark:text-primary-300 mt-1">{statsData.totalStudents}</p>
               </div>
-              <div className="h-8 w-8 lg:h-12 lg:w-12 rounded-full bg-primary-100/50 dark:bg-primary-900/30 flex items-center justify-center">
-                <span className="text-sm lg:text-2xl">👥</span>
+              <div className="h-12 w-12 rounded-full bg-primary-100/50 dark:bg-primary-900/30 flex items-center justify-center">
+                <span className="text-2xl">👥</span>
               </div>
             </div>
           </motion.div>
@@ -298,15 +298,15 @@ export default function AdvisorDashboard() {
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.1 }}
-            className="card-blur p-2 sm:p-3 lg:p-6 rounded-xl"
+            className="card-blur p-6 rounded-xl"
           >
             <div className="flex justify-between items-center">
               <div>
-                <p className="text-xs lg:text-sm font-medium text-success-600 dark:text-success-400">Aktif Süreçler</p>
-                <p className="text-lg lg:text-2xl font-bold text-success-700 dark:text-success-300 mt-1">{statsData.activeProcesses}</p>
+                <p className="text-sm font-medium text-success-600 dark:text-success-400">Aktif Süreçler</p>
+                <p className="text-2xl font-bold text-success-700 dark:text-success-300 mt-1">{statsData.activeProcesses}</p>
               </div>
-              <div className="h-8 w-8 lg:h-12 lg:w-12 rounded-full bg-success-100/50 dark:bg-success-900/30 flex items-center justify-center">
-                <span className="text-sm lg:text-2xl">📊</span>
+              <div className="h-12 w-12 rounded-full bg-success-100/50 dark:bg-success-900/30 flex items-center justify-center">
+                <span className="text-2xl">📊</span>
               </div>
             </div>
           </motion.div>
@@ -316,15 +316,15 @@ export default function AdvisorDashboard() {
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.2 }}
-            className="card-blur p-2 sm:p-3 lg:p-6 rounded-xl"
+            className="card-blur p-6 rounded-xl"
           >
             <div className="flex justify-between items-center">
               <div>
-                <p className="text-xs lg:text-sm font-medium text-warning-600 dark:text-warning-400">Bekleyen Belgeler</p>
-                <p className="text-lg lg:text-2xl font-bold text-warning-700 dark:text-warning-300 mt-1">{statsData.pendingDocuments}</p>
+                <p className="text-sm font-medium text-warning-600 dark:text-warning-400">Bekleyen Belgeler</p>
+                <p className="text-2xl font-bold text-warning-700 dark:text-warning-300 mt-1">{statsData.pendingDocuments}</p>
               </div>
-              <div className="h-8 w-8 lg:h-12 lg:w-12 rounded-full bg-warning-100/50 dark:bg-warning-900/30 flex items-center justify-center">
-                <span className="text-sm lg:text-2xl">📄</span>
+              <div className="h-12 w-12 rounded-full bg-warning-100/50 dark:bg-warning-900/30 flex items-center justify-center">
+                <span className="text-2xl">📄</span>
               </div>
             </div>
           </motion.div>
@@ -334,41 +334,41 @@ export default function AdvisorDashboard() {
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.3 }}
-            className="card-blur p-2 sm:p-3 lg:p-6 rounded-xl"
+            className="card-blur p-6 rounded-xl"
           >
             <div className="flex justify-between items-center">
               <div>
-                <p className="text-xs lg:text-sm font-medium text-accent-600 dark:text-accent-400">Yaklaşan Randevular</p>
-                <p className="text-lg lg:text-2xl font-bold text-accent-700 dark:text-accent-300 mt-1">{statsData.upcomingAppointments}</p>
+                <p className="text-sm font-medium text-accent-600 dark:text-accent-400">Yaklaşan Randevular</p>
+                <p className="text-2xl font-bold text-accent-700 dark:text-accent-300 mt-1">{statsData.upcomingAppointments}</p>
               </div>
-              <div className="h-8 w-8 lg:h-12 lg:w-12 rounded-full bg-accent-100/50 dark:bg-accent-900/30 flex items-center justify-center">
-                <span className="text-sm lg:text-2xl">📅</span>
+              <div className="h-12 w-12 rounded-full bg-accent-100/50 dark:bg-accent-900/30 flex items-center justify-center">
+                <span className="text-2xl">📅</span>
               </div>
             </div>
           </motion.div>
         </div>
 
         {/* Arama Kutusu */}
-        <div className="mb-4 lg:mb-6">
-          <div className="relative w-full max-w-xl">
+        <div className="mb-4 sm:mb-6">
+          <div className="relative max-w-xl mx-auto sm:mx-0">
             <input
               type="text"
               placeholder="İsim, email veya üniversite ile ara..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-3 lg:px-4 py-2 lg:py-3 pl-10 lg:pl-12 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-transparent shadow-sm text-sm lg:text-base"
+              className="w-full px-4 py-3 pl-12 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-transparent shadow-sm"
             />
-            <div className="absolute left-3 lg:left-4 top-2.5 lg:top-3.5 text-gray-400">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 lg:h-5 lg:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="absolute left-4 top-3.5 text-gray-400">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
           </div>
         </div>
 
-        {/* Aşama Sütunları - Desktop */}
-        <div className="hidden lg:block relative w-full overflow-x-auto pb-4">
-          <div className="flex gap-6 min-w-max px-1">
+        {/* Aşama Sütunları */}
+        <div className="relative w-full overflow-x-auto pb-4">
+          <div className="flex gap-4 sm:gap-6 min-w-max px-2 sm:px-1">
             {STAGE_ORDER.map((stage) => {
               const stageStudents = getStudentsByStage(stage);
               const config = STAGE_CONFIG[stage];
@@ -379,7 +379,7 @@ export default function AdvisorDashboard() {
                   variants={itemVariants}
                   initial="hidden"
                   animate="visible"
-                  className={`${config.bgColor} ${config.borderColor} rounded-xl border shadow-sm w-[400px] flex-shrink-0`}
+                  className={`${config.bgColor} ${config.borderColor} rounded-xl border shadow-sm w-[320px] sm:w-[360px] md:w-[400px] flex-shrink-0`}
                 >
                   <div className="sticky top-0 z-10 p-4 border-b border-gray-100/60 dark:border-gray-700/30 bg-inherit backdrop-blur-sm">
                     <div className="flex items-center justify-between">
@@ -399,7 +399,7 @@ export default function AdvisorDashboard() {
                     </div>
                   </div>
 
-                  <div className="p-4 space-y-4 max-h-[calc(100vh-300px)] overflow-y-auto">
+                  <div className="p-3 sm:p-4 space-y-3 sm:space-y-4 max-h-[calc(100vh-350px)] sm:max-h-[calc(100vh-300px)] overflow-y-auto">
                     {stageStudents.length === 0 ? (
                       <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
                         Bu aşamada öğrenci bulunmuyor
@@ -408,7 +408,7 @@ export default function AdvisorDashboard() {
                       stageStudents.map((student: Student) => (
                         <div
                           key={student.email}
-                          className="card-blur rounded-lg p-4 hover:shadow-md transition-all duration-200"
+                          className="card-blur rounded-lg p-3 sm:p-4 hover:shadow-md transition-all duration-200"
                         >
                           <div className="flex items-start space-x-3">
                             <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-bold text-sm shadow-sm flex-shrink-0">
@@ -437,22 +437,22 @@ export default function AdvisorDashboard() {
                             </div>
                           </div>
                           
-                          <div className="mt-4 flex flex-wrap gap-2">
+                          <div className="mt-3 sm:mt-4 flex flex-wrap gap-1.5 sm:gap-2">
                             <button
                               onClick={() => setSelectedStudent(student)}
-                              className="flex-1 min-w-[80px] px-3 py-1.5 bg-gradient-to-r from-secondary-500 to-secondary-600 text-white text-xs rounded-lg hover:from-secondary-600 hover:to-secondary-700 text-center font-medium shadow-sm transition-all duration-200 hover:shadow-md"
+                              className="flex-1 min-w-[70px] sm:min-w-[80px] px-2 sm:px-3 py-1.5 bg-gradient-to-r from-secondary-500 to-secondary-600 text-white text-xs rounded-lg hover:from-secondary-600 hover:to-secondary-700 text-center font-medium shadow-sm transition-all duration-200 hover:shadow-md"
                             >
                               Detaylar
                             </button>
                             <Link 
                               href={`/advisor/messages?student=${encodeURIComponent(student.email || '')}`}
-                              className="flex-1 min-w-[80px] px-3 py-1.5 bg-gradient-to-r from-primary-500 to-primary-600 text-white text-xs rounded-lg hover:from-primary-600 hover:to-primary-700 text-center font-medium shadow-sm transition-all duration-200 hover:shadow-md"
+                              className="flex-1 min-w-[70px] sm:min-w-[80px] px-2 sm:px-3 py-1.5 bg-gradient-to-r from-primary-500 to-primary-600 text-white text-xs rounded-lg hover:from-primary-600 hover:to-primary-700 text-center font-medium shadow-sm transition-all duration-200 hover:shadow-md"
                             >
                               Mesaj
                             </Link>
                             <Link 
                               href={`/advisor/documents?student=${encodeURIComponent(student.email || '')}`}
-                              className="flex-1 min-w-[80px] px-3 py-1.5 bg-gradient-to-r from-accent-500 to-accent-600 text-white text-xs rounded-lg hover:from-accent-600 hover:to-accent-700 text-center font-medium shadow-sm transition-all duration-200 hover:shadow-md"
+                              className="flex-1 min-w-[70px] sm:min-w-[80px] px-2 sm:px-3 py-1.5 bg-gradient-to-r from-accent-500 to-accent-600 text-white text-xs rounded-lg hover:from-accent-600 hover:to-accent-700 text-center font-medium shadow-sm transition-all duration-200 hover:shadow-md"
                             >
                               Belgeler
                             </Link>
@@ -463,126 +463,6 @@ export default function AdvisorDashboard() {
                   </div>
                 </motion.div>
               );
-            })}
-          </div>
-        </div>
-
-        {/* Mobil Görünüm - Basit Liste Tasarımı */}
-        <div className="lg:hidden">
-          {/* Aşama Seçici */}
-          <div className="mb-4">
-            <div className="flex space-x-1 sm:space-x-2 overflow-x-auto scrollbar-hide pb-2">
-              {STAGE_ORDER.map((stage) => {
-                const stageStudents = getStudentsByStage(stage);
-                const config = STAGE_CONFIG[stage];
-                
-                return (
-                  <button
-                    key={stage}
-                    className={`flex-shrink-0 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs font-medium transition-all duration-200 ${
-                      stageStudents.length > 0 
-                        ? 'bg-primary-500 text-white shadow-md' 
-                        : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
-                    }`}
-                  >
-                    <span className="mr-1">{config.icon}</span>
-                    {STAGES[stage]}
-                    <span className="ml-1 bg-white/20 dark:bg-black/20 px-1.5 py-0.5 rounded text-xs">
-                      {stageStudents.length}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Öğrenci Listesi */}
-          <div className="space-y-3">
-            {STAGE_ORDER.map((stage) => {
-              const stageStudents = getStudentsByStage(stage);
-              const config = STAGE_CONFIG[stage];
-              
-              if (stageStudents.length === 0) return null;
-              
-              return stageStudents.map((student: Student) => (
-                <motion.div
-                  key={student.email}
-                  variants={itemVariants}
-                  initial="hidden"
-                  animate="visible"
-                  className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden"
-                >
-                  {/* Öğrenci Kartı */}
-                  <div className="p-4">
-                    <div className="flex items-center space-x-3 mb-3">
-                      <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-bold text-lg">
-                        {student.name?.charAt(0) || student.email?.charAt(0) || '?'}
-                      </div>
-                      
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-1">
-                          <h3 className="text-base font-semibold text-gray-900 dark:text-white truncate">
-                            {student.name}
-                          </h3>
-                          <div className="flex items-center space-x-2">
-                            {(student.unreadMessages ?? 0) > 0 && (
-                              <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
-                                {student.unreadMessages}
-                              </span>
-                            )}
-                            <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${config.color} ${config.bgColor} border ${config.borderColor}`}>
-                              {STAGES[stage]}
-                            </span>
-                          </div>
-                        </div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
-                          {student.email}
-                        </p>
-                        {student.university && (
-                          <p className="text-xs text-gray-400 dark:text-gray-500 truncate">
-                            {student.university}
-                            {student.program && ` • ${student.program}`}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Aksiyon Butonları */}
-                    <div className="grid grid-cols-3 gap-2">
-                      <button
-                        onClick={() => setSelectedStudent(student)}
-                        className="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-2 px-3 rounded-lg font-medium text-sm transition-all duration-200 flex items-center justify-center space-x-1"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                        </svg>
-                        <span>Detay</span>
-                      </button>
-                      
-                      <Link 
-                        href={`/advisor/messages?student=${encodeURIComponent(student.email || '')}`}
-                        className="bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 py-2 px-3 rounded-lg font-medium text-sm transition-all duration-200 flex items-center justify-center space-x-1"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                        </svg>
-                        <span>Mesaj</span>
-                      </Link>
-                      
-                      <Link 
-                        href={`/advisor/documents?student=${encodeURIComponent(student.email || '')}`}
-                        className="bg-green-100 dark:bg-green-900/30 hover:bg-green-200 dark:hover:bg-green-900/50 text-green-700 dark:text-green-300 py-2 px-3 rounded-lg font-medium text-sm transition-all duration-200 flex items-center justify-center space-x-1"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        <span>Belge</span>
-                      </Link>
-                    </div>
-                  </div>
-                </motion.div>
-              ));
             })}
           </div>
         </div>
