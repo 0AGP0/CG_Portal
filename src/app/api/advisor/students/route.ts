@@ -8,6 +8,11 @@ export async function GET(request: NextRequest) {
     
     // Kullanıcı e-postasını header'dan al
     const userEmail = request.headers.get('x-user-email');
+    logger.info('Danışman API: Header bilgileri', { 
+      userEmail,
+      headers: Object.fromEntries(request.headers.entries())
+    });
+    
     if (!userEmail) {
       logger.error('Kullanıcı e-postası bulunamadı');
       return NextResponse.json(
@@ -19,6 +24,7 @@ export async function GET(request: NextRequest) {
     logger.info('Danışman öğrenci listesi getiriliyor', { userEmail });
 
     // Önce danışmanın varlığını kontrol et
+    logger.info('Danışman kontrolü yapılıyor...');
     const advisor = await getAdvisorByEmail(userEmail);
     if (!advisor) {
       logger.error('Danışman bulunamadı:', userEmail);
@@ -27,9 +33,16 @@ export async function GET(request: NextRequest) {
         { status: 404 }
       );
     }
+    
+    logger.info('Danışman bulundu:', { advisorEmail: advisor.email, advisorName: advisor.name });
 
     // Danışmanın öğrencilerini getir
+    logger.info('Öğrenci listesi getiriliyor...');
     const students = await getStudentsByAdvisor(userEmail);
+    logger.info('Ham öğrenci verileri:', { 
+      count: students.length,
+      students: students.map(s => ({ email: s.email, name: s.name, advisor_email: s.advisor_email }))
+    });
     
     // Öğrenci verilerini formatla
     const formattedStudents = students.map(student => ({

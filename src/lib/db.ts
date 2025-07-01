@@ -44,10 +44,18 @@ export async function getStudentByEmail(email: string) {
 export async function getAdvisorByEmail(email: string) {
   const client = await pool.connect();
   try {
+    logger.info('getAdvisorByEmail: Danışman aranıyor', { email });
+    
     const result = await client.query(
       'SELECT * FROM advisors WHERE email = $1',
-      [email]
+      [email.toLowerCase()]
     );
+    
+    logger.info('getAdvisorByEmail: Sorgu sonucu', { 
+      found: !!result.rows[0],
+      advisor: result.rows[0] ? { email: result.rows[0].email, name: result.rows[0].name } : null
+    });
+    
     return result.rows[0];
   } catch (error) {
     logger.error('Danışman getirme hatası:', error);
@@ -60,25 +68,38 @@ export async function getAdvisorByEmail(email: string) {
 export async function getStudentsByAdvisor(advisorEmail: string) {
   const client = await pool.connect();
   try {
+    logger.info('getStudentsByAdvisor: Danışman öğrencileri getiriliyor', { advisorEmail });
+    
+    // Önce basit bir sorgu ile öğrencileri getir
     const query = `
       SELECT 
         s.*,
-        json_agg(
-          json_build_object(
-            'documentType', d.document_type,
-            'documentUrl', d.file_path,
-            'documentName', d.file_name,
-            'updatedAt', d.upload_date
-          )
-        ) FILTER (WHERE d.id IS NOT NULL) as documents
+        COALESCE(
+          json_agg(
+            json_build_object(
+              'documentType', d.document_type,
+              'documentUrl', d.file_path,
+              'documentName', d.file_name,
+              'updatedAt', d.upload_date
+            )
+          ) FILTER (WHERE d.id IS NOT NULL), 
+          '[]'::json
+        ) as documents
       FROM students s
-      LEFT JOIN documents d ON s.id = d.student_id
+      LEFT JOIN documents d ON s.email = d.student_id
       WHERE s.advisor_email = $1
-      GROUP BY s.id, s.email, s.name, s.phone, s.stage, s.process_started, s.created_at, s.updated_at, s.advisor_id, s.advisor_email
+      GROUP BY s.email, s.name, s.phone, s.stage, s.process_started, s.created_at, s.updated_at, s.advisor_id, s.advisor_email
       ORDER BY s.updated_at DESC
     `;
 
-    const result = await client.query(query, [advisorEmail]);
+    logger.info('getStudentsByAdvisor: SQL sorgusu çalıştırılıyor');
+    const result = await client.query(query, [advisorEmail.toLowerCase()]);
+    
+    logger.info('getStudentsByAdvisor: Sorgu sonucu', { 
+      rowCount: result.rowCount,
+      students: result.rows.map(s => ({ email: s.email, name: s.name }))
+    });
+    
     return result.rows;
   } catch (error) {
     logger.error('Danışman öğrencileri getirme hatası:', error);
