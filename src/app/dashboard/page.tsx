@@ -422,8 +422,8 @@ export default function Dashboard() {
                   ></div>
                 </div>
                     
-                    {/* Aşama Noktaları */}
-                    <div className="flex justify-between mt-4 px-2">
+                    {/* Aşama Noktaları - Desktop */}
+                    <div className="hidden md:flex justify-between mt-4 px-2">
                       {stageIcons.map((stage, index) => {
                         const currentStage = normalizeStage(studentData?.stage);
                         const stageNumber = stageMapping[currentStage] || 1;
@@ -448,10 +448,48 @@ export default function Dashboard() {
                             <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10 shadow-lg">
                               {stage.label}
                               <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-900 rotate-45"></div>
-                </div>
-              </div>
+                            </div>
+                          </div>
                         );
                       })}
+                    </div>
+
+                    {/* Aşama Noktaları - Mobil */}
+                    <div className="md:hidden mt-4">
+                      <div className="overflow-x-auto pb-2">
+                        <div className="flex space-x-3 min-w-max px-2">
+                          {stageIcons.map((stage, index) => {
+                            const currentStage = normalizeStage(studentData?.stage);
+                            const stageNumber = stageMapping[currentStage] || 1;
+                            const isCompleted = stageMapping[stage.stage] <= stageNumber;
+                            const isCurrentStage = stage.stage === currentStage;
+                            
+                            return (
+                              <div key={index} className="flex flex-col items-center relative group flex-shrink-0">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200
+                                  ${isCompleted 
+                                    ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/20' 
+                                    : isCurrentStage
+                                    ? 'bg-accent-500 text-white ring-2 ring-accent-300 shadow-lg shadow-accent-500/20'
+                                    : 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 border border-gray-200 dark:border-gray-700'}`}>
+                                  <div className="w-4 h-4">
+                                    <stage.icon />
+                                  </div>
+                                </div>
+                                <span className="text-[8px] font-medium mt-1 text-gray-600 dark:text-gray-400 text-center">
+                                  {stage.shortLabel}
+                                </span>
+                                
+                                {/* Tooltip */}
+                                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10 shadow-lg">
+                                  {stage.label}
+                                  <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-900 rotate-45"></div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
                     </div>
                   </div>
                   

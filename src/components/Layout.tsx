@@ -222,19 +222,99 @@ const Header = () => {
                       </div>
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-2">
-                      <Link 
-                        href={isAdmin() ? '/admin' : isAdvisor() ? '/advisor/dashboard' : '/dashboard'}
-                        className="py-2 px-3 rounded-lg bg-gray-100 dark:bg-gray-800/70 text-gray-800 dark:text-white text-sm font-medium text-center"
-                      >
-                        Dashboard
-                      </Link>
-                      <Link 
-                        href="/dashboard/messages"
-                        className="py-2 px-3 rounded-lg bg-gray-100 dark:bg-gray-800/70 text-gray-800 dark:text-white text-sm font-medium text-center"
-                      >
-                        Mesajlar
-                      </Link>
+                    {/* Mobil menü öğeleri - Kullanıcı rolüne göre */}
+                    <div className="space-y-2">
+                      {user && isAdmin() ? (
+                        // Admin menü öğeleri
+                        <>
+                          <Link 
+                            href="/admin"
+                            className="block py-2 px-3 rounded-lg bg-gray-100 dark:bg-gray-800/70 text-gray-800 dark:text-white text-sm font-medium"
+                          >
+                            Öğrenciler
+                          </Link>
+                          <Link 
+                            href="/admin/advisors"
+                            className="block py-2 px-3 rounded-lg bg-gray-100 dark:bg-gray-800/70 text-gray-800 dark:text-white text-sm font-medium"
+                          >
+                            Danışmanlar
+                          </Link>
+                          <Link 
+                            href="/admin/test"
+                            className="block py-2 px-3 rounded-lg bg-gray-100 dark:bg-gray-800/70 text-gray-800 dark:text-white text-sm font-medium"
+                          >
+                            Test
+                          </Link>
+                        </>
+                      ) : user && isAdvisor() ? (
+                        // Danışman menü öğeleri
+                        <>
+                          <Link 
+                            href="/advisor/dashboard"
+                            className="block py-2 px-3 rounded-lg bg-gray-100 dark:bg-gray-800/70 text-gray-800 dark:text-white text-sm font-medium"
+                          >
+                            Dashboard
+                          </Link>
+                          <Link 
+                            href="/advisor/students"
+                            className="block py-2 px-3 rounded-lg bg-gray-100 dark:bg-gray-800/70 text-gray-800 dark:text-white text-sm font-medium"
+                          >
+                            Öğrencilerim
+                          </Link>
+                          <Link 
+                            href="/advisor/messages"
+                            className="block py-2 px-3 rounded-lg bg-gray-100 dark:bg-gray-800/70 text-gray-800 dark:text-white text-sm font-medium"
+                          >
+                            Mesajlar
+                          </Link>
+                          <Link 
+                            href="/advisor/documents"
+                            className="block py-2 px-3 rounded-lg bg-gray-100 dark:bg-gray-800/70 text-gray-800 dark:text-white text-sm font-medium"
+                          >
+                            Dokümanlar
+                          </Link>
+                        </>
+                      ) : (
+                        // Öğrenci menü öğeleri
+                        <>
+                          <Link 
+                            href="/dashboard"
+                            className="block py-2 px-3 rounded-lg bg-gray-100 dark:bg-gray-800/70 text-gray-800 dark:text-white text-sm font-medium"
+                          >
+                            Genel Bakış
+                          </Link>
+                          <Link 
+                            href="/dashboard/process"
+                            className="block py-2 px-3 rounded-lg bg-gray-100 dark:bg-gray-800/70 text-gray-800 dark:text-white text-sm font-medium"
+                          >
+                            Süreç Durumu
+                          </Link>
+                          <Link 
+                            href="/dashboard/documents"
+                            className="block py-2 px-3 rounded-lg bg-gray-100 dark:bg-gray-800/70 text-gray-800 dark:text-white text-sm font-medium"
+                          >
+                            Dokümanlar
+                          </Link>
+                          <Link 
+                            href="/dashboard/messages"
+                            className="block py-2 px-3 rounded-lg bg-gray-100 dark:bg-gray-800/70 text-gray-800 dark:text-white text-sm font-medium"
+                          >
+                            Mesajlarım
+                          </Link>
+                          <Link 
+                            href="/dashboard/visa"
+                            className="block py-2 px-3 rounded-lg bg-gray-100 dark:bg-gray-800/70 text-gray-800 dark:text-white text-sm font-medium"
+                          >
+                            Vize Bilgileri
+                          </Link>
+                          <Link 
+                            href="/dashboard/education"
+                            className="block py-2 px-3 rounded-lg bg-gray-100 dark:bg-gray-800/70 text-gray-800 dark:text-white text-sm font-medium"
+                          >
+                            Kişisel Bilgiler
+                          </Link>
+                        </>
+                      )}
                     </div>
                     
                     <button 
@@ -532,7 +612,10 @@ const MobileBottomNav = () => {
   const studentMenuItems = [
     { path: '/dashboard', label: 'Ana Sayfa', icon: <HomeIcon /> },
     { path: '/dashboard/process', label: 'Süreç', icon: <ProcessIcon /> },
+    { path: '/dashboard/visa', label: 'Vize', icon: <VisaIcon /> },
+    { path: '/dashboard/education', label: 'Kişisel', icon: <EducationIcon /> },
     { path: '/dashboard/documents', label: 'Dokümanlar', icon: <DocumentIcon /> },
+    { path: '/dashboard/applications', label: 'Başvurular', icon: <ApplicationIcon /> },
     { path: '/dashboard/messages', label: 'Mesajlar', icon: <MessageIcon /> },
   ];
   
@@ -540,8 +623,10 @@ const MobileBottomNav = () => {
   const advisorMenuItems = [
     { path: '/advisor/dashboard', label: 'Ana Sayfa', icon: <HomeIcon /> },
     { path: '/advisor/students', label: 'Öğrenciler', icon: <StudentsIcon /> },
-    { path: '/advisor/messages', label: 'Mesajlar', icon: <MessageIcon /> },
+    { path: '/advisor/applications', label: 'Başvurular', icon: <ApplicationIcon /> },
     { path: '/advisor/documents', label: 'Dokümanlar', icon: <DocumentIcon /> },
+    { path: '/advisor/messages', label: 'Mesajlar', icon: <MessageIcon /> },
+    { path: '/advisor/reports', label: 'Raporlar', icon: <ReportIcon /> },
   ];
 
   // Admin için mobil menü öğeleri
@@ -564,33 +649,35 @@ const MobileBottomNav = () => {
       animate={{ y: 0 }}
       className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg border-t border-gray-200 dark:border-gray-700/50 shadow-lg"
     >
-      <div className="flex items-center justify-around px-2 py-1">
-        {menuItems.map((item) => {
-          const isActive = pathname === item.path;
-          
-          return (
-            <Link
-              key={item.path}
-              href={item.path}
-              className={`flex flex-col items-center justify-center w-14 h-14 rounded-xl transition-all ${
-                isActive
-                  ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400'
-              }`}
-            >
-              <div className={`w-5 h-5 flex items-center justify-center mb-0.5 ${
-                isActive ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400'
-              }`}>
-                {item.icon}
-              </div>
-              <span className={`text-[10px] font-medium ${
-                isActive ? 'text-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400'
-              }`}>
-                {item.label}
-              </span>
-            </Link>
-          );
-        })}
+      <div className="overflow-x-auto scrollbar-hide">
+        <div className="flex items-center px-4 py-2 min-w-max">
+          {menuItems.map((item) => {
+            const isActive = pathname === item.path;
+            
+            return (
+              <Link
+                key={item.path}
+                href={item.path}
+                className={`flex flex-col items-center justify-center w-16 h-16 rounded-xl transition-all flex-shrink-0 mx-1 ${
+                  isActive
+                    ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400'
+                }`}
+              >
+                <div className={`w-6 h-6 flex items-center justify-center mb-1 ${
+                  isActive ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400'
+                }`}>
+                  {item.icon}
+                </div>
+                <span className={`text-[10px] font-medium text-center ${
+                  isActive ? 'text-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400'
+                }`}>
+                  {item.label}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
       </div>
     </motion.nav>
   );

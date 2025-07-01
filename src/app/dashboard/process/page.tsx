@@ -515,58 +515,58 @@ export default function ProcessPanel() {
               </div>
             </div>
 
-            {/* Mobil Timeline - Yatay Kaydırmalı */}
+            {/* Mobil Timeline - Dikey Liste */}
             <div className="md:hidden">
-              <div className="overflow-x-auto pb-4">
-                <div className="flex space-x-4 min-w-max">
-                  {processData.stages.map((step, index) => (
-                    <div key={step.id} className="flex flex-col items-center relative group min-w-[80px]">
-                      {/* Bağlantı çizgisi */}
-                      {index < processData.stages.length - 1 && (
-                        <div className={`absolute top-5 left-10 w-4 h-0.5 ${
-                          step.status === 'completed' ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'
-                        }`}></div>
+              <div className="space-y-4">
+                {processData.stages.map((step, index) => (
+                  <div key={step.id} className="flex items-center space-x-4 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                    {/* Aşama ikonu */}
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-200
+                      ${step.status === 'completed' ? 'bg-green-500 text-white shadow-lg shadow-green-500/20' :
+                        step.status === 'in-progress' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/20' :
+                        'bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-400'
+                      }`}>
+                      {step.status === 'completed' ? (
+                        <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M22 11.08V12C21.9988 14.1564 21.3005 16.2547 20.0093 17.9818C18.7182 19.709 16.9033 20.9725 14.8354 21.5839C12.7674 22.1953 10.5573 22.1219 8.53447 21.3746C6.51168 20.6273 4.78465 19.2461 3.61096 17.4371C2.43727 15.628 1.87979 13.4881 2.02168 11.3363C2.16356 9.18455 2.99721 7.13631 4.39828 5.49706C5.79935 3.85781 7.69279 2.71537 9.79619 2.24013C11.8996 1.7649 14.1003 1.98232 16.07 2.85999" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M22 4L12 14.01L9 11.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      ) : step.status === 'in-progress' ? (
+                        <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M12 6V12L16 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      ) : (
+                        <span className="text-sm font-bold">{step.id}</span>
                       )}
-                      
-                      {/* Aşama ikonu */}
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200
-                        ${step.status === 'completed' ? 'bg-green-500 text-white shadow-lg shadow-green-500/20' :
-                          step.status === 'in-progress' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/20' :
-                          'bg-primary-500 text-white shadow-lg shadow-primary-500/20'
-                        }`}>
-                        {step.status === 'completed' ? (
-                          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M22 11.08V12C21.9988 14.1564 21.3005 16.2547 20.0093 17.9818C18.7182 19.709 16.9033 20.9725 14.8354 21.5839C12.7674 22.1953 10.5573 22.1219 8.53447 21.3746C6.51168 20.6273 4.78465 19.2461 3.61096 17.4371C2.43727 15.628 1.87979 13.4881 2.02168 11.3363C2.16356 9.18455 2.99721 7.13631 4.39828 5.49706C5.79935 3.85781 7.69279 2.71537 9.79619 2.24013C11.8996 1.7649 14.1003 1.98232 16.07 2.85999" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M22 4L12 14.01L9 11.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                        ) : step.status === 'in-progress' ? (
-                          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M12 6V12L16 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                        ) : (
-                          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M19 3H5C3.89543 3 3 3.89543 3 5V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19V5C21 3.89543 20.1046 3 19 3Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M8 12H16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M8 8H16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M8 16H12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                        )}
-                      </div>
-                      
-                      {/* Aşama adı */}
-                      <span className="text-[10px] font-medium mt-2 text-gray-600 dark:text-gray-400 text-center">
-                        {step.name.split(' ')[0]}
-                      </span>
-                      
-                      {/* Tooltip */}
-                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10 shadow-lg">
-                        {step.name}
-                        <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-900 rotate-45"></div>
-                      </div>
                     </div>
-                  ))}
-                </div>
+                    
+                    {/* Aşama bilgileri */}
+                    <div className="flex-1 min-w-0">
+                      <h3 className={`font-semibold text-sm ${
+                        step.status === 'completed' ? 'text-green-700 dark:text-green-400' :
+                        step.status === 'in-progress' ? 'text-blue-700 dark:text-blue-400' :
+                        'text-gray-500 dark:text-gray-400'
+                      }`}>
+                        {step.name}
+                      </h3>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
+                        {step.description}
+                      </p>
+                    </div>
+                    
+                    {/* Durum badge */}
+                    <div className="flex-shrink-0">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        step.status === 'completed' ? 'bg-green-100/80 dark:bg-green-900/30 text-green-800 dark:text-green-300' :
+                        step.status === 'in-progress' ? 'bg-blue-100/80 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300' :
+                        'bg-gray-100/80 dark:bg-gray-700/50 text-gray-600 dark:text-gray-300'
+                      }`}>
+                        {step.date}
+                      </span>
+                    </div>
+                  </div>
+                ))}
               </div>
               
               {/* Mobilde mevcut aşama bilgisi */}
