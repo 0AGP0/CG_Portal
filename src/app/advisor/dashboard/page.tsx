@@ -467,97 +467,163 @@ export default function AdvisorDashboard() {
           </div>
         </div>
 
-        {/* Mobil Görünüm - Dikey Liste */}
-        <div className="lg:hidden space-y-6">
-          {STAGE_ORDER.map((stage) => {
-            const stageStudents = getStudentsByStage(stage);
-            const config = STAGE_CONFIG[stage];
-            
-            if (stageStudents.length === 0) return null;
-            
-            return (
-              <motion.div
-                key={stage}
-                variants={itemVariants}
-                initial="hidden"
-                animate="visible"
-                className={`${config.bgColor} ${config.borderColor} rounded-xl border shadow-sm`}
-              >
-                <div className="p-4 border-b border-gray-100/60 dark:border-gray-700/30">
-                  <div className="flex items-center space-x-3">
-                    <div className={`p-2 rounded-lg ${config.iconBgColor}`}>
-                      {config.icon}
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-[#002757] dark:text-blue-300 text-lg">
-                        {STAGES[stage]}
-                      </h3>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {stageStudents.length} öğrenci
-                      </p>
-                    </div>
-                  </div>
-                </div>
+        {/* Mobil Görünüm - Modern Kart Tasarımı */}
+        <div className="lg:hidden">
+          {/* Aşama Seçici */}
+          <div className="mb-6">
+            <div className="flex space-x-2 overflow-x-auto pb-2 scrollbar-hide">
+              {STAGE_ORDER.map((stage) => {
+                const stageStudents = getStudentsByStage(stage);
+                const config = STAGE_CONFIG[stage];
+                const isActive = stageStudents.length > 0;
+                
+                return (
+                  <button
+                    key={stage}
+                    className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                      isActive 
+                        ? 'bg-primary-500 text-white shadow-lg' 
+                        : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
+                    }`}
+                  >
+                    <span className="mr-2">{config.icon}</span>
+                    {STAGES[stage]}
+                    <span className="ml-2 bg-white/20 dark:bg-black/20 px-2 py-0.5 rounded-full text-xs">
+                      {stageStudents.length}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
-                <div className="p-4 space-y-4">
-                  {stageStudents.map((student: Student) => (
-                    <div
-                      key={student.email}
-                      className="card-blur rounded-lg p-4 hover:shadow-md transition-all duration-200"
-                    >
-                      <div className="flex items-start space-x-3">
-                        <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-bold text-base shadow-sm flex-shrink-0">
-                          {student.name?.charAt(0) || student.email?.charAt(0) || '?'}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between mb-2">
-                            <p className="text-base font-medium text-gray-900 dark:text-gray-100">
-                              {student.name}
-                            </p>
-                            {(student.unreadMessages ?? 0) > 0 && (
-                              <span className="bg-danger-500 text-white text-xs px-2 py-1 rounded-full shadow-sm flex-shrink-0">
-                                {student.unreadMessages}
-                              </span>
-                            )}
+          {/* Öğrenci Kartları */}
+          <div className="space-y-4">
+            {STAGE_ORDER.map((stage) => {
+              const stageStudents = getStudentsByStage(stage);
+              const config = STAGE_CONFIG[stage];
+              
+              if (stageStudents.length === 0) return null;
+              
+              return stageStudents.map((student: Student) => (
+                <motion.div
+                  key={student.email}
+                  variants={itemVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden"
+                >
+                  {/* Üst Kısım - Öğrenci Bilgileri */}
+                  <div className="p-5">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-center space-x-4">
+                        <div className="relative">
+                          <div className="h-16 w-16 rounded-full bg-gradient-to-br from-primary-500 via-primary-600 to-primary-700 flex items-center justify-center text-white font-bold text-xl shadow-lg">
+                            {student.name?.charAt(0) || student.email?.charAt(0) || '?'}
                           </div>
+                          <div className={`absolute -bottom-1 -right-1 h-6 w-6 rounded-full ${config.iconBgColor} flex items-center justify-center text-xs`}>
+                            {config.icon}
+                          </div>
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">
+                            {student.name}
+                          </h3>
                           <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
                             {student.email}
                           </p>
                           {student.university && (
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                            <p className="text-xs text-gray-400 dark:text-gray-500">
                               {student.university}
-                              {student.program && ` - ${student.program}`}
+                              {student.program && ` • ${student.program}`}
                             </p>
                           )}
                         </div>
                       </div>
                       
-                      <div className="mt-4 grid grid-cols-3 gap-2">
-                        <button
-                          onClick={() => setSelectedStudent(student)}
-                          className="px-3 py-2 bg-gradient-to-r from-secondary-500 to-secondary-600 text-white text-sm rounded-lg hover:from-secondary-600 hover:to-secondary-700 text-center font-medium shadow-sm transition-all duration-200 hover:shadow-md"
-                        >
-                          Detaylar
-                        </button>
-                        <Link 
-                          href={`/advisor/messages?student=${encodeURIComponent(student.email || '')}`}
-                          className="px-3 py-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white text-sm rounded-lg hover:from-primary-600 hover:to-primary-700 text-center font-medium shadow-sm transition-all duration-200 hover:shadow-md"
-                        >
-                          Mesaj
-                        </Link>
-                        <Link 
-                          href={`/advisor/documents?student=${encodeURIComponent(student.email || '')}`}
-                          className="px-3 py-2 bg-gradient-to-r from-accent-500 to-accent-600 text-white text-sm rounded-lg hover:from-accent-600 hover:to-accent-700 text-center font-medium shadow-sm transition-all duration-200 hover:shadow-md"
-                        >
-                          Belgeler
-                        </Link>
+                      {/* Aşama Etiketi */}
+                      <div className={`px-3 py-1 rounded-full text-xs font-medium ${config.color} ${config.bgColor} border ${config.borderColor}`}>
+                        {STAGES[stage]}
                       </div>
                     </div>
-                  ))}
-                </div>
-              </motion.div>
-            );
-          })}
+
+                    {/* İstatistikler */}
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <div className="text-center">
+                        <div className="text-lg font-bold text-primary-600 dark:text-primary-400">12</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">Belge</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-lg font-bold text-success-600 dark:text-success-400">5</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">Mesaj</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-lg font-bold text-warning-600 dark:text-warning-400">3</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">Bekleyen</div>
+                      </div>
+                    </div>
+
+                    {/* Butonlar */}
+                    <div className="flex space-x-3">
+                      <button
+                        onClick={() => setSelectedStudent(student)}
+                        className="flex-1 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white py-3 px-4 rounded-xl font-medium text-sm transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center space-x-2"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        <span>Detaylar</span>
+                      </button>
+                      
+                      <Link 
+                        href={`/advisor/messages?student=${encodeURIComponent(student.email || '')}`}
+                        className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-3 px-4 rounded-xl font-medium text-sm transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center space-x-2"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg>
+                        <span>Mesaj</span>
+                      </Link>
+                      
+                      <Link 
+                        href={`/advisor/documents?student=${encodeURIComponent(student.email || '')}`}
+                        className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 px-4 rounded-xl font-medium text-sm transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center space-x-2"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <span>Belgeler</span>
+                      </Link>
+                    </div>
+                  </div>
+
+                  {/* Alt Kısım - Hızlı Aksiyonlar */}
+                  <div className="bg-gray-50 dark:bg-gray-700 px-5 py-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4">
+                        <button className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <span>Son Güncelleme: 2 saat önce</span>
+                        </button>
+                      </div>
+                      
+                      {(student.unreadMessages ?? 0) > 0 && (
+                        <div className="flex items-center space-x-2">
+                          <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                          <span className="text-sm font-medium text-red-600 dark:text-red-400">
+                            {student.unreadMessages} yeni mesaj
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+              ));
+            })}
+          </div>
         </div>
 
         {/* Öğrenci Detay Modalı */}
