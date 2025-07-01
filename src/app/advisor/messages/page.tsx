@@ -100,11 +100,15 @@ export default function AdvisorMessagesPage() {
         
         setStudents(mappedStudents);
       } else {
-        throw new Error('Öğrenci verileri beklenmeyen formatta');
+        // Boş liste döndür, hata fırlatma
+        setStudents([]);
+        console.warn('Öğrenci verileri beklenmeyen formatta veya boş:', data);
       }
     } catch (error) {
       console.error('Öğrenci verilerini getirme hatası:', error);
       setError(error instanceof Error ? error.message : 'Öğrenci listesi alınamadı');
+      // Hata durumunda boş liste set et
+      setStudents([]);
     } finally {
       setIsLoading(false);
     }
@@ -304,15 +308,28 @@ export default function AdvisorMessagesPage() {
     return (
       <Layout>
         <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center p-8 bg-red-50 rounded-lg border border-red-200">
-            <h1 className="text-2xl font-bold text-red-600 mb-4">Hata Oluştu</h1>
-            <p className="mb-4">{error || messagesError}</p>
-            <button 
-              onClick={() => window.location.reload()} 
-              className="btn-primary"
-            >
-              Sayfayı Yenile
-            </button>
+          <div className="text-center p-8 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+            <h1 className="text-2xl font-bold text-red-600 dark:text-red-400 mb-4">Hata Oluştu</h1>
+            <p className="mb-4 text-red-700 dark:text-red-300">
+              {error || messagesError}
+            </p>
+            <div className="space-y-2">
+              <button 
+                onClick={() => {
+                  setError(null);
+                  fetchStudents();
+                }} 
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors mr-2"
+              >
+                Tekrar Dene
+              </button>
+              <button 
+                onClick={() => window.location.reload()} 
+                className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
+              >
+                Sayfayı Yenile
+              </button>
+            </div>
           </div>
         </div>
       </Layout>
