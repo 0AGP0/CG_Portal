@@ -84,7 +84,7 @@ const FIELD_MAPPING = {
 
 // Değerleri temizleyen yardımcı fonksiyon
 function cleanValue(value: any): any {
-  if (value === null || value === undefined || value === '') {
+  if (value === null || value === undefined || value === '' || value === false) {
     return null;
   }
   
