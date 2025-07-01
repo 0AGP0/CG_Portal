@@ -30,6 +30,30 @@
         "x-next-revalidate-tag-token"
       ]
     },
+    "/advisor/dashboard": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "Next-Action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/advisor/dashboard",
+      "dataRoute": "/advisor/dashboard.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
     "/advisor/applications": {
       "experimentalBypassFor": [
         {
@@ -45,6 +69,30 @@
       "initialRevalidateSeconds": false,
       "srcRoute": "/advisor/applications",
       "dataRoute": "/advisor/applications.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/advisor/documents": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "Next-Action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/advisor/documents",
+      "dataRoute": "/advisor/documents.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -78,7 +126,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/advisor/test": {
+    "/advisor/messages": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -91,8 +139,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/advisor/test",
-      "dataRoute": "/advisor/test.rsc",
+      "srcRoute": "/advisor/messages",
+      "dataRoute": "/advisor/messages.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -126,7 +174,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/advisor/dashboard": {
+    "/dashboard/documents": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -139,8 +187,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/advisor/dashboard",
-      "dataRoute": "/advisor/dashboard.rsc",
+      "srcRoute": "/dashboard/documents",
+      "dataRoute": "/dashboard/documents.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -198,30 +246,6 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/dashboard/visa": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "Next-Action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/dashboard/visa",
-      "dataRoute": "/dashboard/visa.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
     "/dashboard": {
       "experimentalBypassFor": [
         {
@@ -237,54 +261,6 @@
       "initialRevalidateSeconds": false,
       "srcRoute": "/dashboard",
       "dataRoute": "/dashboard.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/dashboard/documents": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "Next-Action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/dashboard/documents",
-      "dataRoute": "/dashboard/documents.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/login": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "Next-Action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/login",
-      "dataRoute": "/login.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -318,7 +294,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/admin/advisors": {
+    "/dashboard/visa": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -331,8 +307,32 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/admin/advisors",
-      "dataRoute": "/admin/advisors.rsc",
+      "srcRoute": "/dashboard/visa",
+      "dataRoute": "/dashboard/visa.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/login": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "Next-Action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/login",
+      "dataRoute": "/login.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -366,7 +366,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/advisor/messages": {
+    "/admin/advisors": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -379,8 +379,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/advisor/messages",
-      "dataRoute": "/advisor/messages.rsc",
+      "srcRoute": "/admin/advisors",
+      "dataRoute": "/admin/advisors.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -414,7 +414,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/advisor/documents": {
+    "/advisor/test": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -427,8 +427,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/advisor/documents",
-      "dataRoute": "/advisor/documents.rsc",
+      "srcRoute": "/advisor/test",
+      "dataRoute": "/advisor/test.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -442,8 +442,8 @@
   "dynamicRoutes": {},
   "notFoundRoutes": [],
   "preview": {
-    "previewModeId": "5c8b17a4198828517c797abb8fa8b170",
-    "previewModeSigningKey": "cb4966b98581d222d222879655256cd2bc571afd346315937c839c6017060ab7",
-    "previewModeEncryptionKey": "084d451dea571d6dfa7b2d3b5448240ed674d8d5ad0395c84cc01e9ac380e4e5"
+    "previewModeId": "e5dcfdd78150b7c085984a4a9fdebd84",
+    "previewModeSigningKey": "c4f0277bc1718ab73ca4a7dd2e1bc992e5a13598112a290419293ded77d1bff5",
+    "previewModeEncryptionKey": "6c4dc745ccac3b2a98509129777a71f88a573a1b979654ec5d71f28894b13bf5"
   }
 }
