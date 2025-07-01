@@ -1,31 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
-import { promises as fsPromises } from 'fs';
-import path from 'path';
+import { getConversationsByUser, getMessagesBetweenUsers } from '@/lib/db';
 import { logger } from '@/utils/logger';
-
-interface Message {
-  id: string;
-  senderEmail: string;
-  senderRole: 'student' | 'advisor' | 'sales';
-  content: string;
-  timestamp: string;
-  isRead: boolean;
-}
-
-interface Conversation {
-  id: string;
-  subject: string;
-  studentEmail: string;
-  advisorEmail: string;
-  createdAt: string;
-  lastMessageAt: string;
-  messages: Message[];
-}
-
-interface ConversationData {
-  conversations: Conversation[];
-}
 
 interface Ticket {
   id: number;
@@ -33,8 +8,8 @@ interface Ticket {
   preview: string;
   date: string;
   isRead: boolean;
-  studentEmail: string;
-  studentName: string;
+  advisorEmail: string;
+  advisorName: string;
   messages: Array<{
     sender: 'user' | 'advisor';
     content: string;
@@ -57,55 +32,32 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // messages.json dosyasının yolunu belirle
-    const filePath = path.join(process.cwd(), 'data', 'messages.json');
+    // Veritabanından öğrencinin konuşmalarını getir
+    const conversations = await getConversationsByUser(email, 'student');
     
-    // Dosya varlığını kontrol et ve yoksa oluştur
-    if (!fs.existsSync(filePath)) {
-      logger.info('Mesaj veritabanı bulunamadı, yeni dosya oluşturuluyor');
-      const initialData: ConversationData = { conversations: [] };
-      await fsPromises.writeFile(filePath, JSON.stringify(initialData, null, 2));
-    }
-
-    // Dosyayı oku
-    let data: ConversationData;
-    try {
-      const fileContent = await fsPromises.readFile(filePath, 'utf-8');
-      data = JSON.parse(fileContent);
-    } catch (error) {
-      logger.error('Mesaj veritabanı okuma hatası:', error);
-      return NextResponse.json(
-        { success: false, error: 'Mesaj veritabanı okunamadı' },
-        { status: 500 }
-      );
-    }
-
-    // Öğrencinin konuşmalarını filtrele
-    const conversations = data.conversations || [];
-    const studentConversations = conversations.filter(conv => 
-      conv.studentEmail.toLowerCase() === email.toLowerCase()
-    );
-
-    // Konuşmaları ticket formatına dönüştür
-    const tickets: Ticket[] = studentConversations.map(conv => {
-      const lastMessage = conv.messages[conv.messages.length - 1];
-      const unreadCount = conv.messages.filter(msg => !msg.isRead && msg.senderEmail !== email).length;
+    // Her konuşma için mesajları getir ve ticket formatına dönüştür
+    const tickets: Ticket[] = [];
+    
+    for (const conv of conversations) {
+      const messages = await getMessagesBetweenUsers(email, conv.advisor_email);
+      const lastMessage = messages[messages.length - 1];
+      const unreadCount = messages.filter(msg => !msg.is_read && msg.sender_email !== email).length;
       
-      return {
-        id: parseInt(conv.id.split('-')[1]) || Date.now(),
-        subject: conv.subject,
+      tickets.push({
+        id: conv.id,
+        subject: conv.subject || 'Genel Konuşma',
         preview: lastMessage ? lastMessage.content.substring(0, 100) : '',
-        date: conv.lastMessageAt,
+        date: lastMessage ? lastMessage.created_at : conv.created_at,
         isRead: unreadCount === 0,
-        studentEmail: conv.advisorEmail,
-        studentName: conv.advisorEmail.split('@')[0],
-        messages: conv.messages.map(msg => ({
-          sender: msg.senderEmail === email ? 'user' : 'advisor',
+        advisorEmail: conv.advisor_email,
+        advisorName: conv.advisor_email.split('@')[0],
+        messages: messages.map(msg => ({
+          sender: msg.sender_email === email ? 'user' : 'advisor',
           content: msg.content,
-          timestamp: msg.timestamp
+          timestamp: msg.created_at
         }))
-      };
-    });
+      });
+    }
 
     // Ticket'ları tarihe göre sırala
     const sortedTickets = tickets.sort((a, b) => 

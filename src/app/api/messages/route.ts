@@ -21,8 +21,8 @@ export async function GET(request: NextRequest) {
       // Belirli bir kullanıcı ile olan mesajları getir
       messages = await getMessagesBetweenUsers(email, otherUser);
     } else {
-      // Kullanıcının tüm konuşmalarını getir
-      messages = await getConversationsByUser(email);
+      // Kullanıcının tüm konuşmalarını getir (varsayılan olarak student rolü)
+      messages = await getConversationsByUser(email, 'student');
     }
     
     // Başarılı yanıt

@@ -658,26 +658,58 @@ export async function getMessagesByUser(email: string) {
   }
 }
 
-export async function getConversationsByUser(email: string) {
+export async function getConversationsByUser(email: string, role: 'student' | 'advisor') {
   const client = await pool.connect();
   try {
-    // Kullanıcının katıldığı tüm konuşmaları getir
-    const result = await client.query(
-      `SELECT DISTINCT 
-         CASE 
-           WHEN sender_email = $1 THEN receiver_email 
-           ELSE sender_email 
-         END as other_participant,
-         MIN(created_at) as first_message,
-         MAX(created_at) as last_message,
-         COUNT(*) as message_count,
-         SUM(CASE WHEN is_read = false AND receiver_email = $1 THEN 1 ELSE 0 END) as unread_count
-       FROM messages 
-       WHERE sender_email = $1 OR receiver_email = $1 
-       GROUP BY other_participant
-       ORDER BY last_message DESC`,
-      [email.toLowerCase()]
-    );
+    let query: string;
+    
+    if (role === 'advisor') {
+      // Danışman için: öğrenci e-postalarını getir
+      query = `
+        SELECT DISTINCT 
+          MIN(m.id) as id,
+          COALESCE(m.subject, 'Genel Konuşma') as subject,
+          CASE 
+            WHEN m.sender_email = $1 THEN m.receiver_email
+            ELSE m.sender_email
+          END as student_email,
+          MAX(m.created_at) as created_at
+        FROM messages m
+        WHERE (m.sender_email = $1 OR m.receiver_email = $1)
+          AND m.sender_role IN ('student', 'advisor')
+        GROUP BY 
+          CASE 
+            WHEN m.sender_email = $1 THEN m.receiver_email
+            ELSE m.sender_email
+          END,
+          m.subject
+        ORDER BY MAX(m.created_at) DESC
+      `;
+    } else {
+      // Öğrenci için: danışman e-postalarını getir
+      query = `
+        SELECT DISTINCT 
+          MIN(m.id) as id,
+          COALESCE(m.subject, 'Genel Konuşma') as subject,
+          CASE 
+            WHEN m.sender_email = $1 THEN m.receiver_email
+            ELSE m.sender_email
+          END as advisor_email,
+          MAX(m.created_at) as created_at
+        FROM messages m
+        WHERE (m.sender_email = $1 OR m.receiver_email = $1)
+          AND m.sender_role IN ('student', 'advisor')
+        GROUP BY 
+          CASE 
+            WHEN m.sender_email = $1 THEN m.receiver_email
+            ELSE m.sender_email
+          END,
+          m.subject
+        ORDER BY MAX(m.created_at) DESC
+      `;
+    }
+    
+    const result = await client.query(query, [email.toLowerCase()]);
     return result.rows;
   } catch (error) {
     logger.error('Kullanıcı konuşmaları getirme hatası:', error);
