@@ -275,20 +275,20 @@ export default function AdvisorDashboard() {
         </div>
 
         {/* İstatistik Kartları */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-6 mb-4 lg:mb-8">
           <motion.div
             variants={itemVariants}
             initial="hidden"
             animate="visible"
-            className="card-blur p-4 lg:p-6 rounded-xl"
+            className="card-blur p-3 lg:p-6 rounded-xl"
           >
             <div className="flex justify-between items-center">
               <div>
                 <p className="text-xs lg:text-sm font-medium text-primary-600 dark:text-primary-400">Toplam Öğrenci</p>
-                <p className="text-xl lg:text-2xl font-bold text-primary-700 dark:text-primary-300 mt-1">{statsData.totalStudents}</p>
+                <p className="text-lg lg:text-2xl font-bold text-primary-700 dark:text-primary-300 mt-1">{statsData.totalStudents}</p>
               </div>
-              <div className="h-10 w-10 lg:h-12 lg:w-12 rounded-full bg-primary-100/50 dark:bg-primary-900/30 flex items-center justify-center">
-                <span className="text-lg lg:text-2xl">👥</span>
+              <div className="h-8 w-8 lg:h-12 lg:w-12 rounded-full bg-primary-100/50 dark:bg-primary-900/30 flex items-center justify-center">
+                <span className="text-sm lg:text-2xl">👥</span>
               </div>
             </div>
           </motion.div>
@@ -298,15 +298,15 @@ export default function AdvisorDashboard() {
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.1 }}
-            className="card-blur p-4 lg:p-6 rounded-xl"
+            className="card-blur p-3 lg:p-6 rounded-xl"
           >
             <div className="flex justify-between items-center">
               <div>
                 <p className="text-xs lg:text-sm font-medium text-success-600 dark:text-success-400">Aktif Süreçler</p>
-                <p className="text-xl lg:text-2xl font-bold text-success-700 dark:text-success-300 mt-1">{statsData.activeProcesses}</p>
+                <p className="text-lg lg:text-2xl font-bold text-success-700 dark:text-success-300 mt-1">{statsData.activeProcesses}</p>
               </div>
-              <div className="h-10 w-10 lg:h-12 lg:w-12 rounded-full bg-success-100/50 dark:bg-success-900/30 flex items-center justify-center">
-                <span className="text-lg lg:text-2xl">📊</span>
+              <div className="h-8 w-8 lg:h-12 lg:w-12 rounded-full bg-success-100/50 dark:bg-success-900/30 flex items-center justify-center">
+                <span className="text-sm lg:text-2xl">📊</span>
               </div>
             </div>
           </motion.div>
@@ -316,15 +316,15 @@ export default function AdvisorDashboard() {
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.2 }}
-            className="card-blur p-4 lg:p-6 rounded-xl"
+            className="card-blur p-3 lg:p-6 rounded-xl"
           >
             <div className="flex justify-between items-center">
               <div>
                 <p className="text-xs lg:text-sm font-medium text-warning-600 dark:text-warning-400">Bekleyen Belgeler</p>
-                <p className="text-xl lg:text-2xl font-bold text-warning-700 dark:text-warning-300 mt-1">{statsData.pendingDocuments}</p>
+                <p className="text-lg lg:text-2xl font-bold text-warning-700 dark:text-warning-300 mt-1">{statsData.pendingDocuments}</p>
               </div>
-              <div className="h-10 w-10 lg:h-12 lg:w-12 rounded-full bg-warning-100/50 dark:bg-warning-900/30 flex items-center justify-center">
-                <span className="text-lg lg:text-2xl">📄</span>
+              <div className="h-8 w-8 lg:h-12 lg:w-12 rounded-full bg-warning-100/50 dark:bg-warning-900/30 flex items-center justify-center">
+                <span className="text-sm lg:text-2xl">📄</span>
               </div>
             </div>
           </motion.div>
@@ -334,15 +334,15 @@ export default function AdvisorDashboard() {
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.3 }}
-            className="card-blur p-4 lg:p-6 rounded-xl"
+            className="card-blur p-3 lg:p-6 rounded-xl"
           >
             <div className="flex justify-between items-center">
               <div>
                 <p className="text-xs lg:text-sm font-medium text-accent-600 dark:text-accent-400">Yaklaşan Randevular</p>
-                <p className="text-xl lg:text-2xl font-bold text-accent-700 dark:text-accent-300 mt-1">{statsData.upcomingAppointments}</p>
+                <p className="text-lg lg:text-2xl font-bold text-accent-700 dark:text-accent-300 mt-1">{statsData.upcomingAppointments}</p>
               </div>
-              <div className="h-10 w-10 lg:h-12 lg:w-12 rounded-full bg-accent-100/50 dark:bg-accent-900/30 flex items-center justify-center">
-                <span className="text-lg lg:text-2xl">📅</span>
+              <div className="h-8 w-8 lg:h-12 lg:w-12 rounded-full bg-accent-100/50 dark:bg-accent-900/30 flex items-center justify-center">
+                <span className="text-sm lg:text-2xl">📅</span>
               </div>
             </div>
           </motion.div>
@@ -470,8 +470,8 @@ export default function AdvisorDashboard() {
         {/* Mobil Görünüm - Desktop Sütun Yapısı Slider */}
         <div className="lg:hidden">
           {/* Aşama Slider */}
-          <div className="mb-6">
-            <div className="flex space-x-4 overflow-x-auto scrollbar-hide pb-2">
+          <div className="mb-4">
+            <div className="flex space-x-3 overflow-x-auto scrollbar-hide pb-2">
               {STAGE_ORDER.map((stage) => {
                 const stageStudents = getStudentsByStage(stage);
                 const config = STAGE_CONFIG[stage];
@@ -479,20 +479,20 @@ export default function AdvisorDashboard() {
                 return (
                   <div
                     key={stage}
-                    className="flex-shrink-0 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden"
+                    className="flex-shrink-0 w-72 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden"
                   >
                     {/* Aşama Başlığı */}
-                    <div className={`${config.bgColor} ${config.borderColor} p-4 border-b`}>
+                    <div className={`${config.bgColor} ${config.borderColor} p-3 border-b`}>
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <div className={`p-2 rounded-lg ${config.iconBgColor}`}>
+                        <div className="flex items-center space-x-2">
+                          <div className={`p-1.5 rounded-lg ${config.iconBgColor}`}>
                             {config.icon}
                           </div>
                           <div>
-                            <h3 className={`font-semibold ${config.color} text-lg`}>
+                            <h3 className={`font-semibold ${config.color} text-sm`}>
                               {STAGES[stage]}
                             </h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
                               {stageStudents.length} öğrenci
                             </p>
                           </div>
@@ -501,7 +501,7 @@ export default function AdvisorDashboard() {
                     </div>
 
                     {/* Öğrenci Listesi */}
-                    <div className="p-4 space-y-3 max-h-96 overflow-y-auto">
+                    <div className="p-3 space-y-2 max-h-80 overflow-y-auto">
                       {stageStudents.length === 0 ? (
                         <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                           <svg className="w-12 h-12 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
