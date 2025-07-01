@@ -564,7 +564,7 @@ const MobileBottomNav = () => {
       animate={{ y: 0 }}
       className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg border-t border-gray-200 dark:border-gray-700/50 shadow-lg"
     >
-      <div className="flex items-center justify-around px-2 py-2">
+      <div className="flex items-center justify-around px-2 py-1">
         {menuItems.map((item) => {
           const isActive = pathname === item.path;
           
@@ -572,18 +572,18 @@ const MobileBottomNav = () => {
             <Link
               key={item.path}
               href={item.path}
-              className={`flex flex-col items-center justify-center w-16 h-16 rounded-xl transition-all ${
+              className={`flex flex-col items-center justify-center w-14 h-14 rounded-xl transition-all ${
                 isActive
                   ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400'
                   : 'text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400'
               }`}
             >
-              <div className={`w-6 h-6 flex items-center justify-center mb-1 ${
+              <div className={`w-5 h-5 flex items-center justify-center mb-0.5 ${
                 isActive ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400'
               }`}>
                 {item.icon}
               </div>
-              <span className={`text-xs font-medium ${
+              <span className={`text-[10px] font-medium ${
                 isActive ? 'text-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400'
               }`}>
                 {item.label}
@@ -637,7 +637,7 @@ const Layout = ({ children }: LayoutProps) => {
           </motion.div>
         )}
         
-        <main className={`flex-1 p-4 sm:p-6 md:p-8 transition-all duration-300 ${showSidebar ? 'md:ml-[280px]' : ''} pb-20 md:pb-8`}>
+        <main className={`flex-1 p-4 sm:p-6 md:p-8 transition-all duration-300 ${showSidebar ? 'md:ml-[280px]' : ''} pb-24 md:pb-8`}>
           <motion.div
             variants={fadeInUp}
             initial="hidden"
