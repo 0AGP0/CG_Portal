@@ -198,77 +198,48 @@ const Header = () => {
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.3 }}
-            className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700/30 md:hidden"
+              className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700/30 md:hidden"
             >
-            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-3">
                 {user ? (
                   <>
-                  <div className="flex items-center gap-3 py-2">
-                    <div className="relative">
-                      <div className="absolute inset-0 bg-gradient-to-r from-primary-400 to-accent-400 rounded-full blur-[1px]"></div>
-                      <div className="relative w-9 h-9 rounded-full overflow-hidden border-2 border-white dark:border-gray-800 flex items-center justify-center bg-gradient-to-br from-primary-50 to-accent-50 dark:from-primary-900 dark:to-accent-900">
-                        <span className="font-bold text-sm">
-                          {user.name?.substring(0, 2).toUpperCase() || 'CG'}
+                    <div className="flex items-center gap-3 py-2">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-gradient-to-r from-primary-400 to-accent-400 rounded-full blur-[1px]"></div>
+                        <div className="relative w-9 h-9 rounded-full overflow-hidden border-2 border-white dark:border-gray-800 flex items-center justify-center bg-gradient-to-br from-primary-50 to-accent-50 dark:from-primary-900 dark:to-accent-900">
+                          <span className="font-bold text-sm">
+                            {user.name?.substring(0, 2).toUpperCase() || 'CG'}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="font-medium text-sm">
+                          {user.name || 'Kullanıcı'}
+                        </span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          {isAdmin() ? 'Admin' : isAdvisor() ? 'Danışman' : 'Öğrenci'}
                         </span>
                       </div>
                     </div>
-                    <div className="flex flex-col">
-                      <span className="font-medium text-sm">
-                        {user.name || 'Kullanıcı'}
-                      </span>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
-                        {isAdmin() ? 'Admin' : isAdvisor() ? 'Danışman' : 'Öğrenci'}
-                    </span>
-                    </div>
-                  </div>
-                  
-                  {isAdmin() && (
-                    <>
+                    
+                    <div className="grid grid-cols-2 gap-2">
                       <Link 
-                        href="/admin" 
-                        className={`py-3 px-4 rounded-xl text-sm font-medium ${
-                          pathname === '/admin' 
-                            ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-300' 
-                            : 'bg-gray-100 dark:bg-gray-800/70 text-gray-800 dark:text-white hover:bg-gray-200'
-                        }`}
+                        href={isAdmin() ? '/admin' : isAdvisor() ? '/advisor/dashboard' : '/dashboard'}
+                        className="py-2 px-3 rounded-lg bg-gray-100 dark:bg-gray-800/70 text-gray-800 dark:text-white text-sm font-medium text-center"
                       >
                         Dashboard
                       </Link>
                       <Link 
-                        href="/admin/students" 
-                        className={`py-3 px-4 rounded-xl text-sm font-medium ${
-                          pathname === '/admin/students' 
-                            ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-300' 
-                            : 'bg-gray-100 dark:bg-gray-800/70 text-gray-800 dark:text-white hover:bg-gray-200'
-                        }`}
+                        href="/dashboard/messages"
+                        className="py-2 px-3 rounded-lg bg-gray-100 dark:bg-gray-800/70 text-gray-800 dark:text-white text-sm font-medium text-center"
                       >
-                        Öğrenciler
+                        Mesajlar
                       </Link>
-                      <Link 
-                        href="/admin/advisors" 
-                        className={`py-3 px-4 rounded-xl text-sm font-medium ${
-                          pathname === '/admin/advisors' 
-                            ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-300' 
-                            : 'bg-gray-100 dark:bg-gray-800/70 text-gray-800 dark:text-white hover:bg-gray-200'
-                        }`}
-                      >
-                        Danışmanlar
-                      </Link>
-                    </>
-                  )}
-                  
-                  {!isAdmin() && (
-                    <Link 
-                      href={isAdmin() ? '/admin' : isAdvisor() ? '/advisor/dashboard' : '/dashboard'}
-                      className="py-3 px-4 rounded-xl bg-gray-100 dark:bg-gray-800/70 text-gray-800 dark:text-white text-sm font-medium"
-                    >
-                      Dashboard
-                    </Link>
-                  )}
-                  
+                    </div>
+                    
                     <button 
                       onClick={handleLogout}
-                    className="py-3 px-4 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 text-white text-sm font-medium shadow-sm"
+                      className="py-2 px-4 rounded-lg bg-gradient-to-r from-primary-500 to-primary-600 text-white text-sm font-medium shadow-sm"
                     >
                       Çıkış
                     </button>
@@ -394,7 +365,7 @@ const Sidebar = () => {
 
   return (
     <motion.aside
-      className={`fixed top-0 left-0 z-30 h-screen pt-20 overflow-hidden transition-all duration-300 ease-in-out bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg border-r border-gray-100 dark:border-gray-700/20 shadow-lg ${
+      className={`fixed top-0 left-0 z-30 h-screen pt-20 overflow-hidden transition-all duration-300 ease-in-out bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg border-r border-gray-100 dark:border-gray-700/20 shadow-lg hidden md:block ${
         isCollapsed ? 'w-20' : 'w-[280px]'
       }`}
       layout
@@ -552,6 +523,79 @@ const Footer = () => {
   );
 };
 
+// Mobil Bottom Navigation Bileşeni
+const MobileBottomNav = () => {
+  const pathname = usePathname();
+  const { user, isAdvisor, isAdmin } = useAuth();
+  
+  // Öğrenci için mobil menü öğeleri
+  const studentMenuItems = [
+    { path: '/dashboard', label: 'Ana Sayfa', icon: <HomeIcon /> },
+    { path: '/dashboard/process', label: 'Süreç', icon: <ProcessIcon /> },
+    { path: '/dashboard/documents', label: 'Dokümanlar', icon: <DocumentIcon /> },
+    { path: '/dashboard/messages', label: 'Mesajlar', icon: <MessageIcon /> },
+  ];
+  
+  // Danışman için mobil menü öğeleri
+  const advisorMenuItems = [
+    { path: '/advisor/dashboard', label: 'Ana Sayfa', icon: <HomeIcon /> },
+    { path: '/advisor/students', label: 'Öğrenciler', icon: <StudentsIcon /> },
+    { path: '/advisor/messages', label: 'Mesajlar', icon: <MessageIcon /> },
+    { path: '/advisor/documents', label: 'Dokümanlar', icon: <DocumentIcon /> },
+  ];
+
+  // Admin için mobil menü öğeleri
+  const adminMenuItems = [
+    { path: '/admin', label: 'Öğrenciler', icon: <StudentsIcon /> },
+    { path: '/admin/advisors', label: 'Danışmanlar', icon: <AdvisorIcon /> },
+    { path: '/admin/test', label: 'Test', icon: <ReportIcon /> },
+  ];
+  
+  // Kullanıcının rolüne göre menüyü belirle
+  const menuItems = user && isAdmin() 
+    ? adminMenuItems
+    : user && isAdvisor() 
+      ? advisorMenuItems 
+      : studentMenuItems;
+
+  return (
+    <motion.nav
+      initial={{ y: 100 }}
+      animate={{ y: 0 }}
+      className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg border-t border-gray-200 dark:border-gray-700/50 shadow-lg"
+    >
+      <div className="flex items-center justify-around px-2 py-2">
+        {menuItems.map((item) => {
+          const isActive = pathname === item.path;
+          
+          return (
+            <Link
+              key={item.path}
+              href={item.path}
+              className={`flex flex-col items-center justify-center w-16 h-16 rounded-xl transition-all ${
+                isActive
+                  ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400'
+              }`}
+            >
+              <div className={`w-6 h-6 flex items-center justify-center mb-1 ${
+                isActive ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400'
+              }`}>
+                {item.icon}
+              </div>
+              <span className={`text-xs font-medium ${
+                isActive ? 'text-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400'
+              }`}>
+                {item.label}
+              </span>
+            </Link>
+          );
+        })}
+      </div>
+    </motion.nav>
+  );
+};
+
 const Layout = ({ children }: LayoutProps) => {
   const { user } = useAuth();
   const pathname = usePathname();
@@ -593,7 +637,7 @@ const Layout = ({ children }: LayoutProps) => {
           </motion.div>
         )}
         
-        <main className={`flex-1 p-4 sm:p-6 md:p-8 transition-all duration-300 ${showSidebar ? 'md:ml-[280px]' : ''}`}>
+        <main className={`flex-1 p-4 sm:p-6 md:p-8 transition-all duration-300 ${showSidebar ? 'md:ml-[280px]' : ''} pb-20 md:pb-8`}>
           <motion.div
             variants={fadeInUp}
             initial="hidden"
@@ -616,6 +660,9 @@ const Layout = ({ children }: LayoutProps) => {
       </div>
       
       <Footer />
+      
+      {/* Mobil Bottom Navigation */}
+      {showSidebar && <MobileBottomNav />}
     </div>
   );
 };
