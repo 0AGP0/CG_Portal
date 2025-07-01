@@ -252,18 +252,10 @@ export async function POST(request: NextRequest) {
     if (!email) {
       console.error('❌ Email alanı bulunamadı');
       console.log('Mevcut alanlar:', Object.keys(body));
-      
-      // Test için geçici email oluştur (sadece geliştirme ortamında)
-      if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'production') {
-        const testEmail = `test_${Date.now()}@example.com`;
-        console.log('⚠️ Test email oluşturuluyor:', testEmail);
-        email = testEmail;
-      } else {
-        return NextResponse.json(
-          { error: 'Email field is required', availableFields: Object.keys(body) },
-          { status: 400 }
-        );
-      }
+      return NextResponse.json(
+        { error: 'Email field is required', availableFields: Object.keys(body) },
+        { status: 400 }
+      );
     }
     console.log('✅ Email doğrulandı:', email);
 
@@ -279,31 +271,16 @@ export async function POST(request: NextRequest) {
       let existingStudent;
       
       if (checkResult.rows.length === 0) {
-        console.log('⚠️ Bu email adresiyle kayıtlı öğrenci bulunamadı, yeni öğrenci oluşturuluyor:', email);
-        
-        // Yeni öğrenci oluştur
-        const createQuery = `
-          INSERT INTO students (
-            email, name, advisor_email, stage, process_started, created_at, updated_at
-          ) VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
-          RETURNING *
-        `;
-        
-        const createValues = [
-          email,
-          body.name || 'Test Öğrenci',
-          'test@advisor.com', // Varsayılan danışman
-          'Hazırlık Aşaması',
-          true
-        ];
-        
-        const createResult = await client.query(createQuery, createValues);
-        existingStudent = createResult.rows[0];
-        console.log('✅ Yeni öğrenci oluşturuldu:', existingStudent.name);
-      } else {
-        existingStudent = checkResult.rows[0];
-        console.log('✅ Öğrenci bulundu:', existingStudent.name);
+        console.error('❌ Bu email adresiyle kayıtlı öğrenci bulunamadı, webhook reddedildi:', email);
+        return NextResponse.json({
+          error: 'Student not found',
+          message: 'Bu email adresiyle kayıtlı öğrenci bulunamadı. Sadece mevcut öğrencilerin verileri güncellenebilir.',
+          email: email
+        }, { status: 404 });
       }
+      
+      existingStudent = checkResult.rows[0];
+      console.log('✅ Öğrenci bulundu:', existingStudent.name);
 
       // Güncellenecek alanları hazırla
       console.log('\nGüncellenecek alanlar hazırlanıyor...');

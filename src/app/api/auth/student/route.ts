@@ -38,57 +38,15 @@ export async function POST(request: NextRequest) {
       const student = result.rows[0];
     
     if (!student) {
-        // Öğrenci bulunamadıysa veritabanında yeni kayıt oluştur
-      logger.info('Öğrenci bulunamadı, yeni kayıt oluşturuluyor');
-        
-        const name = body.email.split('@')[0].split('.').map((part: string) => 
-          part.charAt(0).toUpperCase() + part.slice(1)
-        ).join(' ') || 'Yeni Öğrenci';
-
-        const insertQuery = `
-          INSERT INTO students (
-            email,
-            name,
-            created_at,
-            updated_at
-          ) VALUES ($1, $2, NOW(), NOW())
-          RETURNING id, email, name, created_at, updated_at
-        `;
-
-        const insertResult = await client.query(insertQuery, [body.email, name]);
-        const newStudent = insertResult.rows[0];
-      
-      // Token oluştur
-      const token = generateToken({
-        id: newStudent.id.toString(),
-        email: newStudent.email,
-        role: 'student'
-      });
-
-      if (!token) {
-        logger.error('Token oluşturulamadı');
+        // Öğrenci bulunamadıysa giriş reddedilir
+      logger.error('Öğrenci bulunamadı, giriş reddedildi:', body.email);
         return NextResponse.json(
-          { error: 'Giriş yapılırken bir hata oluştu' },
-          { status: 500 }
+          { 
+            error: 'Bu e-posta adresi ile kayıtlı öğrenci bulunamadı. Lütfen admin ile iletişime geçin.',
+            message: 'Öğrenci kaydı bulunamadı'
+          }, 
+          { status: 404 }
         );
-      }
-      
-      // Başarılı giriş
-      return NextResponse.json(
-        { 
-          success: true, 
-          message: 'Giriş başarılı',
-          token,
-          user: {
-            id: newStudent.id,
-            name: newStudent.name,
-            email: newStudent.email,
-              role: 'student',
-              processStarted: false
-          }
-        }, 
-        { status: 200 }
-      );
     }
     
       // Token oluştur
