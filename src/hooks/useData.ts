@@ -148,10 +148,12 @@ export function useStudents(refreshInterval: number = 30000) {
     shouldFetch ? endpoint : null,
     (url) => fetcher(url, user?.email),
     {
-      refreshInterval,
-      revalidateOnFocus: true,
-      revalidateIfStale: true,
-      dedupingInterval: 5000,
+      refreshInterval: 0, // Otomatik yenilemeyi kapat
+      revalidateOnFocus: false, // Focus'ta yenilemeyi kapat
+      revalidateIfStale: false, // Stale durumda yenilemeyi kapat
+      dedupingInterval: 10000, // 10 saniye
+      errorRetryCount: 1, // Sadece 1 kez dene
+      errorRetryInterval: 5000, // 5 saniye sonra tekrar dene
       onError: (err) => {
         logger.error('Öğrenci listesi getirme hatası:', err);
         console.error('useStudents hook error:', err);

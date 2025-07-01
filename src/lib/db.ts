@@ -70,37 +70,60 @@ export async function getStudentsByAdvisor(advisorEmail: string) {
   try {
     logger.info('getStudentsByAdvisor: Danışman öğrencileri getiriliyor', { advisorEmail });
     
-    // Önce basit bir sorgu ile öğrencileri getir
-    const query = `
+    // Önce basit bir sorgu ile öğrencileri getir (dökümanlar olmadan)
+    const simpleQuery = `
       SELECT 
-        s.*,
-        COALESCE(
-          json_agg(
-            json_build_object(
-              'documentType', d.document_type,
-              'documentUrl', d.file_path,
-              'documentName', d.file_name,
-              'updatedAt', d.upload_date
-            )
-          ) FILTER (WHERE d.id IS NOT NULL), 
-          '[]'::json
-        ) as documents
+        s.*
       FROM students s
-      LEFT JOIN documents d ON s.email = d.student_id
       WHERE s.advisor_email = $1
-      GROUP BY s.email, s.name, s.phone, s.stage, s.process_started, s.created_at, s.updated_at, s.advisor_id, s.advisor_email
       ORDER BY s.updated_at DESC
     `;
 
-    logger.info('getStudentsByAdvisor: SQL sorgusu çalıştırılıyor');
-    const result = await client.query(query, [advisorEmail.toLowerCase()]);
+    logger.info('getStudentsByAdvisor: Basit SQL sorgusu çalıştırılıyor');
+    const result = await client.query(simpleQuery, [advisorEmail.toLowerCase()]);
     
     logger.info('getStudentsByAdvisor: Sorgu sonucu', { 
       rowCount: result.rowCount,
-      students: result.rows.map(s => ({ email: s.email, name: s.name }))
+      students: result.rows.map(s => ({ email: s.email, name: s.name, advisor_email: s.advisor_email }))
     });
     
-    return result.rows;
+    // Her öğrenci için dökümanları ayrı ayrı getir
+    const studentsWithDocs = await Promise.all(
+      result.rows.map(async (student) => {
+        try {
+          const docQuery = `
+            SELECT 
+              document_type,
+              file_path,
+              file_name,
+              upload_date
+            FROM documents 
+            WHERE student_id = $1
+            ORDER BY upload_date DESC
+          `;
+          
+          const docResult = await client.query(docQuery, [student.email]);
+          
+          return {
+            ...student,
+            documents: docResult.rows.map(doc => ({
+              documentType: doc.document_type,
+              documentUrl: doc.file_path,
+              documentName: doc.file_name,
+              updatedAt: doc.upload_date
+            }))
+          };
+        } catch (docError) {
+          logger.error('Öğrenci dökümanları getirme hatası:', docError);
+          return {
+            ...student,
+            documents: []
+          };
+        }
+      })
+    );
+    
+    return studentsWithDocs;
   } catch (error) {
     logger.error('Danışman öğrencileri getirme hatası:', error);
     throw error;

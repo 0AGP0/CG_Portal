@@ -1,28 +1,24 @@
-exports.id=8033,exports.ids=[8033],exports.modules={5069:(e,a,t)=>{"use strict";t.a(e,async(e,r)=>{try{t.d(a,{Ab:()=>E,D6:()=>A,I8:()=>l,LW:()=>u,NK:()=>o,Z7:()=>m,_Y:()=>_,aD:()=>R,dz:()=>T,oH:()=>c,s5:()=>d});var s=t(64939),n=t(86481),i=e([s]);if(s=(i.then?(await i)():i)[0],!process.env.POSTGRES_PASSWORD)throw Error("POSTGRES_PASSWORD environment variable is not set");let T=new s.Pool({user:process.env.POSTGRES_USER||"postgres",host:process.env.POSTGRES_HOST||"localhost",database:process.env.POSTGRES_DATABASE||"cg_portal",password:process.env.POSTGRES_PASSWORD,port:parseInt(process.env.POSTGRES_PORT||"5432"),ssl:!1});async function o(e){let a=await T.connect();try{return(await a.query("SELECT * FROM students WHERE email = $1",[e])).rows[0]}catch(e){throw n.vF.error("\xd6ğrenci getirme hatası:",e),e}finally{a.release()}}async function _(e){let a=await T.connect();try{n.vF.info("getAdvisorByEmail: Danışman aranıyor",{email:e});let t=await a.query("SELECT * FROM advisors WHERE email = $1",[e.toLowerCase()]);return n.vF.info("getAdvisorByEmail: Sorgu sonucu",{found:!!t.rows[0],advisor:t.rows[0]?{email:t.rows[0].email,name:t.rows[0].name}:null}),t.rows[0]}catch(e){throw n.vF.error("Danışman getirme hatası:",e),e}finally{a.release()}}async function l(e){let a=await T.connect();try{n.vF.info("getStudentsByAdvisor: Danışman \xf6ğrencileri getiriliyor",{advisorEmail:e});let t=`
+exports.id=8033,exports.ids=[8033],exports.modules={5069:(e,a,t)=>{"use strict";t.a(e,async(e,r)=>{try{t.d(a,{Ab:()=>E,D6:()=>m,I8:()=>l,LW:()=>u,NK:()=>o,Z7:()=>A,_Y:()=>_,aD:()=>R,dz:()=>T,oH:()=>d,s5:()=>c});var s=t(64939),n=t(86481),i=e([s]);if(s=(i.then?(await i)():i)[0],!process.env.POSTGRES_PASSWORD)throw Error("POSTGRES_PASSWORD environment variable is not set");let T=new s.Pool({user:process.env.POSTGRES_USER||"postgres",host:process.env.POSTGRES_HOST||"localhost",database:process.env.POSTGRES_DATABASE||"cg_portal",password:process.env.POSTGRES_PASSWORD,port:parseInt(process.env.POSTGRES_PORT||"5432"),ssl:!1});async function o(e){let a=await T.connect();try{return(await a.query("SELECT * FROM students WHERE email = $1",[e])).rows[0]}catch(e){throw n.vF.error("\xd6ğrenci getirme hatası:",e),e}finally{a.release()}}async function _(e){let a=await T.connect();try{n.vF.info("getAdvisorByEmail: Danışman aranıyor",{email:e});let t=await a.query("SELECT * FROM advisors WHERE email = $1",[e.toLowerCase()]);return n.vF.info("getAdvisorByEmail: Sorgu sonucu",{found:!!t.rows[0],advisor:t.rows[0]?{email:t.rows[0].email,name:t.rows[0].name}:null}),t.rows[0]}catch(e){throw n.vF.error("Danışman getirme hatası:",e),e}finally{a.release()}}async function l(e){let a=await T.connect();try{n.vF.info("getStudentsByAdvisor: Danışman \xf6ğrencileri getiriliyor",{advisorEmail:e});let t=`
       SELECT 
-        s.*,
-        COALESCE(
-          json_agg(
-            json_build_object(
-              'documentType', d.document_type,
-              'documentUrl', d.file_path,
-              'documentName', d.file_name,
-              'updatedAt', d.upload_date
-            )
-          ) FILTER (WHERE d.id IS NOT NULL), 
-          '[]'::json
-        ) as documents
+        s.*
       FROM students s
-      LEFT JOIN documents d ON s.email = d.student_id
       WHERE s.advisor_email = $1
-      GROUP BY s.email, s.name, s.phone, s.stage, s.process_started, s.created_at, s.updated_at, s.advisor_id, s.advisor_email
       ORDER BY s.updated_at DESC
-    `;n.vF.info("getStudentsByAdvisor: SQL sorgusu \xe7alıştırılıyor");let r=await a.query(t,[e.toLowerCase()]);return n.vF.info("getStudentsByAdvisor: Sorgu sonucu",{rowCount:r.rowCount,students:r.rows.map(e=>({email:e.email,name:e.name}))}),r.rows}catch(e){throw n.vF.error("Danışman \xf6ğrencileri getirme hatası:",e),e}finally{a.release()}}async function E(e,a){let t;try{t=await T.connect();let r=[],s=[],n=1;for(let e of["name","phone","birth_date","birth_place","marital_status","contact_address","passport_number","passport_type","passport_issue_date","passport_expiry_date","issuing_authority","high_school_name","high_school_type","high_school_city","high_school_start_date","high_school_graduation_date","university_name","university_department","university_start_date","university_end_date","graduation_status","graduation_year","university_preferences","german_department_preference","language_level","language_certificate","language_course_registration","language_learning_status","visa_consulate","visa_application_date","visa_appointment_date","visa_document","financial_proof","financial_proof_status","exam_entry","exam_result_date","mother_name","mother_surname","mother_birth_date","mother_birth_place","mother_residence","mother_phone","father_name","father_surname","father_birth_date","father_birth_place","father_residence","father_phone"]){let t=a[e];void 0!==t&&(r.push(`${e} = $${n}`),s.push(t),n++)}if(0===r.length)throw Error("G\xfcncellenecek alan bulunamadı");r.push("updated_at = NOW()"),s.push(e);let i=`
+    `;n.vF.info("getStudentsByAdvisor: Basit SQL sorgusu \xe7alıştırılıyor");let r=await a.query(t,[e.toLowerCase()]);return n.vF.info("getStudentsByAdvisor: Sorgu sonucu",{rowCount:r.rowCount,students:r.rows.map(e=>({email:e.email,name:e.name,advisor_email:e.advisor_email}))}),await Promise.all(r.rows.map(async e=>{try{let t=`
+            SELECT 
+              document_type,
+              file_path,
+              file_name,
+              upload_date
+            FROM documents 
+            WHERE student_id = $1
+            ORDER BY upload_date DESC
+          `,r=await a.query(t,[e.email]);return{...e,documents:r.rows.map(e=>({documentType:e.document_type,documentUrl:e.file_path,documentName:e.file_name,updatedAt:e.upload_date}))}}catch(a){return n.vF.error("\xd6ğrenci d\xf6k\xfcmanları getirme hatası:",a),{...e,documents:[]}}}))}catch(e){throw n.vF.error("Danışman \xf6ğrencileri getirme hatası:",e),e}finally{a.release()}}async function E(e,a){let t;try{t=await T.connect();let r=[],s=[],n=1;for(let e of["name","phone","birth_date","birth_place","marital_status","contact_address","passport_number","passport_type","passport_issue_date","passport_expiry_date","issuing_authority","high_school_name","high_school_type","high_school_city","high_school_start_date","high_school_graduation_date","university_name","university_department","university_start_date","university_end_date","graduation_status","graduation_year","university_preferences","german_department_preference","language_level","language_certificate","language_course_registration","language_learning_status","visa_consulate","visa_application_date","visa_appointment_date","visa_document","financial_proof","financial_proof_status","exam_entry","exam_result_date","mother_name","mother_surname","mother_birth_date","mother_birth_place","mother_residence","mother_phone","father_name","father_surname","father_birth_date","father_birth_place","father_residence","father_phone"]){let t=a[e];void 0!==t&&(r.push(`${e} = $${n}`),s.push(t),n++)}if(0===r.length)throw Error("G\xfcncellenecek alan bulunamadı");r.push("updated_at = NOW()"),s.push(e);let i=`
       UPDATE students 
       SET ${r.join(", ")}
       WHERE email = $${n}
       RETURNING *
-    `,o=await t.query(i,s);if(0===o.rows.length)throw Error("\xd6ğrenci bulunamadı");return o.rows[0]}catch(e){throw n.vF.error("\xd6ğrenci profil g\xfcncelleme hatası:",e),e}finally{t&&t.release()}}async function d(e){let a;try{a=await T.connect();let t=`
+    `,o=await t.query(i,s);if(0===o.rows.length)throw Error("\xd6ğrenci bulunamadı");return o.rows[0]}catch(e){throw n.vF.error("\xd6ğrenci profil g\xfcncelleme hatası:",e),e}finally{t&&t.release()}}async function c(e){let a;try{a=await T.connect();let t=`
       INSERT INTO students (
         email,
         name,
@@ -36,9 +32,9 @@ exports.id=8033,exports.ids=[8033],exports.modules={5069:(e,a,t)=>{"use strict";
         advisor_email
       ) VALUES ($1, $2, $3, $4, $5, NOW(), NOW(), $6, $7, $8)
       RETURNING *
-    `,r=[e.email,e.name,e.phone||"",e.stage||"new",e.process_started||!1,e.advisor_id||null,e.advisor_name||null,e.advisor_email||null],s=await a.query(t,r);return n.vF.info("Yeni \xf6ğrenci oluşturuldu:",{email:e.email}),s.rows[0]}catch(e){throw n.vF.error("\xd6ğrenci oluşturma hatası:",e),e}finally{a&&a.release()}}async function c(e){let a=await T.connect();try{return(await a.query(`INSERT INTO messages (sender_email, receiver_email, sender_role, content, subject, category, reply_to_id, created_at) 
+    `,r=[e.email,e.name,e.phone||"",e.stage||"new",e.process_started||!1,e.advisor_id||null,e.advisor_name||null,e.advisor_email||null],s=await a.query(t,r);return n.vF.info("Yeni \xf6ğrenci oluşturuldu:",{email:e.email}),s.rows[0]}catch(e){throw n.vF.error("\xd6ğrenci oluşturma hatası:",e),e}finally{a&&a.release()}}async function d(e){let a=await T.connect();try{return(await a.query(`INSERT INTO messages (sender_email, receiver_email, sender_role, content, subject, category, reply_to_id, created_at) 
        VALUES ($1, $2, $3, $4, $5, $6, $7, NOW()) 
-       RETURNING *`,[e.senderEmail.toLowerCase(),e.receiverEmail.toLowerCase(),e.senderRole,e.content,e.subject||null,e.category||"general",e.replyToId||null])).rows[0]}catch(e){throw n.vF.error("Mesaj oluşturma hatası:",e),e}finally{a.release()}}async function A(e,a){let t=await T.connect();try{let r;return r="advisor"===a?`
+       RETURNING *`,[e.senderEmail.toLowerCase(),e.receiverEmail.toLowerCase(),e.senderRole,e.content,e.subject||null,e.category||"general",e.replyToId||null])).rows[0]}catch(e){throw n.vF.error("Mesaj oluşturma hatası:",e),e}finally{a.release()}}async function m(e,a){let t=await T.connect();try{let r;return r="advisor"===a?`
         SELECT DISTINCT 
           MIN(m.id) as id,
           COALESCE(m.subject, 'Genel Konuşma') as subject,
@@ -79,7 +75,7 @@ exports.id=8033,exports.ids=[8033],exports.modules={5069:(e,a,t)=>{"use strict";
       `,(await t.query(r,[e.toLowerCase()])).rows}catch(e){throw n.vF.error("Kullanıcı konuşmaları getirme hatası:",e),e}finally{t.release()}}async function u(e,a){let t=await T.connect();try{return(await t.query(`SELECT * FROM messages 
        WHERE (sender_email = $1 AND receiver_email = $2) 
           OR (sender_email = $2 AND receiver_email = $1) 
-       ORDER BY created_at ASC`,[e.toLowerCase(),a.toLowerCase()])).rows}catch(e){throw n.vF.error("İki kullanıcı arası mesajlar getirme hatası:",e),e}finally{t.release()}}async function m(e){let a=await T.connect();try{return(await a.query("UPDATE messages SET is_read = true WHERE id = $1 RETURNING *",[e])).rows[0]}catch(e){throw n.vF.error("Mesaj okundu işaretleme hatası:",e),e}finally{a.release()}}async function R(e){let a=await T.connect();try{let t=await a.query("SELECT COUNT(*) as count FROM messages WHERE receiver_email = $1 AND is_read = false",[e.toLowerCase()]);return parseInt(t.rows[0].count)}catch(e){throw n.vF.error("Okunmamış mesaj sayısı getirme hatası:",e),e}finally{a.release()}}T.on("connect",()=>{n.vF.info("Veritabanına bağlantı başarılı")}),T.on("error",e=>{n.vF.error("Veritabanı bağlantı hatası:",e)}),(async function(){let e;try{e=await T.connect(),await e.query(`
+       ORDER BY created_at ASC`,[e.toLowerCase(),a.toLowerCase()])).rows}catch(e){throw n.vF.error("İki kullanıcı arası mesajlar getirme hatası:",e),e}finally{t.release()}}async function A(e){let a=await T.connect();try{return(await a.query("UPDATE messages SET is_read = true WHERE id = $1 RETURNING *",[e])).rows[0]}catch(e){throw n.vF.error("Mesaj okundu işaretleme hatası:",e),e}finally{a.release()}}async function R(e){let a=await T.connect();try{let t=await a.query("SELECT COUNT(*) as count FROM messages WHERE receiver_email = $1 AND is_read = false",[e.toLowerCase()]);return parseInt(t.rows[0].count)}catch(e){throw n.vF.error("Okunmamış mesaj sayısı getirme hatası:",e),e}finally{a.release()}}T.on("connect",()=>{n.vF.info("Veritabanına bağlantı başarılı")}),T.on("error",e=>{n.vF.error("Veritabanı bağlantı hatası:",e)}),(async function(){let e;try{e=await T.connect(),await e.query(`
       CREATE TABLE IF NOT EXISTS students (
         id SERIAL PRIMARY KEY,
         email VARCHAR(255) UNIQUE NOT NULL,
