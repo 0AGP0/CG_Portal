@@ -138,22 +138,39 @@ export function useStudents(refreshInterval: number = 30000) {
   // Danışman endpoint'i
   const endpoint = '/api/advisor/students';
   
+  console.log('useStudents hook debug:', {
+    user: user ? { email: user.email, role: user.role } : null,
+    shouldFetch,
+    endpoint
+  });
+  
   const { data, error, isLoading, isValidating, mutate } = useSWR(
     shouldFetch ? endpoint : null,
     (url) => fetcher(url, user?.email),
     {
       refreshInterval,
-      revalidateOnFocus: false,
+      revalidateOnFocus: true,
       revalidateIfStale: true,
       dedupingInterval: 5000,
       onError: (err) => {
         logger.error('Öğrenci listesi getirme hatası:', err);
+        console.error('useStudents hook error:', err);
+      },
+      onSuccess: (data) => {
+        console.log('useStudents hook success:', data);
       }
     }
   );
   
   // API yanıtını kontrol et ve öğrenci listesini döndür
   const students = data?.success ? data.students : [];
+  
+  console.log('useStudents hook result:', {
+    data,
+    students: students.length,
+    isLoading,
+    isError: error
+  });
   
   return {
     students,
