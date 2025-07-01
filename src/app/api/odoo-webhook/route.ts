@@ -91,10 +91,45 @@ function cleanValue(value: any): any {
   // String değerleri trim et
   if (typeof value === 'string') {
     const trimmed = value.trim();
-    return trimmed === '' ? null : trimmed;
+    if (trimmed === '') return null;
+    
+    // Tarih formatını kontrol et ve düzelt
+    if (isDateField(trimmed)) {
+      return convertDateToPostgreSQL(trimmed);
+    }
+    
+    return trimmed;
   }
   
   return value;
+}
+
+// Tarih alanı olup olmadığını kontrol eden fonksiyon
+function isDateField(value: string): boolean {
+  // Türkçe tarih formatı: DD.MM.YYYY
+  const dateRegex = /^\d{1,2}\.\d{1,2}\.\d{4}$/;
+  return dateRegex.test(value);
+}
+
+// Tarihi PostgreSQL formatına çeviren fonksiyon
+function convertDateToPostgreSQL(dateStr: string): string {
+  try {
+    // DD.MM.YYYY formatını parse et
+    const parts = dateStr.split('.');
+    if (parts.length === 3) {
+      const day = parts[0].padStart(2, '0');
+      const month = parts[1].padStart(2, '0');
+      const year = parts[2];
+      
+      // YYYY-MM-DD formatına çevir
+      return `${year}-${month}-${day}`;
+    }
+  } catch (error) {
+    console.log('Tarih dönüştürme hatası:', dateStr, error);
+  }
+  
+  // Dönüştürülemezse orijinal değeri döndür
+  return dateStr;
 }
 
 // Dinamik UPDATE sorgusu oluşturan fonksiyon
