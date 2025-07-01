@@ -263,7 +263,7 @@ export default function AdvisorDashboard() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-[1920px] mx-auto px-2 sm:px-4"
+        className="w-full"
       >
         <div className="mb-6 lg:mb-8">
           <h1 className="text-2xl lg:text-3xl font-bold text-[#002757] dark:text-blue-300">
