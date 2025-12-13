@@ -39,6 +39,11 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const { user } = useAuth();
   const { documents, currentStage, getDocumentsByStage } = useDocuments();
+  
+  // Kullanıcı değiştiğinde bildirimleri temizle
+  useEffect(() => {
+    setNotifications([]);
+  }, [user?.email]);
 
   // Okunmamış bildirim sayısını hesapla
   const unreadCount = notifications.filter(n => !n.isRead).length;

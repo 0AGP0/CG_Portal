@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { mutate } from 'swr';
 
 export interface User {
   id: string;
@@ -140,6 +141,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           localStorage.setItem('user', JSON.stringify(advisorUser));
         }
         
+        // SWR cache'ini temizle - eski kullanıcının verilerini sil
+        mutate(() => true, undefined, { revalidate: false });
+        
         setIsLoading(false);
         return true;
       } else if (role === 'admin') {
@@ -160,6 +164,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           
           setUser(mockAdmin);
           localStorage.setItem('user', JSON.stringify(mockAdmin));
+          
+          // SWR cache'ini temizle - eski kullanıcının verilerini sil
+          mutate(() => true, undefined, { revalidate: false });
+          
           setIsLoading(false);
           return true;
         } catch (error) {
@@ -235,6 +243,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           localStorage.setItem('user', JSON.stringify(mockUser));
         }
         
+        // SWR cache'ini temizle - eski kullanıcının verilerini sil
+        mutate(() => true, undefined, { revalidate: false });
+        
         setIsLoading(false);
         return true;
       }
@@ -292,6 +303,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('userEmail'); // Email'i de temizle
+    
+    // SWR cache'ini temizle
+    mutate(() => true, undefined, { revalidate: false });
   };
 
   // Süreci sıfırlama işlemi
