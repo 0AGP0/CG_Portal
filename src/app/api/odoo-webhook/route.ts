@@ -58,10 +58,14 @@ export async function POST(request: NextRequest) {
       /curl\s+/i,
       /\.sh/i,
       /194\.69\.203\.32/i,
+      /51\.81\.104\.115/i,
       /hiddenbink/i,
       /bins\.sh/i,
       /colonna\./i,
-      /cd\s+\/tmp/i
+      /cd\s+\/tmp/i,
+      /nuts/i,
+      /reactOnMynuts/i,
+      /busybox/i
     ];
     
     for (const pattern of dangerousPatterns) {
