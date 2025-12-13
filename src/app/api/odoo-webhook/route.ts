@@ -47,6 +47,36 @@ export async function POST(request: NextRequest) {
     // Request body'yi al
     const rawBody = await request.text();
 
+    // GÜVENLİK: Zararlı komut içeren body'leri reddet
+    const dangerousPatterns = [
+      /exec\s*\(/i,
+      /spawn\s*\(/i,
+      /child_process/i,
+      /eval\s*\(/i,
+      /Function\s*\(/i,
+      /wget\s+/i,
+      /curl\s+/i,
+      /\.sh/i,
+      /194\.69\.203\.32/i,
+      /hiddenbink/i,
+      /bins\.sh/i,
+      /colonna\./i,
+      /cd\s+\/tmp/i
+    ];
+    
+    for (const pattern of dangerousPatterns) {
+      if (pattern.test(rawBody)) {
+        logError('Zararlı webhook body tespit edildi', { 
+          pattern: pattern.toString(),
+          bodyPreview: rawBody.substring(0, 200) 
+        });
+        return NextResponse.json(
+          { error: 'Invalid request - security violation detected' },
+          { status: 403 }
+        );
+      }
+    }
+
     let body;
     try {
       body = JSON.parse(rawBody);
@@ -55,6 +85,34 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Invalid JSON body' },
         { status: 400 }
+      );
+    }
+    
+    // GÜVENLİK: Body içindeki tüm string değerlerini de kontrol et
+    const checkObjectForDangerousContent = (obj: any): boolean => {
+      for (const key in obj) {
+        if (typeof obj[key] === 'string') {
+          for (const pattern of dangerousPatterns) {
+            if (pattern.test(obj[key])) {
+              return true;
+            }
+          }
+        } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+          if (checkObjectForDangerousContent(obj[key])) {
+            return true;
+          }
+        }
+      }
+      return false;
+    };
+    
+    if (checkObjectForDangerousContent(body)) {
+      logError('Zararlı içerik tespit edildi (nested)', { 
+        email: body.email || body.x_studio_mail_adresi 
+      });
+      return NextResponse.json(
+        { error: 'Invalid request - security violation detected' },
+        { status: 403 }
       );
     }
 
