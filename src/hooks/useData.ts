@@ -254,8 +254,11 @@ export function useStudentProfile() {
     return data.student || null;
   };
   
+  // SWR key'ine user email'ini ekle - kullanıcı değiştiğinde otomatik yeniden fetch edilir
+  const swrKey = shouldFetch ? `/api/student/profile?email=${user?.email || ''}` : null;
+  
   const { data, error, isLoading, isValidating, mutate } = useSWR(
-    shouldFetch ? '/api/student/profile' : null,
+    swrKey,
     profileFetcher,
     {
       refreshInterval: 0, // Polling tamamen kapalı

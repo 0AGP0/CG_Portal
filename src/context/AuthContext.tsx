@@ -168,6 +168,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           // SWR cache'ini temizle - eski kullanıcının verilerini sil
           mutate(() => true, undefined, { revalidate: false });
           
+          // Kısa bir gecikme sonrası yeni verileri fetch et
+          setTimeout(() => {
+            mutate(() => true, undefined, { revalidate: true });
+          }, 100);
+          
           setIsLoading(false);
           return true;
         } catch (error) {
@@ -203,6 +208,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       
           setUser(mockUser);
           localStorage.setItem('user', JSON.stringify(mockUser));
+          
+          // SWR cache'ini temizle ve yeni verileri fetch et
+          mutate(() => true, undefined, { revalidate: false });
+          setTimeout(() => {
+            mutate(() => true, undefined, { revalidate: true });
+          }, 100);
+          
           setIsLoading(false);
           return true;
         }
@@ -245,6 +257,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         
         // SWR cache'ini temizle - eski kullanıcının verilerini sil
         mutate(() => true, undefined, { revalidate: false });
+        
+        // Kısa bir gecikme sonrası yeni verileri fetch et
+        setTimeout(() => {
+          mutate(() => true, undefined, { revalidate: true });
+        }, 100);
         
         setIsLoading(false);
         return true;
@@ -292,6 +309,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setUser(mockUser);
         localStorage.setItem('user', JSON.stringify(mockUser));
       }
+      
+      // SWR cache'ini temizle ve yeni verileri fetch et
+      mutate(() => true, undefined, { revalidate: false });
+      setTimeout(() => {
+        mutate(() => true, undefined, { revalidate: true });
+      }, 100);
       
       setIsLoading(false);
       return true; // Hata durumunda bile kullanıcı girişi başarılı kabul edelim
