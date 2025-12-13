@@ -334,18 +334,24 @@ export const MessagesProvider = ({ children }: MessagesProviderProps) => {
         const firstSender = ticket.messages.length > 0 ? ticket.messages[0].sender : 'advisor';
         
         // Öğrenci profil bilgilerini getir (satış ekibi üyesi bilgisi için)
-        const profileResponse = await fetch('/api/student/profile', {
-          headers: {
-            'x-user-email': user.email
-          }
-        });
-        
+        // Cache kontrolü ile gereksiz istekleri önle
         let salesPersonEmail = '';
-        if (profileResponse.ok) {
-          const profileData = await profileResponse.json();
-          if (profileData.student && profileData.student.salesPersonEmail) {
-            salesPersonEmail = profileData.student.salesPersonEmail;
+        try {
+          const profileResponse = await fetch('/api/student/profile', {
+            headers: {
+              'x-user-email': user.email,
+              'Cache-Control': 'max-age=300' // 5 dakika cache
+            }
+          });
+          
+          if (profileResponse.ok) {
+            const profileData = await profileResponse.json();
+            if (profileData.student && profileData.student.salesPersonEmail) {
+              salesPersonEmail = profileData.student.salesPersonEmail;
+            }
           }
+        } catch (error) {
+          // Hata durumunda sessizce devam et
         }
         
         // İlk mesaj satış ekibinden gelmişse veya satış temsilcisi varsa
@@ -410,18 +416,24 @@ export const MessagesProvider = ({ children }: MessagesProviderProps) => {
     try {
       if (user.role === 'student') {
         // Öğrenci profil bilgilerini getir (satış ekibi üyesi bilgisi için)
-        const profileResponse = await fetch('/api/student/profile', {
-          headers: {
-            'x-user-email': user.email
-          }
-        });
-        
+        // Cache kontrolü ile gereksiz istekleri önle
         let salesPersonEmail = '';
-        if (profileResponse.ok) {
-          const profileData = await profileResponse.json();
-          if (profileData.student && profileData.student.salesPersonEmail) {
-            salesPersonEmail = profileData.student.salesPersonEmail;
+        try {
+          const profileResponse = await fetch('/api/student/profile', {
+            headers: {
+              'x-user-email': user.email,
+              'Cache-Control': 'max-age=300' // 5 dakika cache
+            }
+          });
+          
+          if (profileResponse.ok) {
+            const profileData = await profileResponse.json();
+            if (profileData.student && profileData.student.salesPersonEmail) {
+              salesPersonEmail = profileData.student.salesPersonEmail;
+            }
           }
+        } catch (error) {
+          // Hata durumunda sessizce devam et
         }
         
         // Seçilen alıcıya göre danışman veya satış ekibine mesaj gönder

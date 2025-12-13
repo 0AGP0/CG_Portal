@@ -4,44 +4,20 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Layout from '@/components/Layout';
 import { useAuth } from '@/context/AuthContext';
+import { useStudentProfile } from '@/hooks/useData';
 
 export default function PersonalInfoPage() {
   const { user } = useAuth();
-  const [studentData, setStudentData] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { student: studentData, isLoading } = useStudentProfile();
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
 
   useEffect(() => {
-    // Kişisel bilgileri API'den çek
-    const fetchPersonalData = async () => {
-      setIsLoading(true);
-      
-      try {
-        if (user) {
-          const response = await fetch('/api/student/profile', {
-            headers: {
-              'x-user-email': user.email
-            }
-          });
-          
-          if (response.ok) {
-            const data = await response.json();
-            setStudentData(data.student);
-            
-            // Son güncelleme tarihi
-            const updateDate = data.student?.systemDetails?.lastUpdateTime || data.student?.systemDetails?.lastUpdated;
-            setLastUpdated(updateDate);
-          }
-        }
-      } catch (error) {
-        console.error('Kişisel bilgiler çekme hatası:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    fetchPersonalData();
-  }, [user]);
+    if (studentData) {
+      // Son güncelleme tarihi
+      const updateDate = studentData?.systemDetails?.lastUpdateTime || studentData?.systemDetails?.lastUpdated;
+      setLastUpdated(updateDate);
+    }
+  }, [studentData]);
   
   if (!user || isLoading) {
     return (

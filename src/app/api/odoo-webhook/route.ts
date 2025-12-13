@@ -1,48 +1,57 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { updateOrCreateRecord, getRecordByEmail } from '@/utils/database';
 import { logError } from '@/utils/logger';
+import crypto from 'crypto';
 
 // Webhook secret sabit değeri
 const WEBHOOK_SECRET = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
 
+// Idempotency protection - aynı webhook'un kısa sürede tekrar işlenmesini önle
+// Production'da Redis kullanılmalı, şimdilik in-memory
+const processedWebhooks = new Map<string, number>();
+const IDEMPOTENCY_WINDOW = 60000; // 60 saniye - aynı webhook 60 saniye içinde tekrar işlenmez
+
+// Eski kayıtları temizle
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, timestamp] of processedWebhooks.entries()) {
+    if (now - timestamp > IDEMPOTENCY_WINDOW) {
+      processedWebhooks.delete(key);
+    }
+  }
+}, 30000); // Her 30 saniyede bir temizle
+
 export async function POST(request: NextRequest) {
-  console.log('\n=== WEBHOOK İSTEĞİ BAŞLADI ===');
-  console.log('Zaman:', new Date().toISOString());
-  console.log('Method:', request.method);
-  console.log('URL:', request.url);
+  // Production'da aşırı loglama kapalı - sadece hata durumlarında log
+  const isDevelopment = process.env.NODE_ENV === 'development';
   
-  // Tüm headers'ları logla
-  const headers = Object.fromEntries(request.headers.entries());
-  console.log('Headers:', JSON.stringify(headers, null, 2));
+  if (isDevelopment) {
+    console.log('\n=== WEBHOOK İSTEĞİ BAŞLADI ===');
+    console.log('Zaman:', new Date().toISOString());
+  }
 
   try {
     // URL'den secret parametresini al
     const url = new URL(request.url);
     const secretParam = url.searchParams.get('secret') || '';
-    console.log('\nSecret Kontrolü:');
-    console.log('- Alınan:', secretParam.substring(0, 10) + '...');
-    console.log('- Beklenen:', WEBHOOK_SECRET.substring(0, 10) + '...');
 
     // Secret kontrolü
     if (secretParam !== WEBHOOK_SECRET) {
-      console.error('❌ Geçersiz webhook secret');
+      logError('Geçersiz webhook secret', { url: request.url });
       return NextResponse.json(
         { error: 'Unauthorized - Invalid secret' },
         { status: 401 }
       );
     }
-    console.log('✅ Secret doğrulandı');
 
     // Request body'yi al
     const rawBody = await request.text();
-    console.log('\nHam Veri:', rawBody);
 
     let body;
     try {
       body = JSON.parse(rawBody);
-      console.log('\nİşlenmiş Veri:', JSON.stringify(body, null, 2));
     } catch (e) {
-      console.error('❌ JSON parse hatası:', e);
+      logError('JSON parse hatası', e);
       return NextResponse.json(
         { error: 'Invalid JSON body' },
         { status: 400 }
@@ -51,37 +60,56 @@ export async function POST(request: NextRequest) {
 
     // Email kontrolü
     const email = body.email || body.x_studio_mail_adresi || null;
-    console.log('\nEmail Kontrolü:', email);
+    
+    // Idempotency kontrolü - aynı webhook'un tekrar işlenmesini önle
+    // Webhook'un unique hash'ini oluştur (email + stage + timestamp kombinasyonu)
+    const webhookId = body.id || body._id || 
+      crypto.createHash('md5')
+        .update(`${email}-${body.x_studio_selection_field_8en_1iqnrqang || body.stage || ''}-${rawBody}`)
+        .digest('hex');
+    
+    const now = Date.now();
+    const lastProcessed = processedWebhooks.get(webhookId);
+    
+    if (lastProcessed && (now - lastProcessed) < IDEMPOTENCY_WINDOW) {
+      // Bu webhook son 60 saniye içinde işlendi, duplicate olarak reddet
+      if (isDevelopment) {
+        console.log('⚠️ Duplicate webhook reddedildi:', webhookId);
+      }
+      return NextResponse.json({
+        success: true,
+        message: 'Webhook zaten işlendi (duplicate)',
+        duplicate: true
+      }, { status: 200 });
+    }
+    
+    // Webhook'u işlenmiş olarak işaretle
+    processedWebhooks.set(webhookId, now);
     
     if (!email) {
-      console.error('❌ Email alanı bulunamadı');
+      logError('Email alanı bulunamadı', body);
       return NextResponse.json(
         { error: 'Email field is required' },
         { status: 400 }
       );
     }
-    console.log('✅ Email doğrulandı');
 
     // Öğrenci kontrolü
-    console.log('\nÖğrenci kontrolü yapılıyor...');
     const existingStudent = await getRecordByEmail(email);
     
     if (!existingStudent) {
-      console.error('❌ Bu email adresiyle kayıtlı öğrenci bulunamadı:', email);
+      logError('Öğrenci bulunamadı', { email });
       return NextResponse.json({
         error: 'Student not found',
         message: 'Bu email adresiyle kayıtlı öğrenci bulunamadı',
         email: email
       }, { status: 404 });
     }
-    console.log('✅ Öğrenci bulundu:', existingStudent.name);
 
     // Durum kontrolü
     const stage = body.x_studio_selection_field_8en_1iqnrqang || body.stage || '';
-    console.log('\nDurum Kontrolü:', stage);
 
     // Öğrenci verisini güncelle
-    console.log('\nÖğrenci güncelleniyor...');
     const updatedStudent = await updateOrCreateRecord({
       email: email,
       name: body.name || existingStudent.name, // Mevcut ismi koru
@@ -111,7 +139,9 @@ export async function POST(request: NextRequest) {
       father_residence: body.x_studio_baba_ikamet_ehrilkesi || existingStudent.father_residence || ''
     });
 
-    console.log('\n✅ Öğrenci başarıyla güncellendi:', JSON.stringify(updatedStudent, null, 2));
+    if (isDevelopment) {
+      console.log('✅ Öğrenci başarıyla güncellendi:', email);
+    }
 
     return NextResponse.json({
       success: true,
@@ -120,14 +150,11 @@ export async function POST(request: NextRequest) {
     }, { status: 200 });
 
   } catch (error: any) {
-    console.error('\n❌ Webhook işleme hatası:', error);
-    logError('Webhook error', error);
+    logError('Webhook işleme hatası', error);
     
     return NextResponse.json(
       { error: 'Internal server error', details: error.message },
       { status: 500 }
     );
-  } finally {
-    console.log('\n=== WEBHOOK İSTEĞİ TAMAMLANDI ===\n');
   }
 } 

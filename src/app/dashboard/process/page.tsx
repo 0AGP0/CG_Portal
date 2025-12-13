@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Layout from '@/components/Layout';
 import { useAuth } from '@/context/AuthContext';
+import { useStudentProfile } from '@/hooks/useData';
 
 // Animasyon varyantları
 const containerVariants = {
@@ -84,60 +85,35 @@ const ProtectedPanel = ({ children, panelName }: { children: React.ReactNode, pa
 
 export default function ProcessPanel() {
   const { user } = useAuth();
-  const [studentData, setStudentData] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { student: studentData, isLoading } = useStudentProfile();
   const [expandedStage, setExpandedStage] = useState<number | null>(3);
 
-  // Öğrenci verilerini API'den çek
+  // Duruma göre aşama belirle
   useEffect(() => {
-    const fetchStudentData = async () => {
-      setIsLoading(true);
+    if (studentData) {
+      const stageMapping: {[key: string]: number} = {
+        'Hazırlık Aşaması': 1,
+        'Ceviri Hazir': 2,
+        'Ödeme Yapilacaklar': 3,
+        'Üniversite Başvurusu Yapılanlar': 4,
+        'Kabul Gelenler': 5,
+        'Vize Başvuru Aşaması': 6,
+        'Süreç Aşaması': 7,
+        'Vize Randevusu Atananlar': 8,
+        'Vize Bekleme Aşaması': 9,
+        'Almanya Aşaması': 10,
+        'BİTEN': 11
+      };
       
-      try {
-        if (user) {
-          const response = await fetch('/api/student/profile', {
-            headers: {
-              'x-user-email': user.email
-            }
-          });
-          
-          if (response.ok) {
-            const data = await response.json();
-            setStudentData(data.student);
-            
-            // Duruma göre aşama belirle
-            const stageMapping: {[key: string]: number} = {
-              'Hazırlık Aşaması': 1,
-              'Ceviri Hazir': 2,
-              'Ödeme Yapilacaklar': 3,
-              'Üniversite Başvurusu Yapılanlar': 4,
-              'Kabul Gelenler': 5,
-              'Vize Başvuru Aşaması': 6,
-              'Süreç Aşaması': 7,
-              'Vize Randevusu Atananlar': 8,
-              'Vize Bekleme Aşaması': 9,
-              'Almanya Aşaması': 10,
-              'BİTEN': 11
-            };
-            
-            const stage = data.student?.systemDetails?.stage;
-            if (stage === 'BİTEN') {
-              setExpandedStage(11); // Son aşama
-            } else {
-              // Mevcut aşamayı bul veya varsayılan olarak 3'ü kullan
-              setExpandedStage(stageMapping[stage] || 3);
-            }
-          }
-        }
-      } catch (error) {
-        console.error('Öğrenci verisi çekme hatası:', error);
-      } finally {
-        setIsLoading(false);
+      const stage = studentData?.systemDetails?.stage;
+      if (stage === 'BİTEN') {
+        setExpandedStage(11); // Son aşama
+      } else {
+        // Mevcut aşamayı bul veya varsayılan olarak 3'ü kullan
+        setExpandedStage(stageMapping[stage] || 3);
       }
-    };
-    
-    fetchStudentData();
-  }, [user]);
+    }
+  }, [studentData]);
 
   // Öğrenci verisine göre süreç aşamalarını hazırla
   const processData = React.useMemo(() => {

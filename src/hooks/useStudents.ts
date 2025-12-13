@@ -24,11 +24,11 @@ const fetcher = async (url: string) => {
 
 /**
  * Danışmanın öğrencilerini çekmek için SWR hook'u
+ * Polling kapalı - sadece manuel refresh ile güncellenir
  * 
- * @param refreshInterval - Yenileme aralığı (ms cinsinden, varsayılan: 10 saniye)
  * @returns SWR response nesnesi
  */
-export function useStudents(refreshInterval: number = 10000) {
+export function useStudents() {
   const { user, isAdvisor } = useAuth();
   
   // Danışman değilse veya giriş yapılmamışsa boş dizi dön
@@ -38,10 +38,11 @@ export function useStudents(refreshInterval: number = 10000) {
     shouldFetch ? `/api/advisor/students` : null,
     fetcher,
     {
-      refreshInterval, 
-      revalidateOnFocus: true,
-      revalidateIfStale: true,
-      dedupingInterval: 2000,
+      refreshInterval: 0, // Polling tamamen kapalı
+      revalidateOnFocus: false,
+      revalidateIfStale: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 30000, // 30 saniye içinde tekrar eden istekleri birleştir
     }
   );
   
@@ -56,12 +57,12 @@ export function useStudents(refreshInterval: number = 10000) {
 
 /**
  * Tek bir öğrencinin verilerini çekmek için SWR hook'u
+ * Polling kapalı - sadece manuel refresh ile güncellenir
  * 
  * @param studentEmail - Öğrenci e-posta adresi
- * @param refreshInterval - Yenileme aralığı (ms cinsinden, varsayılan: 10 saniye)
  * @returns SWR response nesnesi
  */
-export function useStudentDetail(studentEmail: string, refreshInterval: number = 10000) {
+export function useStudentDetail(studentEmail: string) {
   const { user, isAdvisor } = useAuth();
   
   // Danışman değilse veya giriş yapılmamışsa null dön
@@ -71,10 +72,11 @@ export function useStudentDetail(studentEmail: string, refreshInterval: number =
     shouldFetch ? `/api/advisor/students/${encodeURIComponent(studentEmail)}` : null,
     fetcher,
     {
-      refreshInterval, 
-      revalidateOnFocus: true,
-      revalidateIfStale: true,
-      dedupingInterval: 2000,
+      refreshInterval: 0, // Polling tamamen kapalı
+      revalidateOnFocus: false,
+      revalidateIfStale: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 30000, // 30 saniye içinde tekrar eden istekleri birleştir
     }
   );
   

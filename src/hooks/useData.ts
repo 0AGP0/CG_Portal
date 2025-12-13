@@ -50,12 +50,12 @@ export function useMessages(refreshInterval: number = 10000) {
 
 /**
  * Tek bir mesajın detaylarını çekmek için SWR hook'u
+ * Polling kapalı - sadece manuel refresh ile güncellenir
  * 
  * @param messageId - Mesaj ID'si
- * @param refreshInterval - Yenileme aralığı (ms cinsinden, varsayılan: 10 saniye)
  * @returns SWR response nesnesi
  */
-export function useMessageDetail(messageId: string | null, refreshInterval: number = 10000) {
+export function useMessageDetail(messageId: string | null) {
   const { user } = useAuth();
   
   // Giriş yapılmamışsa veya mesaj ID'si yoksa null dön
@@ -65,10 +65,11 @@ export function useMessageDetail(messageId: string | null, refreshInterval: numb
     shouldFetch ? `/api/messages/${messageId}` : null,
     fetcher,
     {
-      refreshInterval, 
-      revalidateOnFocus: true,
-      revalidateIfStale: true,
-      dedupingInterval: 2000,
+      refreshInterval: 0, // Polling tamamen kapalı
+      revalidateOnFocus: false,
+      revalidateIfStale: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 30000, // 30 saniye içinde tekrar eden istekleri birleştir
     }
   );
   
@@ -83,11 +84,11 @@ export function useMessageDetail(messageId: string | null, refreshInterval: numb
 
 /**
  * Okunmamış mesaj sayısını çekmek için SWR hook'u
+ * Polling kapalı - sadece manuel refresh ile güncellenir
  * 
- * @param refreshInterval - Yenileme aralığı (ms cinsinden, varsayılan: 30 saniye)
  * @returns SWR response nesnesi
  */
-export function useUnreadMessagesCount(refreshInterval: number = 30000) {
+export function useUnreadMessagesCount() {
   const { user } = useAuth();
   
   // Giriş yapılmamışsa null dön
@@ -97,10 +98,11 @@ export function useUnreadMessagesCount(refreshInterval: number = 30000) {
     shouldFetch ? '/api/messages/unread' : null,
     fetcher,
     {
-      refreshInterval, 
-      revalidateOnFocus: true,
-      revalidateIfStale: true,
-      dedupingInterval: 5000,
+      refreshInterval: 0, // Polling tamamen kapalı
+      revalidateOnFocus: false,
+      revalidateIfStale: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 30000, // 30 saniye içinde tekrar eden istekleri birleştir
     }
   );
   
@@ -115,11 +117,11 @@ export function useUnreadMessagesCount(refreshInterval: number = 30000) {
 
 /**
  * Danışmanın veya satış ekibinin öğrencilerini çekmek için SWR hook'u
+ * Polling kapalı - sadece manuel refresh ile güncellenir
  * 
- * @param refreshInterval - Yenileme aralığı (ms cinsinden, varsayılan: 10 saniye)
  * @returns SWR response nesnesi
  */
-export function useStudents(refreshInterval: number = 10000) {
+export function useStudents() {
   const { user, isAdvisor, isSales } = useAuth();
   
   // Danışman veya satış ekibi değilse veya giriş yapılmamışsa boş dizi dön
@@ -132,10 +134,11 @@ export function useStudents(refreshInterval: number = 10000) {
     shouldFetch ? endpoint : null,
     fetcher,
     {
-      refreshInterval, 
-      revalidateOnFocus: true,
-      revalidateIfStale: true,
-      dedupingInterval: 2000,
+      refreshInterval: 0, // Polling tamamen kapalı
+      revalidateOnFocus: false,
+      revalidateIfStale: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 30000, // 30 saniye içinde tekrar eden istekleri birleştir
     }
   );
   
@@ -150,12 +153,12 @@ export function useStudents(refreshInterval: number = 10000) {
 
 /**
  * Tek bir öğrencinin verilerini çekmek için SWR hook'u
+ * Polling kapalı - sadece manuel refresh ile güncellenir
  * 
  * @param studentEmail - Öğrenci e-posta adresi
- * @param refreshInterval - Yenileme aralığı (ms cinsinden, varsayılan: 10 saniye)
  * @returns SWR response nesnesi
  */
-export function useStudentDetail(studentEmail: string, refreshInterval: number = 10000) {
+export function useStudentDetail(studentEmail: string) {
   const { user, isAdvisor, isSales } = useAuth();
   
   // Danışman veya satış ekibi değilse veya giriş yapılmamışsa null dön
@@ -168,10 +171,11 @@ export function useStudentDetail(studentEmail: string, refreshInterval: number =
     shouldFetch ? `${baseEndpoint}${encodeURIComponent(studentEmail)}` : null,
     fetcher,
     {
-      refreshInterval, 
-      revalidateOnFocus: true,
-      revalidateIfStale: true,
-      dedupingInterval: 2000,
+      refreshInterval: 0, // Polling tamamen kapalı
+      revalidateOnFocus: false,
+      revalidateIfStale: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 30000, // 30 saniye içinde tekrar eden istekleri birleştir
     }
   );
   
@@ -186,11 +190,11 @@ export function useStudentDetail(studentEmail: string, refreshInterval: number =
 
 /**
  * Kullanıcının dokümanlarını çekmek için SWR hook'u
+ * Polling kapalı - sadece manuel refresh ile güncellenir
  * 
- * @param refreshInterval - Yenileme aralığı (ms cinsinden, varsayılan: 10 saniye)
  * @returns SWR response nesnesi
  */
-export function useDocuments(refreshInterval: number = 10000) {
+export function useDocuments() {
   const { user } = useAuth();
   
   // Giriş yapılmamışsa boş dizi dön
@@ -200,15 +204,70 @@ export function useDocuments(refreshInterval: number = 10000) {
     shouldFetch ? '/api/documents' : null,
     fetcher,
     {
-      refreshInterval, 
-      revalidateOnFocus: true,
-      revalidateIfStale: true,
-      dedupingInterval: 2000,
+      refreshInterval: 0, // Polling tamamen kapalı
+      revalidateOnFocus: false,
+      revalidateIfStale: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 30000, // 30 saniye içinde tekrar eden istekleri birleştir
     }
   );
   
   return {
     documents: data?.documents || [],
+    isLoading,
+    isError: error,
+    isValidating,
+    mutate,
+  };
+}
+
+/**
+ * Öğrenci profil verilerini çekmek için SWR hook'u
+ * Polling kapalı - sadece manuel refresh ile güncellenir
+ * 
+ * @returns SWR response nesnesi
+ */
+export function useStudentProfile() {
+  const { user } = useAuth();
+  
+  // Öğrenci değilse veya giriş yapılmamışsa null dön
+  const shouldFetch = user !== null && user.role === 'student';
+  
+  // Özel fetcher - header ile email gönder
+  const profileFetcher = async (url: string) => {
+    const res = await fetch(url, {
+      headers: {
+        'x-user-email': user?.email || '',
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (!res.ok) {
+      const error = new Error('Profil verisi çekme başarısız oldu');
+      const errorInfo = await res.json().catch(() => ({}));
+      (error as any).info = errorInfo;
+      (error as any).status = res.status;
+      throw error;
+    }
+    
+    const data = await res.json();
+    return data.student || null;
+  };
+  
+  const { data, error, isLoading, isValidating, mutate } = useSWR(
+    shouldFetch ? '/api/student/profile' : null,
+    profileFetcher,
+    {
+      refreshInterval: 0, // Polling tamamen kapalı
+      revalidateOnFocus: false,
+      revalidateIfStale: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 30000, // 30 saniye içinde tekrar eden istekleri birleştir
+    }
+  );
+  
+  return {
+    student: data,
     isLoading,
     isError: error,
     isValidating,

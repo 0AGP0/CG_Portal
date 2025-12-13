@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import Layout from '@/components/Layout';
 import { useAuth } from '@/context/AuthContext';
-import { useUnreadMessagesCount } from '@/hooks/useData';
+import { useUnreadMessagesCount, useStudentProfile } from '@/hooks/useData';
 
 // Animasyon varyantları
 const containerVariants = {
@@ -33,60 +33,19 @@ const itemVariants = {
 export default function Dashboard() {
   const { user, startProcess, resetProcess } = useAuth();
   const { unreadCount } = useUnreadMessagesCount();
-  const [isLoading, setIsLoading] = useState(true);
-  const [studentData, setStudentData] = useState<any>(null);
+  const { student: studentData, isLoading: isLoadingProfile } = useStudentProfile();
   const [currentTime, setCurrentTime] = useState(new Date());
   
   useEffect(() => {
-    // Kullanıcı verilerini API'den çek
-    const fetchUserData = async () => {
-      setIsLoading(true);
-      
-      try {
-        if (user) {
-          const response = await fetch('/api/student/profile', {
-            headers: {
-              'x-user-email': user.email
-            }
-          });
-          
-          if (response.ok) {
-            const data = await response.json();
-            setStudentData(data.student);
-          } else {
-            // API'den veri gelmezse default gösterilecek veriler
-            setStudentData({
-              name: user.name,
-              email: user.email,
-              studentId: "Not Available",
-              university: "Not Available",
-              program: "Not Available",
-              counselor: "Not Available",
-              lastLogin: new Date().toLocaleDateString('tr-TR'),
-              alerts: [
-                { id: 1, type: 'warning', message: 'Profilinizi tamamlamanız gerekiyor.' }
-              ]
-            });
-          }
-        }
-      } catch (error) {
-        console.error('Kullanıcı verisi çekme hatası:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    fetchUserData();
-    
-    // Gün içinde selamlaşma metni için saati güncel tut
+    // Gün içinde selamlaşma metni için saati güncel tut (sadece saat güncellemesi, ağ isteği yok)
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 60000);
     
     return () => clearInterval(timer);
-  }, [user]);
+  }, []);
   
-  if (!user || isLoading) {
+  if (!user || isLoadingProfile) {
     return (
       <Layout>
         <div className="flex flex-col items-center justify-center h-64">
@@ -100,22 +59,22 @@ export default function Dashboard() {
     );
   }
   
-  // Kullanıcı verileri
-  const userData = studentData ? {
-    name: studentData.name || user.name,
-    email: studentData.email || user.email,
+  // Kullanıcı verileri - API'den gelmezse default değerler
+  const userData = {
+    name: studentData?.name || user?.name || '',
+    email: studentData?.email || user?.email || '',
     // Profil resmi için kullanıcı adının baş harflerini al
-    profileImage: `https://placehold.co/100x100/ffc105/002757?text=${(studentData.name || user.name).split(' ').map((n: string) => n[0]).join('')}`,
-    university: studentData.university || "Henüz Belirlenmedi",
-    program: studentData.program || "Henüz Belirlenmedi",
-    studentId: studentData.studentId || "Henüz Belirlenmedi",
-    counselor: studentData.counselor || "Henüz Atanmadı",
-    salesPerson: studentData.salesPerson || "Henüz Atanmadı",
-    lastLogin: studentData.lastLogin || new Date().toLocaleDateString('tr-TR'),
-    alerts: studentData.alerts || [
+    profileImage: `https://placehold.co/100x100/ffc105/002757?text=${(studentData?.name || user?.name || '').split(' ').map((n: string) => n[0]).join('')}`,
+    university: studentData?.university || "Henüz Belirlenmedi",
+    program: studentData?.program || "Henüz Belirlenmedi",
+    studentId: studentData?.studentId || "Henüz Belirlenmedi",
+    counselor: studentData?.counselor || "Henüz Atanmadı",
+    salesPerson: studentData?.salesPerson || "Henüz Atanmadı",
+    lastLogin: studentData?.lastLogin || new Date().toLocaleDateString('tr-TR'),
+    alerts: studentData?.alerts || [
       { id: 1, type: 'warning', message: 'Profilinizi tamamlamanız gerekiyor.' }
     ]
-  } : null;
+  };
   
   // Saat bazlı selamlaşma
   const hour = currentTime.getHours();
@@ -145,8 +104,8 @@ export default function Dashboard() {
                   <div className="absolute inset-0 bg-gradient-to-r from-primary-400 to-accent-400 rounded-full blur-[3px] group-hover:blur-[5px] transition-all"></div>
                   <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden border-4 border-white dark:border-gray-800">
                     <img 
-                      src={userData?.profileImage} 
-                      alt={userData?.name} 
+                      src={userData.profileImage} 
+                      alt={userData.name} 
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -155,7 +114,7 @@ export default function Dashboard() {
           <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{greeting},</p>
                   <h1 className="text-2xl sm:text-3xl font-bold">
-                    <span className="text-gray-800 dark:text-gray-100">{userData?.name}</span>
+                    <span className="text-gray-800 dark:text-gray-100">{userData.name}</span>
             </h1>
                   <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
                     <span className="inline-flex items-center bg-accent-50 dark:bg-accent-900/30 text-accent-700 dark:text-accent-300 px-2 py-0.5 rounded-md text-xs mr-2">

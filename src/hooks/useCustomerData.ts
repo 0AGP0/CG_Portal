@@ -16,21 +16,22 @@ const fetcher = async (url: string) => {
 };
 
 /**
- * Müşteri verilerini çekmek ve gerçek zamanlı güncellemek için SWR hook'u
+ * Müşteri verilerini çekmek için SWR hook'u
+ * Polling kapalı - sadece manuel refresh ile güncellenir
  * 
  * @param email - Müşteri e-posta adresi
- * @param refreshInterval - Yenileme aralığı (ms cinsinden, varsayılan: 10 saniye)
  * @returns SWR response nesnesi
  */
-export function useCustomerData(email: string, refreshInterval: number = 10000) {
+export function useCustomerData(email: string) {
   const { data, error, isLoading, isValidating, mutate } = useSWR(
     email ? `/api/customer?email=${encodeURIComponent(email)}` : null,
     fetcher,
     {
-      refreshInterval, // Belirtilen aralıkla otomatik yenileme
-      revalidateOnFocus: true, // Sayfa odaklandığında yenile
-      revalidateIfStale: true, // Veri bayatsa yenile
-      dedupingInterval: 2000, // 2 saniye içinde tekrar eden istekleri birleştir
+      refreshInterval: 0, // Polling tamamen kapalı
+      revalidateOnFocus: false,
+      revalidateIfStale: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 30000, // 30 saniye içinde tekrar eden istekleri birleştir
     }
   );
   
