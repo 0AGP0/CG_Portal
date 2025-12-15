@@ -65,7 +65,15 @@ export async function POST(request: NextRequest) {
       /cd\s+\/tmp/i,
       /nuts/i,
       /reactOnMynuts/i,
-      /busybox/i
+      /busybox/i,
+      /\/root\/\.local/i,
+      /\/tmp\/[a-zA-Z0-9]+/i,
+      /\/dev\/[a-zA-Z0-9]+/i,
+      /chmod\s+777/i,
+      /bash\s+-c/i,
+      /sh\s+-c/i,
+      /\.\/[a-zA-Z0-9]+/i, // ./binary şeklinde çalıştırma
+      /pACEd|50oN|jdCIjbm/i // Yeni tespit edilen zararlı binary isimleri
     ];
     
     for (const pattern of dangerousPatterns) {
