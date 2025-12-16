@@ -11,3 +11,8 @@ pm2 status
 # Kontrol
 sleep 3
 curl -s -o /dev/null -w "HTTP Status: %{http_code}\n" http://localhost:3000/api || echo "❌ Uygulama başlatılamadı"
+
+
+
+
+
