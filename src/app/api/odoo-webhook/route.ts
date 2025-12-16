@@ -73,7 +73,10 @@ export async function POST(request: NextRequest) {
       /bash\s+-c/i,
       /sh\s+-c/i,
       /\.\/[a-zA-Z0-9]+/i, // ./binary şeklinde çalıştırma
-      /pACEd|50oN|jdCIjbm/i // Yeni tespit edilen zararlı binary isimleri
+      /pACEd|50oN|jdCIjbm/i, // Yeni tespit edilen zararlı binary isimleri
+      /system3d/i, // /tmp/.est1/.system3d zararlı dosyası
+      /\.est1/i, // /tmp/.est1/ dizini
+      /\/tmp\/\.est/i // /tmp/.est* gizli dizinleri
     ];
     
     for (const pattern of dangerousPatterns) {
