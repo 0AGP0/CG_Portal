@@ -55,8 +55,84 @@ setInterval(() => {
   }
 }, 60000); // Her dakika temizle
 
-export function middleware(request: NextRequest) {
+// React2Shell (CVE-2025-55182) ve diğer zararlı içerikleri tespit et
+function containsDangerousContent(text: string): boolean {
+  const dangerousPatterns = [
+    // React2Shell saldırı desenleri
+    /__rsc/i,
+    /react-server/i,
+    /flight/i,
+    /server-components/i,
+    /\.rsc/i,
+    // Zararlı komutlar
+    /exec\s*\(/i,
+    /spawn\s*\(/i,
+    /child_process/i,
+    /eval\s*\(/i,
+    /Function\s*\(/i,
+    /wget\s+/i,
+    /curl\s+/i,
+    /\.sh/i,
+    // Zararlı IP'ler
+    /194\.69\.203\.32/i,
+    /51\.81\.104\.115/i,
+    // Zararlı dosya/dizin desenleri
+    /system3d/i,
+    /\.est1/i,
+    /\.b4nd1d0/i,
+    /\/tmp\/\.est/i,
+    /\/root\/\.local/i,
+    /pACEd|50oN|jdCIjbm/i,
+    /nuts/i,
+    /reactOnMynuts/i,
+    /busybox/i,
+    /hiddenbink/i,
+    /bins\.sh/i,
+    /colonna\./i,
+    // Şüpheli path'ler
+    /cd\s+\/tmp/i,
+    /chmod\s+777/i,
+    /bash\s+-c/i,
+    /sh\s+-c/i,
+    /\.\/[a-zA-Z0-9]+/i,
+  ];
+  
+  return dangerousPatterns.some(pattern => pattern.test(text));
+}
+
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  
+  // GÜVENLİK: URL parametrelerini kontrol et
+  const urlString = request.url;
+  if (containsDangerousContent(urlString)) {
+    return NextResponse.json(
+      { error: 'Invalid request - security violation detected' },
+      { status: 403 }
+    );
+  }
+  
+  // GÜVENLİK: POST/PUT/PATCH isteklerinde body'yi kontrol et
+  if (['POST', 'PUT', 'PATCH'].includes(request.method)) {
+    try {
+      // Body'yi klonla (orijinal request'i bozmadan)
+      const clonedRequest = request.clone();
+      const body = await clonedRequest.text();
+      
+      if (body && containsDangerousContent(body)) {
+        return NextResponse.json(
+          { error: 'Invalid request - security violation detected' },
+          { status: 403 }
+        );
+      }
+    } catch (error) {
+      // Body okuma hatası - güvenlik için reddet
+      return NextResponse.json(
+        { error: 'Invalid request format' },
+        { status: 400 }
+      );
+    }
+  }
   
   // Public endpoint'ler - çok sıkı rate limit
   if (pathname === '/api' || pathname === '/api/customer') {
